@@ -8,5 +8,5 @@ pytest==7.4.2
 pytest-cov==4.1.0
 numpy>=1.26.0
 typing-extensions==4.7.1
-requests==2.31.0
+requests==2.32.2
 setuptools>=61.0
