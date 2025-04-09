@@ -1,0 +1,34 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jira_due_date_analysis"
+version = "0.1.0"
+authors = [
+    { name="Your Name", email="your.email@example.com" },
+]
+description = "A tool for analyzing due date shifts in Jira"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "jira>=3.5.1",
+    "pandas>=2.2.0",
+    "matplotlib>=3.8.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.4.2",
+    "numpy>=1.26.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.2",
+    "pytest-cov>=4.1.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
