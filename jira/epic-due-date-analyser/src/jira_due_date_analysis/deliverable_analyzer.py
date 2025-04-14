@@ -35,9 +35,12 @@ class DeliverableAnalyzer(BaseJiraAnalyzer):
         try:
             jql = f"""
             type = Deliverable 
+            AND (
+                (status = "Done" AND resolved >= {start_date} AND resolved <= {end_date})
+                OR
+                status = "In Progress"
+            )
             AND labels = "{team_label}"
-            AND duedate >= {start_date}
-            ORDER BY duedate ASC
             """
             logger.info(f"Fetching deliverables with JQL: {jql}")
             issues = self.jira.search_issues(jql, expand='changelog')

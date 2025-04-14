@@ -20,9 +20,11 @@ class EpicAnalyzer(BaseJiraAnalyzer):
             jql = f"""
             type = Epic 
             AND project = {project_key}
-            AND status = Done
-            AND resolved >= {start_date}
-            AND resolved <= {end_date}
+            AND (
+                (status = "Done" AND resolved >= {start_date} AND resolved <= {end_date})
+                OR
+                status = "In Progress"
+            )
             ORDER BY resolved ASC
             """
             logger.info(f"Fetching epics with JQL: {jql}")
