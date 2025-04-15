@@ -2,7 +2,7 @@
 
 from datetime import datetime, timezone
 from enum import Enum, auto
-from typing import List, Optional
+from typing import List, Optional, Tuple, Dict
 from dataclasses import dataclass, field
 
 def ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
@@ -26,41 +26,81 @@ class DateShift:
     start_date: datetime
     end_date: datetime
     initial_due_date: datetime
-    shifts: List[datetime] = field(default_factory=list)
+    # Store tuples of (change_date, shift_date)
+    date_changes: List[Tuple[datetime, datetime]] = field(default_factory=list)
+    # Store weekly snapshots of due dates (friday_date, current_due_date)
+    weekly_snapshots: List[Tuple[datetime, datetime]] = field(default_factory=list)
     _total_delay: Optional[int] = field(default=None, init=False, repr=False)
     
     def __post_init__(self):
-        """Ensure all dates are timezone-aware."""
+        """Ensure all dates are timezone-aware and generate weekly snapshots."""
         self.start_date = ensure_utc(self.start_date)
-        self.end_date = ensure_utc(self.end_date)
-        self.initial_due_date = ensure_utc(self.initial_due_date)
-        self.shifts = [ensure_utc(shift) for shift in self.shifts]
+        self.end_date = ensure_utc(self.end_date) if self.end_date else None
+        self.initial_due_date = ensure_utc(self.initial_due_date) if self.initial_due_date else None
+        
+        # Ensure all dates in the tuples are timezone-aware
+        self.date_changes = [(ensure_utc(change_date), ensure_utc(shift_date)) 
+                            for change_date, shift_date in self.date_changes]
+        
+        # Generate weekly snapshots if we have date changes
+        if self.date_changes:
+            try:
+                # Use a more explicit import to avoid potential issues
+                from jira_due_date_analysis.weekly_extension import get_weekly_due_dates
+                self.weekly_snapshots = get_weekly_due_dates(
+                    self.date_changes, 
+                    self.start_date, 
+                    self.end_date
+                )
+                # Ensure at least one weekly snapshot exists
+                if not self.weekly_snapshots:
+                    logging.getLogger(__name__).warning(
+                        f"No weekly snapshots generated for {self.issue_key} despite having {len(self.date_changes)} date changes"
+                    )
+            except Exception as e:
+                # Log the error but don't fail completely
+                import logging
+                logging.getLogger(__name__).error(f"Could not generate weekly snapshots for {self.issue_key}: {e}")
+                self.weekly_snapshots = []
+    
+    @property
+    def shifts(self) -> List[datetime]:
+        """Return just the shift dates for backward compatibility."""
+        return [shift_date for _, shift_date in self.date_changes]
+    
+    @shifts.setter
+    def shifts(self, values: List[datetime]):
+        """Set shifts from a list of dates (for backward compatibility)."""
+        # Create dummy change dates equal to the shift dates
+        self.date_changes = [(ensure_utc(date), ensure_utc(date)) for date in values]
+        
+        # Regenerate weekly snapshots
+        if values:
+            try:
+                from jira_due_date_analysis.weekly_extension import get_weekly_due_dates
+                self.weekly_snapshots = get_weekly_due_dates(
+                    self.date_changes, 
+                    self.start_date, 
+                    self.end_date
+                )
+            except Exception as e:
+                import logging
+                logging.getLogger(__name__).error(f"Could not regenerate weekly snapshots for {self.issue_key}: {e}")
+                self.weekly_snapshots = []
     
     @property
     def total_shifts(self) -> int:
         """Return the total number of due date shifts."""
-        return len(self.shifts)
+        return len(self.date_changes)
     
-    # @property
-    # def total_delay(self) -> int:
-    #     """Return the total number of days between start and last shift."""
-    #     if self._total_delay is None:
-    #         self._total_delay = (
-    #             (self.shifts[-1] - self.start_date).days 
-    #             if self.shifts else 0
-    #         )
-    #     return self._total_delay
-
     @property
     def total_delay(self) -> int:
-        """Return the total number of days between start and last shift."""
+        """Return the total number of days between initial_due_date and end_date."""
         if self._total_delay is None:
-            if self.end_date is None:
+            if self.end_date is None or self.initial_due_date is None:
                 return None
-            self._total_delay = (
-                (self.end_date - self.initial_due_date).days 
-                if self.shifts else 0
-            )
+            
+            self._total_delay = (self.end_date - self.initial_due_date).days
         return self._total_delay
 
 @dataclass

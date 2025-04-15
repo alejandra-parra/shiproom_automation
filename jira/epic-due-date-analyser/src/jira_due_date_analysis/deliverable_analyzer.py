@@ -117,6 +117,8 @@ class DeliverableAnalyzer(BaseJiraAnalyzer):
             logger.error(f"Error determining start date for {deliverable.key}: {e}")
             return parse_jira_datetime(deliverable.fields.created, f"creation date for {deliverable.key} (after error)")
     
+# Update in DeliverableAnalyzer.analyze_due_date_shifts method:
+
     def analyze_due_date_shifts(
         self,
         project_key: str,
@@ -147,9 +149,13 @@ class DeliverableAnalyzer(BaseJiraAnalyzer):
                 if start_dates.skip_deliverable == False:
                     all_start_dates.append(start_dates)
                     
-                    shifts = self.extract_date_shifts(deliverable)
+                    # First get the appropriate calculated start date based on the scenario
+                    calculated_start_date = self.get_start_date(deliverable, scenario, start_dates)
+                    
+                    # Now extract date shifts, passing the calculated start date
+                    shifts = self.extract_date_shifts(deliverable, calculated_start_date=calculated_start_date)
                     if shifts.shifts:
-                        shifts.start_date = self.get_start_date(deliverable, scenario, start_dates)
+                        shifts.start_date = calculated_start_date  # Ensure the DateShift has the correct start date
                         all_shifts.append(shifts)
                 else:
                     logger.info(f"Skipping {deliverable.key}")

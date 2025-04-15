@@ -6,11 +6,16 @@ import numpy as np
 from typing import Optional
 import csv
 import os
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from .models import AnalysisResult
 from .utils import format_duration
 import logging
 import pandas as pd
+import matplotlib.colors as mcolors
+import matplotlib.dates as mdates
+from jira_due_date_analysis.weekly_extension import get_next_friday
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -21,22 +26,24 @@ class DueDateVisualizer:
         """Initialize the visualizer with analysis results."""
         self.result = result
 
+
     def export_to_csv(self, output_dir: str, prefix: Optional[str] = None):
         """Export the date shifts to a CSV file for debugging."""
-        # deliverable_shifts = [
-        #     shift for shift in self.result.date_shifts 
-        #     if shift.issue_type == 'Deliverable'
-        # ]
         deliverable_shifts = self.result.date_shifts
 
         # Sort deliverables by key
         deliverable_shifts.sort(key=lambda x: x.issue_key)
 
         # Find the maximum number of shifts
-        max_shifts = max((len(shift.shifts) for shift in deliverable_shifts), default=0)
+        max_shifts = max((len(shift.date_changes) for shift in deliverable_shifts), default=0)
 
         # Create row labels
-        row_labels = ['Start Date'] + [f'Due Date {i+1}' for i in range(max_shifts)]
+        row_labels = ['Start Date']
+        for i in range(max_shifts):
+            row_labels.extend([
+                f'Change Date {i+1}',
+                f'Due Date {i+1}'
+            ])
         
         # Initialize data dictionary with empty strings
         data = {
@@ -49,14 +56,14 @@ class DueDateVisualizer:
             # Add start date
             column_data.append(shift.start_date.strftime('%Y-%m-%d %H:%M:%S %z'))
             
-            # Add due dates
-            sorted_shifts = sorted(shift.shifts)
-            # Fill with due dates where they exist, empty strings where they don't
+            # Add change and due dates
             for i in range(max_shifts):
-                if i < len(sorted_shifts):
-                    column_data.append(sorted_shifts[i].strftime('%Y-%m-%d %H:%M:%S %z'))
+                if i < len(shift.date_changes):
+                    change_date, shift_date = shift.date_changes[i]
+                    column_data.append(change_date.strftime('%Y-%m-%d %H:%M:%S %z'))
+                    column_data.append(shift_date.strftime('%Y-%m-%d %H:%M:%S %z'))
                 else:
-                    column_data.append('')
+                    column_data.extend(['', ''])  # Empty strings for missing data
             
             data[shift.issue_key] = column_data
 
@@ -222,6 +229,259 @@ class DueDateVisualizer:
         plt.tight_layout()
         return fig
     
+    def create_weekly_timeline_chart(self, 
+                                figsize: tuple = (14, 8),
+                                marker_size: int = 6,
+                                line_width: float = 1.2,
+                                grid_alpha: float = 0.3) -> plt.Figure:
+        """
+        Create a timeline chart showing due dates for each Friday.
+        
+        X-axis: Fridays (weekly snapshots)
+        Y-axis: What the due date was on each Friday
+        
+        Returns:
+            matplotlib.figure.Figure: The created figure
+        """
+        
+        fig, ax = plt.subplots(figsize=figsize)
+        
+        # Collect all deliverables with weekly snapshots
+        deliverables = self.result.date_shifts
+        
+        # Add detailed logging about what we're processing
+        for d in deliverables:
+            logger.info(f"Deliverable {d.issue_key} has {len(d.date_changes)} date changes and {len(d.weekly_snapshots)} weekly snapshots")
+            if d.weekly_snapshots:
+                first_snapshot = d.weekly_snapshots[0]
+                last_snapshot = d.weekly_snapshots[-1]
+                logger.info(f"  - First snapshot: {first_snapshot[0].strftime('%Y-%m-%d')} -> {first_snapshot[1].strftime('%Y-%m-%d')}")
+                logger.info(f"  - Last snapshot: {last_snapshot[0].strftime('%Y-%m-%d')} -> {last_snapshot[1].strftime('%Y-%m-%d')}")
+        
+        deliverables_with_snapshots = [d for d in deliverables if d.weekly_snapshots]
+        
+        if not deliverables_with_snapshots:
+            logger.warning(f"No deliverables with weekly snapshots found out of {len(deliverables)} total deliverables")
+            plt.title("No data available for weekly timeline visualization")
+            return fig
+            
+        logger.info(f"Creating weekly visualization for {len(deliverables_with_snapshots)} deliverables with snapshots")
+        
+        # Create a colormap for different deliverables
+        import matplotlib.colors as mcolors
+        colors = plt.cm.tab20(np.linspace(0, 1, len(deliverables_with_snapshots)))
+        
+        # Create a legend mapping
+        legend_elements = []
+        
+        # Track all dates for axis limits
+        all_friday_dates = []
+        all_due_dates = []
+        
+        # Plot each deliverable's timeline
+        for idx, shift in enumerate(deliverables_with_snapshots):
+            deliverable_color = colors[idx]
+            
+            # Get the Friday dates and current due dates
+            friday_dates = [friday for friday, _ in shift.weekly_snapshots]
+            due_dates = [due_date for _, due_date in shift.weekly_snapshots]
+            
+            # Add to the collections for axis limits
+            all_friday_dates.extend(friday_dates)
+            all_due_dates.extend(due_dates)
+            
+            # Plot the weekly timeline for this deliverable
+            ax.plot(friday_dates, due_dates, 
+                    'o-', 
+                    color=deliverable_color, 
+                    markersize=marker_size, 
+                    linewidth=line_width,
+                    label=shift.issue_key)
+            
+            # Add the end date (resolution date) if available
+            if shift.end_date and friday_dates:
+                # Find the closest Friday to the resolution date
+                closest_friday_idx = min(range(len(friday_dates)), 
+                                    key=lambda i: abs((friday_dates[i] - shift.end_date).total_seconds()))
+                
+                closest_friday = friday_dates[closest_friday_idx]
+                due_date_at_resolution = due_dates[closest_friday_idx]
+                
+                # Plot the end date with a diamond marker
+                ax.plot([closest_friday], [due_date_at_resolution], 
+                        marker='D', 
+                        markersize=8, 
+                        color=deliverable_color,
+                        markeredgecolor=deliverable_color,
+                        markeredgewidth=1.5)
+            
+            # Add a legend entry
+            legend_elements.append(plt.Line2D([0], [0], 
+                                        marker='o', 
+                                        color='w', 
+                                        markerfacecolor=deliverable_color, 
+                                        markersize=6, 
+                                        label=f"{shift.issue_key} - {shift.issue_summary}"))
+        
+        # Add a legend entry for the end date marker
+        legend_elements.append(plt.Line2D([0], [0], 
+                                    marker='D', 
+                                    color='w', 
+                                    markerfacecolor='gray', 
+                                    markeredgecolor='black',
+                                    markeredgewidth=1.5,
+                                    markersize=8, 
+                                    label='Resolution Date'))
+        
+        # Set axis labels and title
+        ax.set_xlabel('Fridays (Weekly Snapshots)')
+        ax.set_ylabel('Due Date')
+        ax.set_title(f'Weekly Due Date Timeline for {self.result.team}\nWhat the due date was on each Friday')
+        
+        # Format dates on the axes
+        import matplotlib.dates as mdates
+        
+        # Set up the x-axis to show dates properly
+        ax.xaxis.set_major_locator(mdates.MonthLocator())
+        ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %Y'))  # Month and Year
+        ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=4))  # Friday
+        
+        # Format y-axis with dates
+        ax.yaxis.set_major_formatter(mdates.DateFormatter('%b %d, %Y'))
+        
+        # Rotate x-axis labels for better readability
+        plt.xticks(rotation=45, ha='right')
+        
+        # Get today's date for marking on the chart
+        today = datetime.now(timezone.utc)
+        
+        # Ensure all data points are visible by setting proper limits
+        if all_friday_dates and all_due_dates:
+            buffer = timedelta(days=7)  # One week buffer
+            
+            # Make sure today's date is included in the x-axis range
+            x_min = min(min(all_friday_dates), today - buffer)
+            x_max = max(max(all_friday_dates), today + buffer)
+            y_min = min(all_due_dates) - buffer
+            y_max = max(all_due_dates) + buffer
+            
+            # Set limits with some padding
+            ax.set_xlim(x_min, x_max)
+            ax.set_ylim(y_min, y_max)
+            
+            # Log the date ranges to help with debugging
+            logger.info(f"X-axis range: {x_min.strftime('%Y-%m-%d')} to {x_max.strftime('%Y-%m-%d')}")
+            logger.info(f"Y-axis range: {y_min.strftime('%Y-%m-%d')} to {y_max.strftime('%Y-%m-%d')}")
+        
+        # Add a grid for easier reading
+        ax.grid(True, which='minor', alpha=grid_alpha/2, linestyle=':')
+        ax.grid(True, which='major', alpha=grid_alpha, linestyle='-')
+        
+        # Add a HORIZONTAL line for today's date on the y-axis
+        ax.axhline(y=today, color='lightgray', linestyle='--', linewidth=2, alpha=0.7)
+        
+        # Add text label for today's date
+        # Position it near the right edge of the x-axis
+        x_pos = ax.get_xlim()[1] - (ax.get_xlim()[1] - ax.get_xlim()[0]) * 0.02  # Position near right edge
+        ax.text(x_pos, today, f"Today ({today.strftime('%Y-%m-%d')})", 
+                color='lightgray',  rotation=0, va='bottom', ha='left')
+        
+        # Add today's date to the legend
+        legend_elements.append(plt.Line2D([0], [0], 
+                                    color='lightgray', 
+                                    linestyle='--',
+                                    linewidth=1,
+                                    label="Today's Date"))
+        
+        # Add the legend outside the plot
+        ax.legend(handles=legend_elements, 
+                loc='center left', 
+                bbox_to_anchor=(1, 0.5),
+                fontsize=8)
+        
+        # Add a note explaining the chart
+        ax.text(0.05, 0.95, 
+                "Each point represents the due date\nas it was on a given Friday.\nFlat lines indicate periods with\nno due date changes.",
+                transform=ax.transAxes,
+                fontsize=8,
+                verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='white', alpha=0.7))
+        
+        plt.tight_layout()
+        return fig
+
+    def export_weekly_timeline_data(self, output_dir: str, prefix: Optional[str] = None):
+        """Export the weekly timeline data to a CSV file."""
+        # Filter for deliverables with weekly snapshots
+        deliverables = self.result.date_shifts
+        
+        # Log details about all deliverables
+        logger.info(f"Checking {len(deliverables)} deliverables for weekly snapshots")
+        for d in deliverables:
+            logger.info(f"Deliverable {d.issue_key} has {len(d.date_changes)} date changes and {len(d.weekly_snapshots)} weekly snapshots")
+            if d.weekly_snapshots and len(d.weekly_snapshots) > 0:
+                first_date = d.weekly_snapshots[0][0]
+                last_date = d.weekly_snapshots[-1][0]
+                logger.info(f"  - Weekly snapshots for {d.issue_key} span from {first_date.strftime('%Y-%m-%d')} to {last_date.strftime('%Y-%m-%d')}")
+        
+        deliverables_with_snapshots = [d for d in deliverables if d.weekly_snapshots]
+        
+        if not deliverables_with_snapshots:
+            logger.warning("No deliverables with weekly snapshots found for export")
+            return
+        
+        logger.info(f"Exporting weekly data for {len(deliverables_with_snapshots)} deliverables")
+        
+        # Create data for CSV
+        rows = []
+        for shift in deliverables_with_snapshots:
+            for i, (friday_date, due_date) in enumerate(shift.weekly_snapshots):
+                # Check if this snapshot is at or near the resolution date
+                is_resolution_week = False
+                days_after_friday = 0
+                
+                if shift.end_date:
+                    # If the end date is within 7 days after this Friday
+                    days_after_friday = (shift.end_date - friday_date).days
+                    is_resolution_week = 0 <= days_after_friday < 7
+                
+                rows.append({
+                    'DeliverableKey': shift.issue_key,
+                    'DeliverableSummary': shift.issue_summary,
+                    'WeekIndex': i + 1,
+                    'FridayDate': friday_date.strftime('%Y-%m-%d'),
+                    'DueDate': due_date.strftime('%Y-%m-%d'),
+                    'DaysUntilDue': (due_date - friday_date).days,
+                    'IsResolutionWeek': is_resolution_week,
+                    'DaysToResolution': days_after_friday if shift.end_date else None,
+                    'StartDate': shift.start_date.strftime('%Y-%m-%d'),
+                    'EndDate': shift.end_date.strftime('%Y-%m-%d') if shift.end_date else ''
+                })
+        
+        # Create DataFrame
+        df = pd.DataFrame(rows)
+        
+        # Save to CSV
+        prefix = prefix or f"{self.result.team}_{self.result.scenario.value}"
+        csv_path = os.path.join(output_dir, f"{prefix}_weekly_timeline.csv")
+        df.to_csv(csv_path, index=False)
+        logger.info(f"Weekly timeline data exported to {csv_path} ({len(rows)} rows)")
+        
+        # Print a preview
+        print("\nWeekly Timeline Data Preview:")
+        preview = df.head(10)  # Show more rows to diagnose issues
+        print(preview.to_string())
+        
+        # Show summary by deliverable
+        deliverable_summary = df.groupby('DeliverableKey').agg({
+            'WeekIndex': 'count', 
+            'FridayDate': ['min', 'max']
+        })
+        deliverable_summary.columns = ['WeekCount', 'FirstFriday', 'LastFriday']
+        print("\nWeekly Timeline Summary by Deliverable:")
+        print(deliverable_summary.to_string())
+
+
     def save_charts(self, output_dir: str, prefix: Optional[str] = None):
         """Save all charts and data to the specified directory."""
         import os
@@ -231,6 +491,9 @@ class DueDateVisualizer:
         
         # Export the date shifts to CSV
         self.export_to_csv(output_dir, prefix)
+
+        # Export weekly timeline data to CSV
+        self.export_weekly_timeline_data(output_dir, prefix)
         
         # Temporarily store original show_start_dates value
         original_show_start_dates = self.result.show_start_dates
@@ -249,6 +512,14 @@ class DueDateVisualizer:
         shift_chart_with_dates = self.create_shift_chart()
         shift_chart_with_dates.savefig(
             os.path.join(output_dir, f"{prefix}_shifts_with_dates.png"),
+            bbox_inches='tight',
+            dpi=300
+        )
+        
+        # Save weekly timeline chart
+        weekly_timeline_chart = self.create_weekly_timeline_chart()
+        weekly_timeline_chart.savefig(
+            os.path.join(output_dir, f"{prefix}_weekly_timeline.png"),
             bbox_inches='tight',
             dpi=300
         )
