@@ -187,6 +187,8 @@ class EpicAnalyzer(BaseJiraAnalyzer):
             logger.error(f"Error determining start date for {epic.key}: {e}")
             return parse_jira_datetime(epic.fields.created, f"creation date for {epic.key} (after error)")
     
+# Update in EpicAnalyzer.analyze_due_date_shifts method:
+
     def analyze_due_date_shifts(
         self,
         project_key: str,
@@ -214,10 +216,14 @@ class EpicAnalyzer(BaseJiraAnalyzer):
                 start_dates = self.get_epic_start_dates(epic.key)
                 all_start_dates.append(start_dates)
                 
-                shifts = self.extract_date_shifts(epic)
+                # First get the appropriate calculated start date based on the scenario
+                calculated_start_date = self.get_start_date(epic, scenario, start_dates)
+                
+                # Now extract date shifts, passing the calculated start date
+                shifts = self.extract_date_shifts(epic, calculated_start_date=calculated_start_date)
                 if shifts and shifts.shifts:
-                    # Get the appropriate start date based on scenario
-                    shifts.start_date = self.get_start_date(epic, scenario, start_dates)
+                    # Ensure the DateShift has the correct start date
+                    shifts.start_date = calculated_start_date
                     all_shifts.append(shifts)
             except Exception as e:
                 logger.error(f"Error analyzing epic {epic.key}: {e}")

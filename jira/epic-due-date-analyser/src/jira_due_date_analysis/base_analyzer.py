@@ -1,7 +1,7 @@
 """Base class for Jira analysis functionality."""
 
 from typing import List, Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 import logging
 from abc import ABC, abstractmethod
 
@@ -60,51 +60,85 @@ class BaseJiraAnalyzer(ABC):
         logger.debug(f"Retrieved {len(all_histories)} changelog entries for {issue_key}")
         return all_histories
     
-    def extract_date_shifts(self, issue, field: str = 'duedate') -> DateShift:
-        """Extract all due date shifts from an issue's changelog."""
-        logger.debug(f"Extracting date shifts for {issue.key}")
-        start_date = parse_jira_datetime(issue.fields.created, f"creation date for {issue.key}")
-        end_date = parse_jira_datetime(issue.fields.resolutiondate, f"resolution date for {issue.key}")
-        shifts = []
-        initial_due_date = None
-        earliest_change_date = None
+    def extract_date_shifts(self, issue, field: str = 'duedate', calculated_start_date: Optional[datetime] = None) -> DateShift:
+        """
+        Extract all due date shifts from an issue's changelog.
         
+        Args:
+            issue: The Jira issue to analyze
+            field: The field name to track (default: 'duedate')
+            calculated_start_date: The calculated project start date, if available. Defaults to issue creation date if not provided.
+        
+        Returns:
+            DateShift object containing all due date shifts
+        """
+        logger.debug(f"Extracting date shifts for {issue.key}")
+        creation_date = parse_jira_datetime(issue.fields.created, f"creation date for {issue.key}")
+        
+        # Use the provided calculated start date or fall back to creation date
+        start_date = calculated_start_date or creation_date
+        logger.debug(f"Using start date for {issue.key}: {start_date} (calculated: {calculated_start_date is not None})")
+        
+        end_date = parse_jira_datetime(issue.fields.resolutiondate, f"resolution date for {issue.key}")
+        
+        # Store tuples of (change_date, shift_date)
+        date_changes = []
+        initial_due_date = None
+        
+        # Process all changes from the changelog
         histories = self._get_complete_changelog(issue.key)
+        
+        # First look for any due date changes
+        due_date_changes_exist = False
+        for history in histories:
+            for item in history['items']:
+                if item['field'] == field and item.get('fromString'):
+                    due_date_changes_exist = True
+                    break
+            if due_date_changes_exist:
+                break
+        
+        # If there are no due date changes in the changelog, and we have a current due date,
+        # then the current due date is also the initial due date
+        if not due_date_changes_exist and issue.fields.duedate:
+            current_due_date = parse_jira_datetime(issue.fields.duedate, f"current due date for {issue.key}")
+            if current_due_date and current_due_date > start_date:
+                initial_due_date = current_due_date
+                # Add as a change at creation time
+                date_changes.append((creation_date, current_due_date))
+                logger.debug(f"No due date changes in changelog. Using current due date as initial due date for {issue.key}: {current_due_date}")
+        
+        # Process all changes from the changelog
         for history in histories:
             history_date = parse_jira_datetime(history['created'], f"history date for {issue.key}")
             
             for item in history['items']:
-                if item['field'] == field and item.get('fromString'):
-                    shift_date = parse_jira_datetime(item['fromString'], f"shift date for {issue.key}")
+                if item['field'] == field and item.get('fromString') and item.get('toString'):
+                    old_due_date = parse_jira_datetime(item['fromString'], f"old due date for {issue.key}")
+                    new_due_date = parse_jira_datetime(item['toString'], f"new due date for {issue.key}")
                     
-                    # Only consider dates after the start date
-                    if shift_date > start_date:
-                        # Track initial due date based on earliest history date
-                        if not earliest_change_date or history_date < earliest_change_date:
-                            earliest_change_date = history_date
-                            initial_due_date = shift_date
-                            logger.info(f"Updated initial due date for {issue.key} to {initial_due_date} "
-                                    f"based on change at {history_date}")
-                        
-                        # Add to shifts collection
-                        shifts.append(shift_date)
-                        logger.debug(f"Found valid due date shift for {issue.key} on {shift_date}")
+                    # If this is the first change we've encountered, use the old value as initial due date
+                    # but only if it's after the start date
+                    if due_date_changes_exist and not initial_due_date and old_due_date and old_due_date > start_date:
+                        initial_due_date = old_due_date
+                        # Add the initial due date with the creation date
+                        date_changes.append((creation_date, old_due_date))
+                        logger.debug(f"Using first 'fromString' as initial due date for {issue.key}: {old_due_date}")
+                    
+                    # Add the new due date with the change date, but only if it's after the start date
+                    if new_due_date and new_due_date > start_date:
+                        date_changes.append((history_date, new_due_date))
+                        logger.debug(f"Due date changed for {issue.key} from {old_due_date} to {new_due_date} on {history_date}")
                     else:
-                        logger.debug(f"Ignoring due date shift before start date for {issue.key}: {shift_date}")
+                        logger.debug(f"Ignoring due date change to {new_due_date} as it's before start date {start_date}")
         
-        if issue.fields.duedate:
-            current_due_date = parse_jira_datetime(issue.fields.duedate, f"current due date for {issue.key}")
-            shifts.append(current_due_date)
-            
-            # If we haven't found an initial due date yet, use the current due date
-            if not initial_due_date:
-                initial_due_date = current_due_date
-                logger.debug(f"Using current due date as initial due date for {issue.key}: {initial_due_date}")
-        
-        if shifts:
-            logger.info(f"Found {len(shifts)} valid due date shifts for {issue.key}{issue.fields.summary}")
+        if date_changes:
+            logger.info(f"Found {len(date_changes)} due date changes for {issue.key}: {issue.fields.summary}")
         else:
-            logger.debug(f"No valid due date shifts found for {issue.key}")
+            logger.debug(f"No due date changes found for {issue.key}")
+        
+        # Sort date_changes by the change date chronologically
+        date_changes.sort(key=lambda x: x[0])
         
         return DateShift(
             issue_key=issue.key,
@@ -112,8 +146,8 @@ class BaseJiraAnalyzer(ABC):
             issue_type=issue.fields.issuetype.name,
             start_date=start_date,
             end_date=end_date,
-            shifts=sorted(shifts),
-            initial_due_date=initial_due_date  # Now we always pass this parameter
+            date_changes=date_changes,
+            initial_due_date=initial_due_date
         )
     
     def get_epic_issues(self, epic_key: str) -> List[Dict]:
