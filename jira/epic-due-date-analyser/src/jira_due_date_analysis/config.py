@@ -52,8 +52,8 @@ class AnalysisSettings(BaseSettings):
     """Default analysis parameters and settings."""
     project_key: str = 'TOL'
     team_label: str = 'Tolkien'
-    start_date: str = '2025-03-01'
-    end_date: str = '2025-03-31'
+    start_date: str = '2025-03-15'
+    end_date: str = '2025-04-15'
     
     class Config:
         """Pydantic configuration."""
