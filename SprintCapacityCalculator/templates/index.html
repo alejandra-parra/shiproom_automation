@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sprint Planning Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        
+        .available { background-color: #d1dd93; }
+        .on-support { background-color: #c2d5f4; }
+        .planned-absence { background-color: #FFB092; }
+        .public-holiday { background-color: #C3B1E1; }
+        .no-workday { background-color: #CCCCCC; }
+        .partial-available { background-color: #f0edaa; }
+        .unplanned-absence { background-color: #ff8c8c; }
+        .other-status { background-color: #bdeeed; }
+        
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f5f5f5;
+        }
+        
+        select {
+            width: 100%;
+            padding: 4px;
+        }
+        
+        #sprint_settings {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .date-input {
+            margin: 0 10px;
+        }
+        
+        button {
+            padding: 8px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        button:hover {
+            background-color: #0056b3;
+        }
+        
+        #total_capacity {
+            font-weight: bold;
+            padding: 10px;
+            background-color: #e9ecef;
+        }
+        
+        .legend {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        
+        .legend-item {
+            display: inline-block;
+            margin-right: 15px;
+        }
+        
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body>
+    <div id="sprint_settings">
+        <h3>Sprint Settings</h3>
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" class="date-input">
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" class="date-input">
+        <button onclick="generateSprintCalendar()">Generate Sprint Calendar</button>
+    </div>
+    
+    <div id="sprint_calendar"></div>
+    
+    <div class="legend">
+        <h4>Status Legend</h4>
+        <div class="legend-item"><span class="legend-color available"></span>Available</div>
+        <div class="legend-item"><span class="legend-color on-support"></span>On Support</div>
+        <div class="legend-item"><span class="legend-color planned-absence"></span>Planned Absence</div>
+        <div class="legend-item"><span class="legend-color public-holiday"></span>Public Holiday</div>
+        <div class="legend-item"><span class="legend-color no-workday"></span>No Workday</div>
+        <div class="legend-item"><span class="legend-color partial-available"></span>Partial Available</div>
+        <div class="legend-item"><span class="legend-color unplanned-absence"></span>Unplanned Absence</div>
+        <div class="legend-item"><span class="legend-color other-status"></span>Other/Onboarding</div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
