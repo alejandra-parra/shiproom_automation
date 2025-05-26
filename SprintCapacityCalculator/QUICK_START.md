@@ -2,7 +2,7 @@
 
 This guide will get you up and running with the Sprint Capacity Calculator in under 30 minutes.
 
-![Sprint Capacity Calculator Screenshot](image.png)
+![Sprint Capacity Calculator Screenshot](docs/images/sprint_capacity_calculator.png)
 *The application provides a visual calendar showing team availability and capacity*
 
 ## 🚀 Quick Setup (5 minutes)
