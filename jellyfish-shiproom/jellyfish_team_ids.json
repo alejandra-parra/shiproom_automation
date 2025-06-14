@@ -1,0 +1,2546 @@
+[
+  {
+    "id": 184331,
+    "name": "[9T] Development: [DEV]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 206521,
+    "name": "AI Help Desk: [CAI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5928,
+    "name": "ARCHIVE – [MAR] Website Team: [MWT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5877,
+    "name": "Asset Management: [AM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 6182,
+    "name": "Automated Security Testing: [AST]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 118421,
+    "name": "Big Rocks: [BIG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5878,
+    "name": "[BIZ] Marketplace Pipeline: [BMP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 201215,
+    "name": "Bryan's Task Management Project: [BJC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 206743,
+    "name": "Business Platform: [BP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 211553,
+    "name": "Business Platform Development: [BPD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 210771,
+    "name": "Business Platform Team: [BPT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5879,
+    "name": "[CF] Monetization Strategy: [MONEY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5880,
+    "name": "[CF][Retired] Opportunity Portfolio: [CO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 58292,
+    "name": "[CF] Works Council: [WOCO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 205795,
+    "name": "Chief Architect's Office: [CAO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 200771,
+    "name": "Compliance & Admin Platform: [CAP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 75445,
+    "name": "[COMS] Commercial Services Support: [COMS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 191283,
+    "name": "Contentful Demo Team: [CDT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 90695,
+    "name": "Contentful Planning: [CCS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 55749,
+    "name": "CP Discovery: [CPD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 205757,
+    "name": "CS Customer Requests: [CCR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5882,
+    "name": "CSD Customers: [CSD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 120977,
+    "name": "[CTF Demo Team] Commerce Tools: [CCT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 14831,
+    "name": "[CTFL] Inclusion and Diversity Working Group: [IDB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 31050,
+    "name": "[CTFL] Safety Concerns: [SCON]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5887,
+    "name": "Customer Growth Team: [CGT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5888,
+    "name": "Customer Messaging Pipeline: [CMP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5889,
+    "name": "Customer Solutions Team Tasks: [CSTT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 193871,
+    "name": "Customer Support: [SUPPORT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 198265,
+    "name": "Customer Support Portal: [CSP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5881,
+    "name": "[CX] CS Ops: [CSOPS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5883,
+    "name": "[CX] Digital Touch Program: [DTPL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5884,
+    "name": "[CX] Growth Messaging Pipeline: [GMP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5885,
+    "name": "[CX] Help Desk: [CSHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 20470,
+    "name": "[CX] Professional Services: [PS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 207173,
+    "name": "[CX] Programs: [PROG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5886,
+    "name": "[CX] Zendesk Tickets: [ZEND]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 78577,
+    "name": "Data Leadership : [DL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 148481,
+    "name": "Discovery Testing Project: [DTP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 51936,
+    "name": "Ecosystem: [ECO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 201913,
+    "name": "El's Sprint: [EL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184899,
+    "name": "EMEA People Projects: [PBP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5891,
+    "name": "[FIN] Business Platform - GTM: [FBS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 10421,
+    "name": "[FIN] Business Platform Help Desk: [BIZSYS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5892,
+    "name": "[FIN] Culture: [CULTURE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5893,
+    "name": "[FIN] Data Deletion Requests: [DDR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5890,
+    "name": "[FIN] Finance & Accounting Projects: [FAP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5894,
+    "name": "[FIN] Finance Help Desk: [FHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5895,
+    "name": "[FIN] IT Team: [FIT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5896,
+    "name": "[FIN] Legal Team: [LAW]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 27855,
+    "name": "[FIN] Mulesoft Development: [MULESOFT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5897,
+    "name": "[FIN] Netsuite Implementation: [NSI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 15683,
+    "name": "[FIN] NetSuite to Adaptive FX Integration: [FX]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 47078,
+    "name": "[FIN] Purchasing: [FP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5898,
+    "name": "[FIN] Strategic Finance Project: [STRATFIN]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 7594,
+    "name": "[FIN] Testing Grounds: [TEST]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 162583,
+    "name": "[FIN] Travel Issue & Compliance Tracking: [TRAV]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 14459,
+    "name": "[FIN] US GAAP Project: [GAAP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 211619,
+    "name": "Freddie Tracking: [FT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 73171,
+    "name": "Funnel Analytics : [FANL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 119017,
+    "name": "FY25 People OKRs: [PEOP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171311,
+    "name": "Gatekeeper Maintenance: [GK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 67743,
+    "name": "[GRC] Governance Risk and Compliance: [GRC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 72033,
+    "name": "GROOT - PRODUCT & DESIGN: [GPD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 68939,
+    "name": "Growth Product Analytics: [GPA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 201781,
+    "name": "[Hackathon] Praiseful: [PRAISEFUL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5900,
+    "name": "[HR] Michaela Private: [HRM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 21365,
+    "name": "[HR] Recruiting Test: [REC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 21989,
+    "name": "[HR] Recruiting Test 2: [REC2]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5901,
+    "name": "Incident Response: [IR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5899,
+    "name": "InfoServices Helpdesk: [HELP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5902,
+    "name": "Infrastructure Chapter: [IC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 96521,
+    "name": "[IS] ABC: [ABC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 96461,
+    "name": "[IS] Agogi: [AGG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 35687,
+    "name": "[IS] BigD: [CDP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 38732,
+    "name": "[IS] BSA Projects: [BSA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 34975,
+    "name": "[IS] Business Intelligence: [AENG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 48136,
+    "name": "[IS] Data Governance: [CDG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 97001,
+    "name": "[IS] Data Group: [DG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 86521,
+    "name": "[IS] Data Initiatives: [DATAINIT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5980,
+    "name": "[IS] Data Leadership Team: [DLT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 74609,
+    "name": "[IS] Data Program Management: [IDPM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 90645,
+    "name": "IS Data Requests Services: [IDRS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 56406,
+    "name": "[IS] Data Science: [IDS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 87007,
+    "name": "[IS] Data Support: [IDSUP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 73173,
+    "name": "[IS] Data Support Rotation: [IDSR3]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 90697,
+    "name": "[IS] Data Support Service Desk: [DSUP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 36649,
+    "name": "[IS] IT Compliance: [ITC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 15557,
+    "name": "[IS] IT Projects: [ITPR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 31051,
+    "name": "[IS] IT Security: [ITSEC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 96523,
+    "name": "[IS] Mission Possible: [MPO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 164377,
+    "name": "ISMS: [IS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171955,
+    "name": "[IS] People Tech Team: [ISPT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 17052,
+    "name": "[IS] Project Intake: [FPI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 49442,
+    "name": "[IS] Purchasing: [ISP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 13430,
+    "name": "[IT] Change Management: [ITCM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 36575,
+    "name": "IT Security Help Desk: [ISHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 22107,
+    "name": "IT Services Kanban: [ITS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 51937,
+    "name": "IT Services Projects: [ITSK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 211289,
+    "name": "ITS Planned Work: [ITSP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 182999,
+    "name": "Jamie Task Manager: [JTM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 141989,
+    "name": "javascript-SDKs: [JSDK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 191739,
+    "name": "Jira Enhancements: [JE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5903,
+    "name": "Jira Improvements: [JIRA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 194023,
+    "name": "Jira Zendesk Test: [JRZDT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5904,
+    "name": "Josh Test: [JT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 23567,
+    "name": "Krisy Test: [KRISY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 36576,
+    "name": "Krisy Testing: [KTT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 77843,
+    "name": "[LEGAL] Equity/Stock Help Desk: [STOCK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 24220,
+    "name": "Legal Help Desk: [LEGAL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 140823,
+    "name": "[Legal] Revenue Deals Sheet: [REVDEAL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 55074,
+    "name": "Lifecycle: [LFCY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5905,
+    "name": "[MAR] ARCHIVED Product Marketing: [PMM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5906,
+    "name": "[MAR] Content Distribution: [MCD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5907,
+    "name": "[MAR] Data: [MARD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 71441,
+    "name": "  [MAR] Demand Campaigns: [CAMP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5908,
+    "name": "[MAR] Demand Generation: [MDG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5909,
+    "name": "[MAR] Department: [MDEP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5910,
+    "name": "[MAR] Design: [MD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5911,
+    "name": "[MAR] Developer Relations: [DR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5912,
+    "name": "[MAR] Developer Relations Content: [DRC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5913,
+    "name": "[MAR] Field Marketing: [ME]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5914,
+    "name": "[MAR] Field Marketing 2020: [MRP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5915,
+    "name": "[MAR] Go To Market: [GTM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5916,
+    "name": "[MAR] Help Desk: [MHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 59507,
+    "name": "Marketing Analytics: [MANL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5917,
+    "name": "[Marketing] Data (Transitioning away)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 206697,
+    "name": "Marketplace Technical Improvements: [MKTPTI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5918,
+    "name": "[MAR] Marcoms: [MAR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5919,
+    "name": "[MAR] Marketing Automation Project: [MA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 21554,
+    "name": "[MAR] Marketing Ops: [MMO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5920,
+    "name": "[MAR] Ops Templates: [MOT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 72035,
+    "name": "[MAR] Paid Media: [PAID]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 71443,
+    "name": "[MAR] Paid Media: [PAID]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5921,
+    "name": "[MAR] Partner Marketing: [MPM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5922,
+    "name": "[MAR] PMM Product Marketing Initiatives: [PRODMKT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5923,
+    "name": "[MAR] Product Marketing Q3 Community Edition launch: [COMM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 71445,
+    "name": " [MAR] Sales Funnel Optimization: [SFNL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5924,
+    "name": "[MAR] Sara Private: [SARA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 41669,
+    "name": "[MAR] Social Media: [SOCIAL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5925,
+    "name": "[MAR] Universal Search Project: [USP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5927,
+    "name": "[MAR] Web Experience: [WEB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5926,
+    "name": "[MAR] Website CRO Projects: [CRO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183153,
+    "name": "Mitch/David: [MDH]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 8425,
+    "name": "[MKT] Blackbird: [BLACKBIRD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 164695,
+    "name": "NA Weekly CSM meeting: [NWCM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184849,
+    "name": "Ninetailed (legacy)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 202019,
+    "name": "Ninetailed - Product & Design: [NTPD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171689,
+    "name": "Opsgenie Migrated Incidents 28-05-2024 03:14: [OMI2020]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 72987,
+    "name": "Paid Media Marketing Analytics : [PMANL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184901,
+    "name": "People EMEA Projects: [PEP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171957,
+    "name": "People Tech Test: [PTT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 182737,
+    "name": "Picard: [PIC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 19692,
+    "name": "[PPL] Greenhouse - Looker Integration: [LOOKGH]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5929,
+    "name": "[PPL] Help Desk: [HR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 44252,
+    "name": "[PPL] People Dept: [PPD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5930,
+    "name": "[PPL] People Onboarding/Offboarding: [PPL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5931,
+    "name": "[PPL] People Ops Team: [PPLOPS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5932,
+    "name": "[PPL] People Team (NA)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5933,
+    "name": "[PRD] Agile: [AC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5934,
+    "name": "[PRD] Automation and Tooling: [ATOOLS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 17053,
+    "name": "[PRD] Bauhaus: [BAU]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5935,
+    "name": "[PRD] Biz Stakeholders Technical Initiatives: [BSTI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5985,
+    "name": "[PRD] Content Design: [PTE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5936,
+    "name": "[PRD] Content Experience Group Opportunities: [CXGO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 21555,
+    "name": "[PRD] Core Data Product Analysis: [CDSA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5938,
+    "name": "[PRD-CX] Team Penguin: [PEN]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5939,
+    "name": "[PRD-CX] Team Prose: [PROSE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5940,
+    "name": "[PRD-CX] Team Pulitzer: [PUL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5937,
+    "name": "[PRD-CX] Web Creator: [CX]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 14175,
+    "name": "[PRD] Dante: [DANTE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5941,
+    "name": "[PRD] Data Analysts Chapter: [DANALYSTS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5943,
+    "name": "[PRD] Design: [PD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5944,
+    "name": "[PRD] DevOps-Requests: [DEVOPS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 31052,
+    "name": "[PRD] Doc Migration: [DM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5945,
+    "name": "[PRD] E2E Migration: [E2EMIGR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5946,
+    "name": "[PRD] Engineering Management: [EM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 11386,
+    "name": "[PRD] Engineering Organization: [ENGORG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 72031,
+    "name": "[PRD] Experience: [XT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 210691,
+    "name": "[PRD] Experience Analytics: [EXA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 49120,
+    "name": "[PRD] FIFA Improvements: [FIFA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 11199,
+    "name": "[PRD] Frontend Chapter: [FE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 191503,
+    "name": "[PRD] Fusion: [FUS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5948,
+    "name": "[PRD] Gatsby Integration: [PGI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5949,
+    "name": "[PRD] Group Product Managers : [GPMS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 10422,
+    "name": "[PRD] Growth: [GROWTH]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 52475,
+    "name": "[PRD] Growth - Plato: [PLATO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 23764,
+    "name": "[PRD] Headcount: [PH]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 15072,
+    "name": "[PRD] Hiring: [HIRE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5954,
+    "name": "[PRD] Incident Prevention Task Force: [IPTF]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5955,
+    "name": "[PRD] Information architecture: [IA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5956,
+    "name": "[PRD] Infrastructure Group: [IG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 57210,
+    "name": "[PRD] Isotopes: [CFISO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 79175,
+    "name": "(PRD) Julia's Project: [PJP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 80893,
+    "name": "[PRD] Mechagodzilla: [MEC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 186261,
+    "name": "[PRD] Ninetailed: [NT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5957,
+    "name": "[PRD] NodeJS Chapter: [NODE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 57453,
+    "name": "[PRD] OLD DEPRECATED Team Integrations: [INTEGRATE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 122909,
+    "name": "[PRD] Partial Publishing: [PPP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184597,
+    "name": "[PRD] Picard: [PIC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 16214,
+    "name": "[PRD] PMO3: [PMO3]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 16215,
+    "name": "[PRD] PMO4: [PMO4]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 16216,
+    "name": "[PRD] PMO -JWM Test: [PMO2]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5964,
+    "name": "[PRD][POC] Headcount / Capacity: [PP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 20453,
+    "name": "[PRD] P&P: [PPACK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 71339,
+    "name": "[PRD] Prod Development : [PROD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5958,
+    "name": "[PRD] ProdDev Requests: [PDHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 99525,
+    "name": "[PRD] ProdDev Risk Register: [PDRR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 7084,
+    "name": "[PRD] Product Analytics Team: [DA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 75529,
+    "name": "[PRD] Product Data Analytics: [PRDA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5959,
+    "name": "[PRD] Product Development [DEPRECATED]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 8219,
+    "name": "[PRD] Program Management Office: [PMO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 64878,
+    "name": "[PRD] Prometheus: [PROM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5960,
+    "name": "[PRD] React Migration: [REACT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 94473,
+    "name": "  [PRD] Research Operations: [REOPS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5961,
+    "name": "[PRD] Research Requests Backlog: [RB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5962,
+    "name": "[PRD] Research Team: [RES]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5942,
+    "name": "[PRD] [Retired] Organizational Growth Group: [OGG]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5963,
+    "name": "[PRD] [Retired] Team Aloha: [ALO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5965,
+    "name": "[PRD] [Retired] Team Authoring: [AUTH]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5966,
+    "name": "[PRD] [Retired] Team Content APIs: [APIS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5967,
+    "name": "[PRD] Risk Management: [ISMS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5968,
+    "name": "[PRD] Ruby Services Chapter: [RBSV]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5969,
+    "name": "[PRD] SDK-Android: [ANDR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5970,
+    "name": "[PRD] SDK-Cocoa: [COCOA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5971,
+    "name": "[PRD] SDK-Java: [JAVA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5972,
+    "name": "[PRD] SDK-JavaScript: [JS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5973,
+    "name": "[PRD] SDK-.Net: [NET]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5974,
+    "name": "[PRD] SDK-PHP: [PHP]",
+    "active": false,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5975,
+    "name": "[PRD] SDK-Python: [PY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5976,
+    "name": "[PRD] SDK-Ruby: [RUBY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 9100,
+    "name": "[PRD] Security Bug Bounty: [SBB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 13877,
+    "name": "[PRD] Sparks: [SPA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 6920,
+    "name": "[PRD] Staff Engineers: [STAFF]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5978,
+    "name": "[PRD] SxD and Research Chapter Internal: [RT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5950,
+    "name": "[PRD] Team Ahoy: [AHOY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 205723,
+    "name": "[PRD] Team Alpine (Developer Experience)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 93367,
+    "name": "[PRD] Team Altitude: [ALT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 93171,
+    "name": "[PRD] Team Altitude: [ALT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 121601,
+    "name": "[PRD] Team Arcee: [ARCEE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 210775,
+    "name": "[PRD] Team Clippy: [CLIP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5992,
+    "name": "[PRD] Team Coaching: [AGILE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5979,
+    "name": "[PRD] Team Coaching Cards: [TCC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 61505,
+    "name": "[PRD] Team Content API: [CAPI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 8032,
+    "name": "[PRD] Team Content Storage: [CSTORE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5982,
+    "name": "[PRD] Team Development Velocity: [DVEL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 10780,
+    "name": "[PRD] Team Godzilla: [GOD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 12710,
+    "name": "[PRD] Team Godzilla - Idea Bank: [GODBANK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 52476,
+    "name": "[PRD] Team Groot: [GROOT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5952,
+    "name": "[PRD] Team Hejo: [HEJO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 15073,
+    "name": "[PRD] Team Homer: [HOMER]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 10781,
+    "name": "[PRD] Team Kraken: [KRK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171843,
+    "name": "[PRD] Team Lumos: [LUMOS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 11200,
+    "name": "[PRD] Team Mogwai: [MOGWAI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5953,
+    "name": "[PRD] Team Moi: [MOI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 24442,
+    "name": "[PRD] Team Monet: [MONET]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 68781,
+    "name": "[PRD] Team Pegasus: [PEGASUS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5981,
+    "name": "[PRD] Team Phoenix: [PHX]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5984,
+    "name": "[PRD] Team Reliability: [REL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 14239,
+    "name": "[PRD] Team Shelley: [SHE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 198433,
+    "name": "[PRD] Team Studio West: [STDWEST]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 65807,
+    "name": "[PRD] Team Taiga (Marketplace)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5983,
+    "name": "[PRD] Team Tundra (Extensibility)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5986,
+    "name": "[PRD] Team Workload Overview: [PRD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 75699,
+    "name": "[PRD] Test Discovery Project: [PTDP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 90301,
+    "name": "[PRD] The Bumblebees: [BBEE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 44743,
+    "name": "[PRD] Tolkien: [TOL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5947,
+    "name": "[PRD] UI Foundation: [UFO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5987,
+    "name": "[PRD] UX Writing: [PUX]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 118359,
+    "name": "Pricing Strategy: [PRIC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 25884,
+    "name": "[PRIV] Michael's Project: [PMP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 22350,
+    "name": "Product Recruiting: [PR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184599,
+    "name": "Programs+Ops_Team: [PT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 211817,
+    "name": "[PTEC] People Technology Planned Work: [PPTEC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 210773,
+    "name": "[PTEC] People Technology Work: [PTEC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 121315,
+    "name": "Rémy Lenoir: [REMYLENOIR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 6914,
+    "name": "[SALE] Sales Help Desk: [SSHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5988,
+    "name": "[SALES] Colorful Demo Project: [COLORFUL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 94835,
+    "name": "[SALES] Loopio Help Desk : [LOOPIO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 210729,
+    "name": "Sample Project: [SMPL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5989,
+    "name": "Sascha Test: [ST]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5990,
+    "name": "Security: [SEC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183255,
+    "name": "Security Actions: [ACT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 159545,
+    "name": "Security Engagement: [SECENGAGE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 162649,
+    "name": "Security Findings: [SF]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 139139,
+    "name": "Security Incidents: [SI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 162651,
+    "name": "SECURITY INCIDENTS: [SI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 157053,
+    "name": "SECURITY KR PLAN: [SKRP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 156217,
+    "name": "Security Planning: [SECPLAN]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 119123,
+    "name": "Security Risk Register: [SRR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 122551,
+    "name": "Security Team Board: [SECTEST]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 162653,
+    "name": "SE Demo Team: [SDT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 72773,
+    "name": "Site Analytics: [SANL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5991,
+    "name": "SM (Test)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 174347,
+    "name": "SOC2: [SOC2]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183495,
+    "name": "Software Asset Management: [SAM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183541,
+    "name": "Software Asset Management: [SAM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 119019,
+    "name": "Sparks - Experience Builder: [SEB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 165035,
+    "name": "STATHIS TASKS: [STATHIS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 122835,
+    "name": "Team Groot – Discovery: [TGD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 93113,
+    "name": "Team Taiga Technical Roadmap: [TRMKTP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183001,
+    "name": "Team Tundra - Technical Improvements: [TTTI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 121255,
+    "name": "Technical Limits: [LIMIT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 197719,
+    "name": "Test Help Desk for Asana: [TESANA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 118361,
+    "name": "Testing project: [TP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 182903,
+    "name": "test-omer: [TO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 172281,
+    "name": "Test PRD: [TESTPRD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 197785,
+    "name": "test-security: [TS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183257,
+    "name": "Threat Detection and Response: [TDR]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183063,
+    "name": "Treasury: [TREAS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 91999,
+    "name": "Vendor Contracts: [VCT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 180591,
+    "name": "Vulnerabilities: [VUL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 172669,
+    "name": "Vulnerabilities (Team)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5993,
+    "name": "Vulnerability Management: [XSS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171959,
+    "name": "Workday Test Board: [WTB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5994,
+    "name": "[WP] Workplace Help Desk: [WHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 206745,
+    "name": "Zendesk Customer Help Desk : [ZHD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183391,
+    "name": "Zuora: [ZUORA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  }
+]

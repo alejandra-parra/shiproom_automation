@@ -52,6 +52,7 @@ temp/
 
 # Google Service Account keys
 *.json
+!jellyfish_team_ids.json
 !requirements.txt
 
 # Generated reports
