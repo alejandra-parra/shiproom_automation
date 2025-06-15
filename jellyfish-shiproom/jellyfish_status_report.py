@@ -18,6 +18,13 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from clients.google_slides import GoogleSlidesClient
+from clients.jira import JiraClient
+from clients.jellyfish import JellyfishClient
+from config.config_loader import load_config
+from utils.date_utils import format_date
+from utils.table_utils import prepare_merged_table
+
 # Load environment variables
 load_dotenv()
 
@@ -921,9 +928,9 @@ class StatusReportGenerator:
     
     def __init__(self, config: Dict):
         self.config = config
-        self.client = JellyfishClient(config)
-        self.jira_client = JiraClient(config)
-        self.slides_client = GoogleSlidesClient(config)
+        self.jellyfish = JellyfishClient(config)
+        self.jira = JiraClient(config)
+        self.slides = GoogleSlidesClient(config)
         self.seven_days_ago = datetime.now() - timedelta(days=7)
         self.today = datetime.now()
         
@@ -979,11 +986,11 @@ class StatusReportGenerator:
     def format_due_date_with_history(self, current_date: str, issue_key: str) -> Tuple[str, List[Dict]]:
         """Format due date with history, returning text and formatting instructions"""
         # Get due date history from Jira
-        date_history = self.jira_client.get_due_date_history(issue_key)
+        date_history = self.jira.get_due_date_history(issue_key)
         
         if not date_history:
             # No history available, just return formatted current date
-            return self.format_date(current_date), []
+            return format_date(current_date), []
         
         # Format all dates and track formatting
         formatted_dates = []
@@ -991,7 +998,7 @@ class StatusReportGenerator:
         current_pos = 0
         
         for i, date in enumerate(date_history):
-            formatted = self.format_date(date)
+            formatted = format_date(date)
             if formatted:
                 if i < len(date_history) - 1:
                     # This is an old date - should be struck through
@@ -1012,224 +1019,43 @@ class StatusReportGenerator:
         full_text = ' '.join(formatted_dates)
         return full_text, formatting_instructions
     
-    def prepare_deliverables_table(self, deliverables: List[Dict]) -> Tuple[List[List], Dict, Dict]:
-        """Prepare deliverables data for table rendering"""
-        rows = []
-        formatting_map = {}  # Maps (row, col) to formatting instructions
-        color_map = {}  # Maps (row, col) to background colors
-        
-        for row_idx, item in enumerate(deliverables):
-            issue_key = item.get('source_issue_key', '')
-            due_date_display, formatting_instructions = self.format_due_date_with_history(
-                item.get('target_date', ''), 
-                issue_key
-            )
-            
-            name = item.get('name', '')
-            status = item.get('_status', 'In Progress')
-            
-            row = [
-                issue_key,
-                name,
-                'GA',  # Default maturity
-                due_date_display,
-                ''  # Empty text for status - will be color-coded
-            ]
-            rows.append(row)
-            
-            # Store formatting instructions for the due date column (index 3)
-            if formatting_instructions:
-                formatting_map[(row_idx + 1, 3)] = formatting_instructions  # +1 because of header row
-            
-            # Store color for status column (index 4)
-            status_color = self.get_status_color(status)
-            if status_color:
-                color_map[(row_idx + 1, 4)] = status_color  # +1 because of header row
-        
-        return rows, formatting_map, color_map
-    
-    def prepare_epics_table(self, epics: List[Dict]) -> Tuple[List[List], Dict, Dict]:
-        """Prepare epics data for table rendering"""
-        rows = []
-        formatting_map = {}  # Maps (row, col) to formatting instructions
-        color_map = {}  # Maps (row, col) to background colors
-        
-        for row_idx, item in enumerate(epics):
-            issue_key = item.get('source_issue_key', '')
-            due_date_display, formatting_instructions = self.format_due_date_with_history(
-                item.get('target_date', ''), 
-                issue_key
-            )
-            
-            name = item.get('name', '')
-            status = item.get('_status', 'In Progress')
-            
-            row = [
-                issue_key,
-                name,
-                due_date_display,
-                ''  # Empty text for status - will be color-coded
-            ]
-            rows.append(row)
-            
-            # Store formatting instructions for the due date column (index 2)
-            if formatting_instructions:
-                formatting_map[(row_idx + 1, 2)] = formatting_instructions  # +1 because of header row
-            
-            # Store color for status column (index 3)
-            status_color = self.get_status_color(status)
-            if status_color:
-                color_map[(row_idx + 1, 3)] = status_color  # +1 because of header row
-        
-        return rows, formatting_map, color_map
-    
-    def get_status_color(self, status: str) -> Dict:
-        """Get muted background color for status"""
-        colors = {
-            'Done': {
-                'red': 0.8,    # Muted green
-                'green': 0.9,
-                'blue': 0.8
-            },
-            'In Progress': {
-                'red': 1.0,    # Muted yellow
-                'green': 0.95,
-                'blue': 0.7
-            },
-            'Overdue': {
-                'red': 1.0,    # Muted red
-                'green': 0.8,
-                'blue': 0.8
-            }
-        }
-        return colors.get(status, colors['In Progress'])
-    
-    def format_date(self, date_str: str) -> str:
-        """Format date string to YYYY-MM-DD"""
-        if not date_str:
-            return ''
-        
-        try:
-            dt = datetime.fromisoformat(date_str.replace('Z', '+00:00'))
-            return dt.strftime('%Y-%m-%d')
-        except:
-            return date_str[:10] if len(date_str) >= 10 else date_str
-    
-    def prepare_merged_table(self, deliverables: List[Dict], epics: List[Dict]) -> Tuple[List[List], Dict, Dict, list]:
-        """Prepare a single merged table with deliverables and epics, including formatting and merged cells."""
-        rows = []
-        formatting_map = {}  # (row, col) -> formatting instructions
-        color_map = {}       # (row, col) -> background color
-        merge_map = []       # List of dicts for merged cells
-
-        # --- Deliverables Header ---
-        deliverables_header = ["Deliverable", "Name", "Maturity", "Due Date", "Status"]
-        rows.append(deliverables_header)
-        deliverables_header_row = 0
-        black_header = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
-        for col in range(5):
-            formatting_map[(deliverables_header_row, col)] = [{"bold": True, "fontSize": 9, "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0}}]
-            color_map[(deliverables_header_row, col)] = black_header
-
-        # --- Deliverables Rows ---
-        deliverables_rows, deliverables_formatting, deliverables_colors = self.prepare_deliverables_table(deliverables)
-        for i, row in enumerate(deliverables_rows):
-            rows.append(row)
-            # Offset formatting/color maps by +1 for header
-            for key, val in deliverables_formatting.items():
-                if key[0] == i + 1:
-                    formatting_map[(i + 1, key[1])] = val
-            for key, val in deliverables_colors.items():
-                if key[0] == i + 1:
-                    color_map[(i + 1, key[1])] = val
-
-        # --- Spacer Row ---
-        spacer_row_idx = len(rows)
-        spacer_row = [" "] + ["" for _ in range(4)]  # Only anchor cell gets a space
-        rows.append(spacer_row)
-        # Merge all cells in spacer row (colSpan=5)
-        merge_map.append({
-            "row": spacer_row_idx,
-            "col": 0,
-            "rowSpan": 1,
-            "colSpan": 5,
-            "backgroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0},
-            "noBorder": True
-        })
-
-        # --- Epics Header (Name spans columns 2 and 3) ---
-        epics_header_row = len(rows)
-        epics_header = ["Epic Link", "Name", "", "Due Date", "Status"]
-        rows.append(epics_header)
-        purple_header = {'red': 0.529, 'green': 0.467, 'blue': 0.851}
-        for col in range(5):
-            formatting_map[(epics_header_row, col)] = [{"bold": True, "fontSize": 9, "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0}}]
-            color_map[(epics_header_row, col)] = purple_header
-        # Merge Name header (col 1+2)
-        merge_map.append({
-            "row": epics_header_row,
-            "col": 1,
-            "rowSpan": 1,
-            "colSpan": 2
-        })
-
-        # --- Epics Rows (Name spans columns 2 and 3) ---
-        epics_rows, epics_formatting, epics_colors = self.prepare_epics_table(epics)
-        for i, epic_row in enumerate(epics_rows):
-            # Insert into 5 columns: [Epic Link, Name, '', Due Date, Status], merge Name+Maturity
-            row_idx = len(rows)
-            row = [epic_row[0], epic_row[1], '', epic_row[2], epic_row[3]]
-            rows.append(row)
-            # Merge Name+Maturity columns (col 1+2)
-            merge_map.append({
-                "row": row_idx,
-                "col": 1,
-                "rowSpan": 1,
-                "colSpan": 2
-            })
-            # Formatting and color for due date and status
-            for key, val in epics_formatting.items():
-                if key[0] == i + 1:
-                    formatting_map[(row_idx, 3)] = val
-            for key, val in epics_colors.items():
-                if key[0] == i + 1:
-                    color_map[(row_idx, 4)] = val
-
-        return rows, formatting_map, color_map, merge_map
-
     def generate_slides(self):
         """Generate Google Slides status report with a single merged table"""
         today = datetime.now()
         start_date = today - timedelta(days=21)
         end_date = today
         print(f"Date range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
-        print(f"Fetching deliverables for team {self.client.team_name}...")
-        deliverables = self.client.get_work_items_by_category(
+        print(f"Fetching deliverables for team {self.jellyfish.team_name}...")
+        deliverables = self.jellyfish.get_work_items_by_category(
             "deliverable-new",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
         filtered_deliverables = self.filter_items(deliverables)
-        print(f"Fetching epics for team {self.client.team_name}...")
-        epics_response = self.client.get_work_items_by_category(
+        print(f"Fetching epics for team {self.jellyfish.team_name}...")
+        epics_response = self.jellyfish.get_work_items_by_category(
             "epics",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
         filtered_epics = self.filter_items(epics_response)
-        slide_id = self.slides_client.slide_id
+        slide_id = self.slides.slide_id
         try:
-            self.slides_client.clear_slide_content(slide_id)
+            self.slides.clear_slide_content(slide_id)
         except Exception as e:
             print(f"Warning: Could not clear slide content: {e}")
             print("Continuing with existing content...")
-        self.slides_client.add_title(slide_id, f"{self.client.team_name} - Status Report", 50, 20)
+        self.slides.add_title(slide_id, f"{self.jellyfish.team_name} - Status Report", 50, 20)
         # Prepare merged table
-        merged_data, formatting_map, color_map, merge_map = self.prepare_merged_table(filtered_deliverables, filtered_epics)
+        merged_data, formatting_map, color_map, merge_map = prepare_merged_table(
+            filtered_deliverables, 
+            filtered_epics,
+            self.format_due_date_with_history
+        )
         y_position = 80
         print(f"Merged table data: {len(merged_data)} rows")
         # Add merged table (extend add_table to support merge_map if needed)
-        self.slides_client.add_table(
+        self.slides.add_table(
             slide_id,
             merged_data,
             50,
@@ -1241,70 +1067,18 @@ class StatusReportGenerator:
         )
         print(f"Report generated in Google Slides")
 
-
-def load_config(config_path: str) -> Dict:
-    """Load configuration from YAML file"""
-    with open(config_path, 'r') as f:
-        return yaml.safe_load(f)
-
-
 def main():
-    parser = argparse.ArgumentParser(description='Generate Jellyfish status report in Google Slides')
-    parser.add_argument('--config', '-c', type=str, default='config.yaml',
-                        help='Path to configuration file')
-    parser.add_argument('--test-auth', action='store_true',
-                        help='Test authentication with a simple API call')
-    
+    """Main entry point"""
+    parser = argparse.ArgumentParser(description='Generate Jellyfish status report')
+    parser.add_argument('--config', required=True, help='Path to config file')
     args = parser.parse_args()
     
-    # Check if config file exists
-    if not Path(args.config).exists():
-        print(f"Configuration file not found: {args.config}")
-        print("\nPlease create a config.yaml file. Most credentials should be in .env file.")
-        print("See README.md for detailed setup instructions.")
-        print("\nMinimal config.yaml structure:")
-        print("""
-# Required: Google Slides presentation to update
-google_slides:
-  presentation_id: "your-presentation-id-here"
-  slide_id: "your-slide-id-here"
-
-# Required: Team configuration
-team:
-  team_id: "your-team-id"
-  team_name: "Your Team Name"
-""")
-        return
-    
-    # Load config
+    # Load configuration
     config = load_config(args.config)
-    
-    # Test authentication if requested
-    if args.test_auth:
-        client = JellyfishClient(config)
-        print("\nTesting authentication...")
-        print(f"Headers: {json.dumps({k: v[:20] + '...' if k == 'Authorization' else v for k, v in client.headers.items()}, indent=2)}")
-        
-        # Try a simple endpoint first
-        test_url = f"{client.base_url}/delivery/work_category_contents"
-        print(f"\nTesting URL: {test_url}")
-        
-        # Try with minimal parameters
-        params = {"format": "json", "team_id": client.team_id}
-        response = requests.get(test_url, headers=client.headers, params=params)
-        
-        print(f"Response status: {response.status_code}")
-        if response.status_code != 200:
-            print(f"Response headers: {dict(response.headers)}")
-            print(f"Response text: {response.text}")
-        else:
-            print("Authentication successful!")
-        return
     
     # Generate report
     generator = StatusReportGenerator(config)
     generator.generate_slides()
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
