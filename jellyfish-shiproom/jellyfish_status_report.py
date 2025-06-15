@@ -25,6 +25,7 @@ from config.config_loader import load_config
 from utils.date_utils import format_date, get_report_date_range
 from utils.table_utils import prepare_merged_table
 from utils.filter_utils import filter_items
+from utils.due_date_utils import format_due_date_with_history
 
 # Load environment variables
 load_dotenv()
@@ -943,41 +944,11 @@ class StatusReportGenerator:
             'default': 'In Progress'
         }
     
-    def format_due_date_with_history(self, current_date: str, issue_key: str) -> Tuple[str, List[Dict]]:
-        """Format due date with history, returning text and formatting instructions"""
+    def get_formatted_due_date(self, current_date: str, issue_key: str) -> Tuple[str, List[Dict]]:
+        """Get formatted due date with history for an issue"""
         # Get due date history from Jira
         date_history = self.jira.get_due_date_history(issue_key)
-        
-        if not date_history:
-            # No history available, just return formatted current date
-            return format_date(current_date), []
-        
-        # Format all dates and track formatting
-        formatted_dates = []
-        formatting_instructions = []
-        current_pos = 0
-        
-        for i, date in enumerate(date_history):
-            formatted = format_date(date)
-            if formatted:
-                if i < len(date_history) - 1:
-                    # This is an old date - should be struck through
-                    formatting_instructions.append({
-                        'start': current_pos,
-                        'end': current_pos + len(formatted),
-                        'strikethrough': True
-                    })
-                
-                formatted_dates.append(formatted)
-                current_pos += len(formatted)
-                
-                # Add space between dates (except for the last one)
-                if i < len(date_history) - 1:
-                    current_pos += 1  # for the space
-        
-        # Join all dates with spaces
-        full_text = ' '.join(formatted_dates)
-        return full_text, formatting_instructions
+        return format_due_date_with_history(current_date, date_history)
     
     def generate_slides(self):
         """Generate Google Slides status report with a single merged table"""
@@ -1008,7 +979,7 @@ class StatusReportGenerator:
         merged_data, formatting_map, color_map, merge_map = prepare_merged_table(
             filtered_deliverables, 
             filtered_epics,
-            self.format_due_date_with_history
+            self.get_formatted_due_date
         )
         y_position = 80
         print(f"Merged table data: {len(merged_data)} rows")
