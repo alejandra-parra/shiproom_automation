@@ -22,7 +22,7 @@ from clients.google_slides import GoogleSlidesClient
 from clients.jira import JiraClient
 from clients.jellyfish import JellyfishClient
 from config.config_loader import load_config
-from utils.date_utils import format_date
+from utils.date_utils import format_date, get_report_date_range
 from utils.table_utils import prepare_merged_table
 
 # Load environment variables
@@ -1021,9 +1021,7 @@ class StatusReportGenerator:
     
     def generate_slides(self):
         """Generate Google Slides status report with a single merged table"""
-        today = datetime.now()
-        start_date = today - timedelta(days=21)
-        end_date = today
+        start_date, end_date = get_report_date_range()
         print(f"Date range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
         print(f"Fetching deliverables for team {self.jellyfish.team_name}...")
         deliverables = self.jellyfish.get_work_items_by_category(
