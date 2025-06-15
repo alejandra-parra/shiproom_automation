@@ -84,7 +84,7 @@ class StatusReportGenerator:
             print("Continuing with existing content...")
         self.slides.add_title(slide_id, f"{self.jellyfish.team_name} - Status Report", 50, 20)
         # Prepare merged table
-        merged_data, formatting_map, color_map, merge_map = prepare_merged_table(
+        merged_data, formatting_map, color_map, merge_map, link_map = prepare_merged_table(
             filtered_deliverables, 
             filtered_epics,
             self.get_formatted_due_date
@@ -100,7 +100,8 @@ class StatusReportGenerator:
             formatting_map,
             color_map,
             None,  # header_color handled per-row in formatting_map
-            merge_map=merge_map
+            merge_map=merge_map,
+            link_map=link_map
         )
         print(f"Report generated in Google Slides")
 

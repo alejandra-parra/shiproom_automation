@@ -6,14 +6,16 @@ This module handles the preparation and formatting of tables for the status repo
 from typing import List, Dict, Tuple, Callable
 from utils.status_utils import get_status_color
 
-def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict]:
-    """Prepare deliverables data for table rendering"""
+def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict, Dict]:
+    """Prepare deliverables data for table rendering, including a map of (row, col) to issue key URLs."""
     rows = []
-    formatting_map = {}  # Maps (row, col) to formatting instructions
-    color_map = {}  # Maps (row, col) to background colors
+    formatting_map = {}  # (row, col) -> formatting instructions
+    color_map = {}       # (row, col) -> background color
+    link_map = {}        # (row, col) -> URL for issue key
     
     for row_idx, item in enumerate(deliverables):
         issue_key = item.get('source_issue_key', '')
+        issue_url = item.get('source_issue_url', '')
         due_date_display, formatting_instructions = format_due_date_with_history(
             item.get('target_date', ''), 
             issue_key
@@ -22,8 +24,9 @@ def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_hi
         name = item.get('name', '')
         status = item.get('_status', 'In Progress')
         
+        # Use plain text issue key
         row = [
-            issue_key,
+            issue_key,  # Issue key (to be hyperlinked)
             name,
             'GA',  # Default maturity
             due_date_display,
@@ -39,17 +42,23 @@ def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_hi
         status_color = get_status_color(status)
         if status_color:
             color_map[(row_idx + 1, 4)] = status_color  # +1 because of header row
+        
+        # Store link for issue key (column 0)
+        if issue_url:
+            link_map[(row_idx + 1, 0)] = issue_url  # +1 for header
     
-    return rows, formatting_map, color_map
+    return rows, formatting_map, color_map, link_map
 
-def prepare_epics_table(epics: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict]:
-    """Prepare epics data for table rendering"""
+def prepare_epics_table(epics: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict, Dict]:
+    """Prepare epics data for table rendering, including a map of (row, col) to issue key URLs."""
     rows = []
-    formatting_map = {}  # Maps (row, col) to formatting instructions
-    color_map = {}  # Maps (row, col) to background colors
+    formatting_map = {}  # (row, col) -> formatting instructions
+    color_map = {}      # (row, col) -> background color
+    link_map = {}       # (row, col) -> URL for issue key
     
     for row_idx, item in enumerate(epics):
         issue_key = item.get('source_issue_key', '')
+        issue_url = item.get('source_issue_url', '')
         due_date_display, formatting_instructions = format_due_date_with_history(
             item.get('target_date', ''), 
             issue_key
@@ -58,8 +67,9 @@ def prepare_epics_table(epics: List[Dict], format_due_date_with_history: Callabl
         name = item.get('name', '')
         status = item.get('_status', 'In Progress')
         
+        # Use plain text issue key
         row = [
-            issue_key,
+            issue_key,  # Issue key (to be hyperlinked)
             name,
             due_date_display,
             ''  # Empty text for status - will be color-coded
@@ -74,87 +84,85 @@ def prepare_epics_table(epics: List[Dict], format_due_date_with_history: Callabl
         status_color = get_status_color(status)
         if status_color:
             color_map[(row_idx + 1, 3)] = status_color  # +1 because of header row
+        
+        # Store link for issue key (column 0)
+        if issue_url:
+            link_map[(row_idx + 1, 0)] = issue_url  # +1 for header
     
-    return rows, formatting_map, color_map
+    return rows, formatting_map, color_map, link_map
 
-def prepare_merged_table(deliverables: List[Dict], epics: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict, list]:
-    """Prepare a single merged table with deliverables and epics, including formatting and merged cells."""
+def prepare_merged_table(deliverables: List[Dict], epics: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict, list, Dict]:
+    """Prepare merged table data for both deliverables and epics, including a link_map for issue key hyperlinks."""
     rows = []
     formatting_map = {}  # (row, col) -> formatting instructions
-    color_map = {}       # (row, col) -> background color
-    merge_map = []       # List of dicts for merged cells
+    color_map = {}      # (row, col) -> background color
+    merge_map = []      # List of cell merge instructions
+    link_map = {}       # (row, col) -> URL for issue key
 
-    # --- Deliverables Header ---
-    deliverables_header = ["Deliverable", "Name", "Maturity", "Due Date", "Status"]
-    rows.append(deliverables_header)
-    deliverables_header_row = 0
-    black_header = {'red': 0.0, 'green': 0.0, 'blue': 0.0}
+    # --- Deliverables Section ---
+    # Add header row with all column titles
+    deliverables_header_row = ["Deliverable", "Name", "Maturity", "Due Date", "Status"]
+    rows.append(deliverables_header_row)
+    # Black background, bold white text for Deliverables header
     for col in range(5):
-        formatting_map[(deliverables_header_row, col)] = [{"bold": True, "fontSize": 9, "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0}}]
-        color_map[(deliverables_header_row, col)] = black_header
+        formatting_map[(0, col)] = [{"bold": True, "fontSize": 10, "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0}}]
+        color_map[(0, col)] = {"red": 0.0, "green": 0.0, "blue": 0.0}
 
-    # --- Deliverables Rows ---
-    deliverables_rows, deliverables_formatting, deliverables_colors = prepare_deliverables_table(deliverables, format_due_date_with_history)
+    deliverables_rows, deliverables_formatting, deliverables_colors, deliverables_links = prepare_deliverables_table(deliverables, format_due_date_with_history)
     for i, row in enumerate(deliverables_rows):
+        row_idx = len(rows)
         rows.append(row)
-        # Offset formatting/color maps by +1 for header
         for key, val in deliverables_formatting.items():
             if key[0] == i + 1:
-                formatting_map[(i + 1, key[1])] = val
+                formatting_map[(row_idx, key[1])] = val
         for key, val in deliverables_colors.items():
             if key[0] == i + 1:
-                color_map[(i + 1, key[1])] = val
+                color_map[(row_idx, key[1])] = val
+        for key, val in deliverables_links.items():
+            if key[0] == i + 1:
+                link_map[(row_idx, key[1])] = val
 
-    # --- Spacer Row ---
-    spacer_row_idx = len(rows)
-    spacer_row = [" "] + ["" for _ in range(4)]  # Only anchor cell gets a space
-    rows.append(spacer_row)
-    # Merge all cells in spacer row (colSpan=5)
-    merge_map.append({
-        "row": spacer_row_idx,
-        "col": 0,
-        "rowSpan": 1,
-        "colSpan": 5,
-        "backgroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0},
-        "noBorder": True
-    })
+    # --- Epics Section ---
+    if epics:
+        # Spacer row (invisible) - will be merged across all columns
+        spacer_row = ["", "", "", "", ""]
+        spacer_row_idx = len(rows)
+        rows.append(spacer_row)
+        # Merge spacer row across all columns
+        merge_map.append({"row": spacer_row_idx, "col": 0, "rowSpan": 1, "colSpan": 5, "is_spacer": True})
 
-    # --- Epics Header (Name spans columns 2 and 3) ---
-    epics_header_row = len(rows)
-    epics_header = ["Epic Link", "Name", "", "Due Date", "Status"]
-    rows.append(epics_header)
-    purple_header = {'red': 0.529, 'green': 0.467, 'blue': 0.851}
-    for col in range(5):
-        formatting_map[(epics_header_row, col)] = [{"bold": True, "fontSize": 9, "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0}}]
-        color_map[(epics_header_row, col)] = purple_header
-    # Merge Name header (col 1+2)
-    merge_map.append({
-        "row": epics_header_row,
-        "col": 1,
-        "rowSpan": 1,
-        "colSpan": 2
-    })
-
-    # --- Epics Rows (Name spans columns 2 and 3) ---
-    epics_rows, epics_formatting, epics_colors = prepare_epics_table(epics, format_due_date_with_history)
-    for i, epic_row in enumerate(epics_rows):
-        # Insert into 5 columns: [Epic Link, Name, '', Due Date, Status], merge Name+Maturity
+        # Epics header row with all column titles
+        epics_header_row = ["Epics", "Name", "", "Due Date", "Status"]
         row_idx = len(rows)
-        row = [epic_row[0], epic_row[1], '', epic_row[2], epic_row[3]]
-        rows.append(row)
-        # Merge Name+Maturity columns (col 1+2)
-        merge_map.append({
-            "row": row_idx,
-            "col": 1,
-            "rowSpan": 1,
-            "colSpan": 2
-        })
-        # Formatting and color for due date and status
-        for key, val in epics_formatting.items():
-            if key[0] == i + 1:
-                formatting_map[(row_idx, 3)] = val
-        for key, val in epics_colors.items():
-            if key[0] == i + 1:
-                color_map[(row_idx, 4)] = val
+        rows.append(epics_header_row)
+        # Jira epic purple: #8777D9
+        epic_purple = {"red": 135/255, "green": 119/255, "blue": 217/255}
+        for col in range(5):
+            formatting_map[(row_idx, col)] = [{"bold": True, "fontSize": 10, "foregroundColor": {"red": 1.0, "green": 1.0, "blue": 1.0}}]
+            color_map[(row_idx, col)] = epic_purple
+        # Merge Name cell with empty cell in header row
+        merge_map.append({"row": row_idx, "col": 1, "rowSpan": 1, "colSpan": 2})
 
-    return rows, formatting_map, color_map, merge_map 
+        epics_rows, epics_formatting, epics_colors, epics_links = prepare_epics_table(epics, format_due_date_with_history)
+        for i, epic_row in enumerate(epics_rows):
+            row_idx = len(rows)
+            rows.append([
+                epic_row[0],  # Epic Link
+                epic_row[1],  # Name
+                '',  # Empty maturity (for spanning)
+                epic_row[2],  # Due Date
+                epic_row[3]   # Status
+            ])
+            # Merge Name+Maturity columns for epics
+            merge_map.append({"row": row_idx, "col": 1, "rowSpan": 1, "colSpan": 2})
+            for key, val in epics_formatting.items():
+                if key[0] == i + 1:
+                    formatting_map[(row_idx, 3)] = val
+            for key, val in epics_colors.items():
+                if key[0] == i + 1:
+                    color_map[(row_idx, 4)] = val
+            for key, val in epics_links.items():
+                if key[0] == i + 1:
+                    link_map[(row_idx, 0)] = val
+
+    return rows, formatting_map, color_map, merge_map, link_map 

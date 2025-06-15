@@ -286,8 +286,8 @@ class GoogleSlidesClient:
             traceback.print_exc()
             return {}
 
-    def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None):
-        """Add a table to a slide"""
+    def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None, link_map: Dict = None):
+        """Add a table to a slide, with optional text links for issue keys."""
         try:
             # Use microseconds for unique table ID
             table_id = f"table_{int(time.time() * 1000000)}"
@@ -382,7 +382,6 @@ class GoogleSlidesClient:
             all_cell_requests = []
             for row_idx, row in enumerate(data):
                 for col_idx, cell_value in enumerate(row):
-                    # Use the correct cell location format
                     cell_location = {
                         'rowIndex': row_idx,
                         'columnIndex': col_idx
@@ -461,7 +460,33 @@ class GoogleSlidesClient:
                                 'fields': 'tableCellBackgroundFill'
                             }
                         })
-            
+            # --- Add hyperlink requests for issue keys ---
+            if link_map:
+                for (row_idx, col_idx), url in link_map.items():
+                    cell_location = {
+                        'rowIndex': row_idx,
+                        'columnIndex': col_idx
+                    }
+                    issue_key = str(data[row_idx][col_idx])
+                    if not issue_key.strip():
+                        continue
+                    all_cell_requests.append({
+                        'updateTextStyle': {
+                            'objectId': table_id,
+                            'cellLocation': cell_location,
+                            'style': {
+                                'link': {
+                                    'url': url
+                                }
+                            },
+                            'textRange': {
+                                'type': 'FIXED_RANGE',
+                                'startIndex': 0,
+                                'endIndex': len(issue_key)
+                            },
+                            'fields': 'link'
+                        }
+                    })
             # Execute all cell requests at once
             if all_cell_requests:
                 self.service.presentations().batchUpdate(
@@ -568,8 +593,8 @@ class GoogleSlidesClient:
                         }
                     })
                     # If this is the spacer row, set its borders to transparent
-                    is_spacer_row = merge.get('rowSpan', 1) == 1 and merge.get('colSpan', 1) == 5 and merge.get('col', 0) == 0
-                    if is_spacer_row:
+                    if merge.get('is_spacer', False):
+                        # Set all borders of spacer row to transparent
                         for side in ['TOP', 'BOTTOM', 'LEFT', 'RIGHT']:
                             border_requests.append({
                                 'updateTableBorderProperties': {
@@ -593,9 +618,7 @@ class GoogleSlidesClient:
                                     'fields': '*'
                                 }
                             })
-                        # Set the bottom border of the row above and top border of the row below to default color
-                        default_border = {'red': 0.8, 'green': 0.8, 'blue': 0.8}
-                        # Row above (last deliverable row)
+                        # Set the bottom border of the row above (last deliverable row) to default color
                         if merge['row'] > 0:
                             border_requests.append({
                                 'updateTableBorderProperties': {
@@ -604,7 +627,7 @@ class GoogleSlidesClient:
                                         'tableBorderFill': {
                                             'solidFill': {
                                                 'color': {
-                                                    'rgbColor': default_border
+                                                    'rgbColor': {'red': 0.8, 'green': 0.8, 'blue': 0.8}
                                                 }
                                             }
                                         },
@@ -619,7 +642,7 @@ class GoogleSlidesClient:
                                     'fields': '*'
                                 }
                             })
-                        # Row below (epics header)
+                        # Set the top border of the row below (epics header) to default color
                         border_requests.append({
                             'updateTableBorderProperties': {
                                 'objectId': table_id,
@@ -627,7 +650,7 @@ class GoogleSlidesClient:
                                     'tableBorderFill': {
                                         'solidFill': {
                                             'color': {
-                                                'rgbColor': default_border
+                                                'rgbColor': {'red': 0.8, 'green': 0.8, 'blue': 0.8}
                                             }
                                         }
                                     },
