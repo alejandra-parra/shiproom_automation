@@ -1,0 +1,9 @@
+# Google Slides Configuration
+google_slides:
+  presentation_id: "your-google-slides-presentation-id"
+  slide_id: "your-google-slides-slide-id"
+
+# Team Configuration
+team:
+  team_id: "your-jellyfish-team-id"
+  team_name: "Your Team Name" 
