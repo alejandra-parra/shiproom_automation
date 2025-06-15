@@ -76,6 +76,8 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
     Only includes items that are either:
     - "In Progress" (based on source_issue_status)
     - Completed in the last 7 days
+    AND
+    - Have "Roadmap" in their investment_classification
     
     Args:
         items: List of work items (deliverables or epics)
@@ -93,11 +95,18 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
         issue_key = item.get('source_issue_key', 'unknown')
         date_history = item.get('date_history', [])
         source_status = item.get('source_issue_status', '')
+        investment_classification = item.get('investment_classification', '')
         
         print(f"\nProcessing item {issue_key}:")
         print(f"  Target date: {target_date_str}")
         print(f"  Date history: {date_history}")
         print(f"  Source status: {source_status}")
+        print(f"  Investment classification: {investment_classification}")
+        
+        # Skip items that don't have "Roadmap" in their investment classification
+        if "Roadmap" not in investment_classification:
+            print(f"  Skipping item (not a roadmap item)")
+            continue
         
         # Check if completed in the last week
         if completed_date_str:
