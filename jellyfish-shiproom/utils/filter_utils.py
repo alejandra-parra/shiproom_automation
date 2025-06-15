@@ -73,6 +73,10 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
     - Overdue: Past target date OR due date shifted by 2+ weeks in last 7 days
     - In Progress: All other cases
     
+    Only includes items that are either:
+    - "In Progress" (based on source_issue_status)
+    - Completed in the last 7 days
+    
     Args:
         items: List of work items (deliverables or epics)
         seven_days_ago: Datetime object representing 7 days ago
@@ -88,10 +92,12 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
         target_date_str = item.get('target_date')
         issue_key = item.get('source_issue_key', 'unknown')
         date_history = item.get('date_history', [])
+        source_status = item.get('source_issue_status', '')
         
         print(f"\nProcessing item {issue_key}:")
         print(f"  Target date: {target_date_str}")
         print(f"  Date history: {date_history}")
+        print(f"  Source status: {source_status}")
         
         # Check if completed in the last week
         if completed_date_str:
@@ -105,6 +111,11 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
                     continue
             except Exception as e:
                 print(f"Error parsing completed_date for {issue_key}: {e}")
+        
+        # Skip items that are not "In Progress"
+        if source_status != "In Progress":
+            print(f"  Skipping item (not in progress)")
+            continue
         
         # Check if overdue (past target date) or had a significant due date shift
         is_overdue = False
