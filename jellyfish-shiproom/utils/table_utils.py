@@ -1,32 +1,12 @@
 """
-Table preparation utilities for the Jellyfish Status Report Generator
+Table utility functions for the Jellyfish Status Report Generator.
+This module handles the preparation and formatting of tables for the status report.
 """
 
-from typing import List, Dict, Tuple
-from datetime import datetime
+from typing import List, Dict, Tuple, Callable
+from utils.status_utils import get_status_color
 
-def get_status_color(status: str) -> Dict:
-    """Get muted background color for status"""
-    colors = {
-        'Done': {
-            'red': 0.8,    # Muted green
-            'green': 0.9,
-            'blue': 0.8
-        },
-        'In Progress': {
-            'red': 1.0,    # Muted yellow
-            'green': 0.95,
-            'blue': 0.7
-        },
-        'Overdue': {
-            'red': 1.0,    # Muted red
-            'green': 0.8,
-            'blue': 0.8
-        }
-    }
-    return colors.get(status, colors['In Progress'])
-
-def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_history) -> Tuple[List[List], Dict, Dict]:
+def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict]:
     """Prepare deliverables data for table rendering"""
     rows = []
     formatting_map = {}  # Maps (row, col) to formatting instructions
@@ -62,7 +42,7 @@ def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_hi
     
     return rows, formatting_map, color_map
 
-def prepare_epics_table(epics: List[Dict], format_due_date_with_history) -> Tuple[List[List], Dict, Dict]:
+def prepare_epics_table(epics: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict]:
     """Prepare epics data for table rendering"""
     rows = []
     formatting_map = {}  # Maps (row, col) to formatting instructions
@@ -97,7 +77,7 @@ def prepare_epics_table(epics: List[Dict], format_due_date_with_history) -> Tupl
     
     return rows, formatting_map, color_map
 
-def prepare_merged_table(deliverables: List[Dict], epics: List[Dict], format_due_date_with_history) -> Tuple[List[List], Dict, Dict, list]:
+def prepare_merged_table(deliverables: List[Dict], epics: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict, list]:
     """Prepare a single merged table with deliverables and epics, including formatting and merged cells."""
     rows = []
     formatting_map = {}  # (row, col) -> formatting instructions

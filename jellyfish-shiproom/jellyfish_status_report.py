@@ -26,6 +26,7 @@ from utils.date_utils import format_date, get_report_date_range
 from utils.table_utils import prepare_merged_table
 from utils.filter_utils import filter_items
 from utils.due_date_utils import format_due_date_with_history
+from utils.status_utils import STATUS_MAPPING
 
 # Load environment variables
 load_dotenv()
@@ -937,12 +938,7 @@ class StatusReportGenerator:
         self.today = datetime.now()
         
         # Status mapping for Google Sheets
-        self.status_mapping = {
-            'Done': 'Done',
-            'In Progress': 'In Progress', 
-            'Overdue': 'Overdue',
-            'default': 'In Progress'
-        }
+        self.status_mapping = STATUS_MAPPING
     
     def get_formatted_due_date(self, current_date: str, issue_key: str) -> Tuple[str, List[Dict]]:
         """Get formatted due date with history for an issue"""
