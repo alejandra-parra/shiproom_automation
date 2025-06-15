@@ -5,6 +5,7 @@ Google Slides client for interacting with Google Slides API
 import os
 import json
 import socket
+import time
 from datetime import datetime
 from typing import List, Dict
 from google.oauth2.service_account import Credentials
@@ -159,7 +160,6 @@ class GoogleSlidesClient:
     def add_title(self, slide_id: str, title: str, x: float = 50, y: float = 50):
         """Add a title text box to a slide"""
         try:
-            import time
             title_id = f"title_{int(time.time() * 1000000)}"
             
             requests = [
@@ -236,37 +236,99 @@ class GoogleSlidesClient:
                     print(f"Found table element: {table_id}")
                     size = element.get('size', {})
                     transform = element.get('transform', {})
-                    return {
-                        'size': size,
-                        'transform': transform
+                    
+                    # Check if we have the expected data structure
+                    if not size or not transform:
+                        print(f"Missing size or transform data for table {table_id}")
+                        return {}
+                    
+                    # Google Slides API returns dimensions in EMU (English Metric Units)
+                    # 1 point = 12,700 EMUs
+                    height_emu = size.get('height', {}).get('magnitude', 0)
+                    width_emu = size.get('width', {}).get('magnitude', 0)
+                    y_emu = transform.get('translateY', 0)
+                    x_emu = transform.get('translateX', 0)
+                    
+                    print(f"Raw EMU dimensions for table {table_id}:")
+                    print(f"  Height: {height_emu} EMU")
+                    print(f"  Width: {width_emu} EMU")
+                    print(f"  Y position: {y_emu} EMU")
+                    print(f"  X position: {x_emu} EMU")
+                    
+                    # Convert EMU to points (1 point = 12,700 EMUs)
+                    height_pt = height_emu / 12700
+                    width_pt = width_emu / 12700
+                    y_pt = y_emu / 12700
+                    x_pt = x_emu / 12700
+                    
+                    print(f"Converted to points for table {table_id}:")
+                    print(f"  Height: {height_pt:.2f} PT")
+                    print(f"  Width: {width_pt:.2f} PT")
+                    print(f"  Y position: {y_pt:.2f} PT")
+                    print(f"  X position: {x_pt:.2f} PT")
+                    
+                    dimensions = {
+                        'height': height_pt,
+                        'width': width_pt,
+                        'y_position': y_pt,
+                        'x_position': x_pt
                     }
+                    
+                    return dimensions
+                else:
+                    print(f"Found element: {element_id} (not our table)")
             
             print(f"Table {table_id} not found in slide {self.slide_id}")
             return {}
-            
-        except HttpError as e:
-            print(f"Error getting table dimensions: {e}")
+        except Exception as e:
+            print(f"Error getting table dimensions for {table_id}: {e}")
+            import traceback
+            traceback.print_exc()
             return {}
-    
+
     def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None):
-        """Add a table to a slide with optional formatting"""
+        """Add a table to a slide"""
         try:
-            import time
+            # Use microseconds for unique table ID
             table_id = f"table_{int(time.time() * 1000000)}"
             
-            # Calculate table dimensions
+            if not data:
+                print("No data to add to table")
+                return None, None
+            
             rows = len(data)
             cols = len(data[0]) if data else 0
             
-            # Create the table
-            requests = [{
+            if rows == 0 or cols == 0:
+                print("Invalid table dimensions")
+                return None, None
+            
+            # Define column widths based on content type
+            # For deliverables: [Key, Name, Maturity, Due Date, Status]
+            # For epics: [Key, Name, Due Date, Status]
+            if cols == 5:  # Deliverables table
+                column_widths = [80, 250, 60, 100, 60]  # Key, Name, Maturity, Due Date, Status
+            elif cols == 4:  # Epics table
+                column_widths = [80, 280, 100, 60]  # Key, Name, Due Date, Status
+            else:
+                # Fallback to equal widths
+                column_widths = [140] * cols
+            
+            total_width = sum(column_widths)
+            
+            # Calculate initial height based on number of rows
+            # Each row is 25pt high, plus 20pt for padding
+            initial_height = rows * 25 + 20
+            
+            # Step 1: Create table first
+            create_table_request = {
                 'createTable': {
                     'objectId': table_id,
                     'elementProperties': {
                         'pageObjectId': slide_id,
                         'size': {
-                            'height': {'magnitude': 400, 'unit': 'PT'},
-                            'width': {'magnitude': 600, 'unit': 'PT'}
+                            'height': {'magnitude': initial_height, 'unit': 'PT'},
+                            'width': {'magnitude': total_width, 'unit': 'PT'}
                         },
                         'transform': {
                             'scaleX': 1,
@@ -279,99 +341,351 @@ class GoogleSlidesClient:
                     'rows': rows,
                     'columns': cols
                 }
-            }]
+            }
             
-            # Add the data
-            for row_idx, row in enumerate(data):
-                for col_idx, cell in enumerate(row):
-                    requests.append({
-                        'insertText': {
-                            'objectId': f"{table_id}_{row_idx}_{col_idx}",
-                            'text': str(cell)
-                        }
-                    })
-            
-            # Apply formatting if provided
-            if formatting_map:
-                for cell_id, format_spec in formatting_map.items():
-                    requests.append({
-                        'updateTextStyle': {
-                            'objectId': cell_id,
-                            'style': format_spec,
-                            'fields': ','.join(format_spec.keys())
-                        }
-                    })
-            
-            # Apply colors if provided
-            if color_map:
-                for cell_id, color in color_map.items():
-                    requests.append({
-                        'updateTableCellProperties': {
-                            'objectId': cell_id,
-                            'tableCellProperties': {
-                                'tableCellBackgroundFill': {
-                                    'propertyState': 'NOT_RENDERED',
-                                    'solidFill': {
-                                        'color': color
-                                    }
-                                }
-                            },
-                            'fields': 'tableCellBackgroundFill.solidFill.color'
-                        }
-                    })
-            
-            # Apply header color if provided
-            if header_color:
-                for col in range(cols):
-                    cell_id = f"{table_id}_0_{col}"
-                    requests.append({
-                        'updateTableCellProperties': {
-                            'objectId': cell_id,
-                            'tableCellProperties': {
-                                'tableCellBackgroundFill': {
-                                    'propertyState': 'NOT_RENDERED',
-                                    'solidFill': {
-                                        'color': header_color
-                                    }
-                                }
-                            },
-                            'fields': 'tableCellBackgroundFill.solidFill.color'
-                        }
-                    })
-            
-            # Apply cell merging if provided
-            if merge_map:
-                for merge_spec in merge_map:
-                    requests.append({
-                        'mergeTableCells': {
-                            'objectId': table_id,
-                            'tableRange': merge_spec
-                        }
-                    })
-            
-            # Execute the batch update
+            # Create the table first
             self.service.presentations().batchUpdate(
                 presentationId=self.presentation_id,
-                body={'requests': requests}
+                body={'requests': [create_table_request]}
             ).execute()
             
-            print(f"Added table to slide {slide_id}")
-            return table_id
+            print(f"Created table {table_id}")
+            
+            # Small delay to ensure table is fully created
+            time.sleep(0.5)
+            
+            # Step 1.5: Set column widths
+            column_width_requests = []
+            for col_idx, width in enumerate(column_widths):
+                column_width_requests.append({
+                    'updateTableColumnProperties': {
+                        'objectId': table_id,
+                        'columnIndices': [col_idx],
+                        'tableColumnProperties': {
+                            'columnWidth': {
+                                'magnitude': width,
+                                'unit': 'PT'
+                            }
+                        },
+                        'fields': 'columnWidth'
+                    }
+                })
+            
+            if column_width_requests:
+                self.service.presentations().batchUpdate(
+                    presentationId=self.presentation_id,
+                    body={'requests': column_width_requests}
+                ).execute()
+                print(f"Set column widths: {column_widths}")
+            
+            # Step 2: Add content to all cells in one batch
+            all_cell_requests = []
+            for row_idx, row in enumerate(data):
+                for col_idx, cell_value in enumerate(row):
+                    # Use the correct cell location format
+                    cell_location = {
+                        'rowIndex': row_idx,
+                        'columnIndex': col_idx
+                    }
+                    # Add text to cell
+                    all_cell_requests.append({
+                        'insertText': {
+                            'objectId': table_id,
+                            'cellLocation': cell_location,
+                            'text': str(cell_value) if cell_value else '',
+                            'insertionIndex': 0
+                        }
+                    })
+                    # Set font size for all cells that have text
+                    if cell_value and str(cell_value).strip():
+                        all_cell_requests.append({
+                            'updateTextStyle': {
+                                'objectId': table_id,
+                                'cellLocation': cell_location,
+                                'style': {
+                                    'fontSize': {'magnitude': 7, 'unit': 'PT'}
+                                },
+                                'textRange': {
+                                    'type': 'ALL'
+                                },
+                                'fields': 'fontSize'
+                            }
+                        })
+                    # Format header row
+                    if row_idx == 0:
+                        # Use custom header color if provided, otherwise default gray
+                        if header_color:
+                            header_bg_color = header_color
+                            text_color = {'red': 1.0, 'green': 1.0, 'blue': 1.0}  # White text
+                        else:
+                            header_bg_color = {'red': 0.8, 'green': 0.8, 'blue': 0.8}  # Gray
+                            text_color = {'red': 0.0, 'green': 0.0, 'blue': 0.0}  # Black text
+                        # Only apply text style if cell has text
+                        if cell_value and str(cell_value).strip():
+                            all_cell_requests.append({
+                                'updateTextStyle': {
+                                    'objectId': table_id,
+                                    'cellLocation': cell_location,
+                                    'style': {
+                                        'bold': True,
+                                        'fontSize': {'magnitude': 7, 'unit': 'PT'},
+                                        'foregroundColor': {
+                                            'opaqueColor': {
+                                                'rgbColor': text_color
+                                            }
+                                        }
+                                    },
+                                    'textRange': {
+                                        'type': 'ALL'
+                                    },
+                                    'fields': 'bold,fontSize,foregroundColor'
+                                }
+                            })
+                        all_cell_requests.append({
+                            'updateTableCellProperties': {
+                                'objectId': table_id,
+                                'tableRange': {
+                                    'location': cell_location,
+                                    'rowSpan': 1,
+                                    'columnSpan': 1
+                                },
+                                'tableCellProperties': {
+                                    'tableCellBackgroundFill': {
+                                        'solidFill': {
+                                            'color': {
+                                                'rgbColor': header_bg_color
+                                            }
+                                        }
+                                    }
+                                },
+                                'fields': 'tableCellBackgroundFill'
+                            }
+                        })
+            
+            # Execute all cell requests at once
+            if all_cell_requests:
+                self.service.presentations().batchUpdate(
+                    presentationId=self.presentation_id,
+                    body={'requests': all_cell_requests}
+                ).execute()
+            
+            # Apply strikethrough formatting if provided
+            if formatting_map:
+                formatting_requests = []
+                for (row_idx, col_idx), instructions in formatting_map.items():
+                    # Only apply formatting if the cell contains text
+                    cell_text = ''
+                    if 0 <= row_idx < len(data) and 0 <= col_idx < len(data[row_idx]):
+                        cell_text = str(data[row_idx][col_idx])
+                    if not cell_text.strip():
+                        continue
+                    cell_location = {
+                        'rowIndex': row_idx,
+                        'columnIndex': col_idx
+                    }
+                    for instruction in instructions:
+                        # Support both strikethrough and other styles
+                        style = {}
+                        if 'strikethrough' in instruction:
+                            style['strikethrough'] = instruction['strikethrough']
+                        if 'bold' in instruction:
+                            style['bold'] = instruction['bold']
+                        if 'fontSize' in instruction:
+                            style['fontSize'] = {'magnitude': 7, 'unit': 'PT'}
+                        if 'foregroundColor' in instruction:
+                            style['foregroundColor'] = {'opaqueColor': {'rgbColor': instruction['foregroundColor']}}
+                        if not style:
+                            continue
+                        formatting_requests.append({
+                            'updateTextStyle': {
+                                'objectId': table_id,
+                                'cellLocation': cell_location,
+                                'style': style,
+                                'textRange': {
+                                    'type': 'ALL' if 'strikethrough' not in instruction else 'FIXED_RANGE',
+                                    'startIndex': instruction.get('start', 0),
+                                    'endIndex': instruction.get('end', 0)
+                                } if 'strikethrough' in instruction else {'type': 'ALL'},
+                                'fields': ','.join(style.keys())
+                            }
+                        })
+                if formatting_requests:
+                    self.service.presentations().batchUpdate(
+                        presentationId=self.presentation_id,
+                        body={'requests': formatting_requests}
+                    ).execute()
+                    print(f"Applied formatting to {len(formatting_requests)} text ranges")
+
+            # Apply background colors if provided
+            if color_map:
+                color_requests = []
+                for (row_idx, col_idx), color in color_map.items():
+                    cell_location = {
+                        'rowIndex': row_idx,
+                        'columnIndex': col_idx
+                    }
+                    color_requests.append({
+                        'updateTableCellProperties': {
+                            'objectId': table_id,
+                            'tableRange': {
+                                'location': cell_location,
+                                'rowSpan': 1,
+                                'columnSpan': 1
+                            },
+                            'tableCellProperties': {
+                                'tableCellBackgroundFill': {
+                                    'solidFill': {
+                                        'color': {
+                                            'rgbColor': color
+                                        }
+                                    }
+                                }
+                            },
+                            'fields': 'tableCellBackgroundFill'
+                        }
+                    })
+                if color_requests:
+                    self.service.presentations().batchUpdate(
+                        presentationId=self.presentation_id,
+                        body={'requests': color_requests}
+                    ).execute()
+                    print(f"Applied background colors to {len(color_requests)} cells")
+
+            # --- Handle merged cells and custom background/border for merged cells ---
+            if merge_map:
+                merge_requests = []
+                border_requests = []
+                for merge in merge_map:
+                    # Use mergeTableCells for merging cells in Google Slides
+                    merge_requests.append({
+                        'mergeTableCells': {
+                            'objectId': table_id,
+                            'tableRange': {
+                                'location': {'rowIndex': merge['row'], 'columnIndex': merge['col']},
+                                'rowSpan': merge.get('rowSpan', 1),
+                                'columnSpan': merge.get('colSpan', 1)
+                            }
+                        }
+                    })
+                    # If this is the spacer row, set its borders to transparent
+                    is_spacer_row = merge.get('rowSpan', 1) == 1 and merge.get('colSpan', 1) == 5 and merge.get('col', 0) == 0
+                    if is_spacer_row:
+                        for side in ['TOP', 'BOTTOM', 'LEFT', 'RIGHT']:
+                            border_requests.append({
+                                'updateTableBorderProperties': {
+                                    'objectId': table_id,
+                                    'tableBorderProperties': {
+                                        'tableBorderFill': {
+                                            'solidFill': {
+                                                'color': {
+                                                    'rgbColor': {'red': 1.0, 'green': 1.0, 'blue': 1.0}
+                                                }
+                                            }
+                                        },
+                                        'weight': {'magnitude': 1, 'unit': 'PT'}
+                                    },
+                                    'tableRange': {
+                                        'location': {'rowIndex': merge['row'], 'columnIndex': merge['col']},
+                                        'rowSpan': 1,
+                                        'columnSpan': 5
+                                    },
+                                    'borderPosition': side,
+                                    'fields': '*'
+                                }
+                            })
+                        # Set the bottom border of the row above and top border of the row below to default color
+                        default_border = {'red': 0.8, 'green': 0.8, 'blue': 0.8}
+                        # Row above (last deliverable row)
+                        if merge['row'] > 0:
+                            border_requests.append({
+                                'updateTableBorderProperties': {
+                                    'objectId': table_id,
+                                    'tableBorderProperties': {
+                                        'tableBorderFill': {
+                                            'solidFill': {
+                                                'color': {
+                                                    'rgbColor': default_border
+                                                }
+                                            }
+                                        },
+                                        'weight': {'magnitude': 1, 'unit': 'PT'}
+                                    },
+                                    'tableRange': {
+                                        'location': {'rowIndex': merge['row'] - 1, 'columnIndex': 0},
+                                        'rowSpan': 1,
+                                        'columnSpan': 5
+                                    },
+                                    'borderPosition': 'BOTTOM',
+                                    'fields': '*'
+                                }
+                            })
+                        # Row below (epics header)
+                        border_requests.append({
+                            'updateTableBorderProperties': {
+                                'objectId': table_id,
+                                'tableBorderProperties': {
+                                    'tableBorderFill': {
+                                        'solidFill': {
+                                            'color': {
+                                                'rgbColor': default_border
+                                            }
+                                        }
+                                    },
+                                    'weight': {'magnitude': 1, 'unit': 'PT'}
+                                },
+                                'tableRange': {
+                                    'location': {'rowIndex': merge['row'] + 1, 'columnIndex': 0},
+                                    'rowSpan': 1,
+                                    'columnSpan': 5
+                                },
+                                'borderPosition': 'TOP',
+                                'fields': '*'
+                            }
+                        })
+                if merge_requests:
+                    self.service.presentations().batchUpdate(
+                        presentationId=self.presentation_id,
+                        body={'requests': merge_requests}
+                    ).execute()
+                    print(f"Applied {len(merge_requests)} merged cell requests (mergeTableCells)")
+                if border_requests:
+                    self.service.presentations().batchUpdate(
+                        presentationId=self.presentation_id,
+                        body={'requests': border_requests}
+                    ).execute()
+                    print(f"Applied {len(border_requests)} border color requests for spacer row separation")
+
+            print(f"Added content to table with {rows}x{cols} on slide {slide_id}")
+            
+            # Wait for content to be fully rendered
+            time.sleep(1)
+            
+            # Get actual dimensions after content is added
+            actual_dimensions = self.get_table_dimensions(table_id)
+            if not actual_dimensions:
+                # Fallback to initial dimensions if we can't get actual ones
+                actual_dimensions = {
+                    'height': initial_height,
+                    'width': total_width,
+                    'y_position': y,
+                    'x_position': x
+                }
+            
+            return table_id, actual_dimensions
             
         except HttpError as e:
             print(f"Error adding table to slide {slide_id}: {e}")
-            raise
+            return None, None
     
     def add_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 400, height: float = 100):
         """Add a text box to a slide"""
         try:
-            import time
-            text_box_id = f"text_box_{int(time.time() * 1000000)}"
+            text_id = f"text_{int(time.time() * 1000000)}"
             
             requests = [
                 {
                     'createShape': {
-                        'objectId': text_box_id,
+                        'objectId': text_id,
                         'shapeType': 'TEXT_BOX',
                         'elementProperties': {
                             'pageObjectId': slide_id,
@@ -391,7 +705,7 @@ class GoogleSlidesClient:
                 },
                 {
                     'insertText': {
-                        'objectId': text_box_id,
+                        'objectId': text_id,
                         'text': text
                     }
                 }
@@ -403,7 +717,6 @@ class GoogleSlidesClient:
             ).execute()
             
             print(f"Added text box to slide {slide_id}")
-            return text_box_id
             
         except HttpError as e:
             print(f"Error adding text box to slide {slide_id}: {e}")
