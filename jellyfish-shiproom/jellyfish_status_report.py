@@ -24,6 +24,7 @@ from clients.jellyfish import JellyfishClient
 from config.config_loader import load_config
 from utils.date_utils import format_date, get_report_date_range
 from utils.table_utils import prepare_merged_table
+from utils.filter_utils import filter_items
 
 # Load environment variables
 load_dotenv()
@@ -942,47 +943,6 @@ class StatusReportGenerator:
             'default': 'In Progress'
         }
     
-    def filter_items(self, items: List[Dict]) -> List[Dict]:
-        """Filter and color-code items based on dates"""
-        filtered = []
-        
-        for item in items:
-            completed_date_str = item.get('completed_date')
-            target_date_str = item.get('target_date')
-            issue_key = item.get('source_issue_key', 'unknown')
-            
-            # Check if completed in the last week
-            if completed_date_str:
-                try:
-                    completed_date = datetime.fromisoformat(completed_date_str.replace('Z', '+00:00'))
-                    if completed_date >= self.seven_days_ago:
-                        # Completed this week
-                        item['_status'] = 'Done'
-                        filtered.append(item)
-                        print(f"{issue_key}: Completed on {completed_date_str} - Done")
-                        continue
-                except Exception as e:
-                    print(f"Error parsing completed_date for {issue_key}: {e}")
-            
-            # Check if overdue (past target date)
-            if target_date_str:
-                try:
-                    target_date = datetime.fromisoformat(target_date_str.replace('Z', '+00:00'))
-                    if target_date < self.today:
-                        # Past target date
-                        item['_status'] = 'Overdue'
-                        filtered.append(item)
-                        print(f"{issue_key}: Overdue (target: {target_date_str}) - Overdue")
-                        continue
-                except Exception as e:
-                    print(f"Error parsing target_date for {issue_key}: {e}")
-            
-            # Otherwise it's in progress
-            item['_status'] = 'In Progress'
-            filtered.append(item)
-        
-        return filtered
-    
     def format_due_date_with_history(self, current_date: str, issue_key: str) -> Tuple[str, List[Dict]]:
         """Format due date with history, returning text and formatting instructions"""
         # Get due date history from Jira
@@ -1029,14 +989,14 @@ class StatusReportGenerator:
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
-        filtered_deliverables = self.filter_items(deliverables)
+        filtered_deliverables = filter_items(deliverables, self.seven_days_ago, self.today)
         print(f"Fetching epics for team {self.jellyfish.team_name}...")
         epics_response = self.jellyfish.get_work_items_by_category(
             "epics",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
-        filtered_epics = self.filter_items(epics_response)
+        filtered_epics = filter_items(epics_response, self.seven_days_ago, self.today)
         slide_id = self.slides.slide_id
         try:
             self.slides.clear_slide_content(slide_id)
