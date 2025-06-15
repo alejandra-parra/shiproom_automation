@@ -8,7 +8,7 @@ Future versions may modify how historical dates are displayed or tracked.
 from typing import List, Dict, Tuple
 from utils.date_utils import format_date
 
-def format_due_date_with_history(current_date: str, date_history: List[str]) -> Tuple[str, List[Dict]]:
+def format_due_date_with_history(current_date: str, date_history: List[Dict]) -> Tuple[str, List[Dict]]:
     """
     Format due date with history, returning text and formatting instructions.
     
@@ -19,7 +19,7 @@ def format_due_date_with_history(current_date: str, date_history: List[str]) -> 
     
     Args:
         current_date: The current due date string
-        date_history: List of historical due dates
+        date_history: List of dicts containing due dates and their timestamps
         
     Returns:
         Tuple containing:
@@ -35,8 +35,8 @@ def format_due_date_with_history(current_date: str, date_history: List[str]) -> 
     formatting_instructions = []
     current_pos = 0
     
-    for i, date in enumerate(date_history):
-        formatted = format_date(date)
+    for i, date_info in enumerate(date_history):
+        formatted = format_date(date_info['date'])
         if formatted:
             if i < len(date_history) - 1:
                 # This is an old date - should be struck through

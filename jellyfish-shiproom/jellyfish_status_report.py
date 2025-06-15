@@ -52,14 +52,30 @@ class StatusReportGenerator:
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
+        
+        # Add due date history to deliverables
+        for deliverable in deliverables:
+            issue_key = deliverable.get('source_issue_key')
+            if issue_key:
+                deliverable['date_history'] = self.jira.get_due_date_history(issue_key)
+        
         filtered_deliverables = filter_items(deliverables, self.seven_days_ago, self.today)
+        
         print(f"Fetching epics for team {self.jellyfish.team_name}...")
         epics_response = self.jellyfish.get_work_items_by_category(
             "epics",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
+        
+        # Add due date history to epics
+        for epic in epics_response:
+            issue_key = epic.get('source_issue_key')
+            if issue_key:
+                epic['date_history'] = self.jira.get_due_date_history(issue_key)
+        
         filtered_epics = filter_items(epics_response, self.seven_days_ago, self.today)
+        
         slide_id = self.slides.slide_id
         try:
             self.slides.clear_slide_content(slide_id)
