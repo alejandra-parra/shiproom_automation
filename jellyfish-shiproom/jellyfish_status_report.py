@@ -4,19 +4,10 @@ Jellyfish Status Report Generator
 Generates Google Sheets status reports for engineering teams based on Jellyfish data
 """
 
-import requests
 from datetime import datetime, timedelta
-from typing import List, Dict, Optional, Tuple
-import json
+from typing import Dict, List, Tuple
 import argparse
-import yaml
-from pathlib import Path
-from jira import JIRA
-import os
 from dotenv import load_dotenv
-from google.oauth2.service_account import Credentials
-from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 
 from clients.google_slides import GoogleSlidesClient
 from clients.jira import JiraClient
