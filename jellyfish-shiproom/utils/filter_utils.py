@@ -7,22 +7,23 @@ Future versions may use different criteria for status determination.
 
 from datetime import datetime, timedelta
 from typing import List, Dict
+from utils.date_utils import get_weekly_lookback_range
 
 # Status constants - these may be expanded or modified in future versions
 STATUS_DONE = 'Done'
 STATUS_IN_PROGRESS = 'In Progress'
 STATUS_OVERDUE = 'Overdue'
 
-def check_due_date_shift(date_history: List[Dict], seven_days_ago: datetime) -> bool:
+def check_due_date_shift(date_history: List[Dict], lookback_start: datetime) -> bool:
     """
-    Check if a due date was shifted by 2+ weeks in the last 7 days.
+    Check if a due date was shifted by 2+ weeks in the lookback period.
     
     Args:
         date_history: List of dicts containing due dates and their timestamps
-        seven_days_ago: Datetime object representing 7 days ago
+        lookback_start: Datetime object representing the start of the lookback period
         
     Returns:
-        True if due date was shifted by 2+ weeks in the last 7 days, False otherwise
+        True if due date was shifted by 2+ weeks in the lookback period, False otherwise
     """
     if len(date_history) < 2:
         print(f"Not enough date history to check shift (need at least 2 dates, got {len(date_history)})")
@@ -38,24 +39,24 @@ def check_due_date_shift(date_history: List[Dict], seven_days_ago: datetime) -> 
         print(f"  Previous date: {previous_date}")
         print(f"  Current date: {current_date}")
         print(f"  Current timestamp: {current_timestamp}")
-        print(f"  Seven days ago: {seven_days_ago}")
+        print(f"  Lookback start: {lookback_start}")
         
-        # Check if the change happened in the last 7 days
+        # Check if the change happened in the lookback period
         if current_timestamp:
             # Convert timestamp to timezone-aware datetime
             change_date = datetime.fromisoformat(current_timestamp.replace('Z', '+00:00'))
-            # Make seven_days_ago timezone-aware
-            seven_days_ago = seven_days_ago.replace(tzinfo=change_date.tzinfo)
+            # Make lookback_start timezone-aware
+            lookback_start = lookback_start.replace(tzinfo=change_date.tzinfo)
             
-            if change_date >= seven_days_ago:
+            if change_date >= lookback_start:
                 # Calculate the shift in days
                 shift_days = (current_date - previous_date).days
                 print(f"  Shift days: {shift_days}")
-                print(f"  Change was in last 7 days: True")
+                print(f"  Change was in lookback period: True")
                 print(f"  Shift >= 14 days: {shift_days >= 14}")
                 return shift_days >= 14  # 2 weeks = 14 days
             else:
-                print(f"  Change was in last 7 days: False (change date: {change_date})")
+                print(f"  Change was in lookback period: False (change date: {change_date})")
         else:
             print(f"  No timestamp available for the change")
             
@@ -64,25 +65,25 @@ def check_due_date_shift(date_history: List[Dict], seven_days_ago: datetime) -> 
         
     return False
 
-def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -> List[Dict]:
+def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: datetime) -> List[Dict]:
     """
     Filter and determine status for work items based on completion and target dates.
     
     Current criteria:
-    - Done: Completed in the last 7 days
-    - Overdue: Past target date OR due date shifted by 2+ weeks in last 7 days
+    - Done: Completed in the lookback period
+    - Overdue: Past target date OR due date shifted by 2+ weeks in lookback period
     - In Progress: All other cases
     
     Only includes items that are either:
     - "In Progress" (based on source_issue_status)
-    - Completed in the last 7 days
+    - Completed in the lookback period
     AND
     - Have "Roadmap" in their investment_classification
     
     Args:
         items: List of work items (deliverables or epics)
-        seven_days_ago: Datetime object representing 7 days ago
-        today: Current datetime
+        lookback_start: Datetime object representing the start of the lookback period
+        lookback_end: Datetime object representing the end of the lookback period
         
     Returns:
         List of items with added _status field
@@ -108,12 +109,12 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
             print(f"  Skipping item (not a roadmap item)")
             continue
         
-        # Check if completed in the last week
+        # Check if completed in the lookback period
         if completed_date_str:
             try:
                 completed_date = datetime.fromisoformat(completed_date_str.replace('Z', '+00:00'))
-                if completed_date >= seven_days_ago:
-                    # Completed this week
+                if lookback_start <= completed_date <= lookback_end:
+                    # Completed in lookback period
                     item['_status'] = STATUS_DONE
                     filtered.append(item)
                     print(f"  Status: Done (completed on {completed_date_str})")
@@ -132,8 +133,8 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
             try:
                 target_date = datetime.fromisoformat(target_date_str.replace('Z', '+00:00'))
                 print(f"  Target date parsed: {target_date}")
-                print(f"  Today: {today}")
-                if target_date < today:
+                print(f"  Lookback end: {lookback_end}")
+                if target_date < lookback_end:
                     is_overdue = True
                     print(f"  Is overdue: True (target date is in the past)")
                 else:
@@ -142,7 +143,7 @@ def filter_items(items: List[Dict], seven_days_ago: datetime, today: datetime) -
                 print(f"Error parsing target_date for {issue_key}: {e}")
         
         # Check for significant due date shift
-        has_significant_shift = check_due_date_shift(date_history, seven_days_ago)
+        has_significant_shift = check_due_date_shift(date_history, lookback_start)
         print(f"  Has significant shift: {has_significant_shift}")
         
         if is_overdue or has_significant_shift:

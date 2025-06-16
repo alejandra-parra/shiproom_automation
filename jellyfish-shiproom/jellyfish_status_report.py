@@ -13,7 +13,7 @@ from clients.google_slides import GoogleSlidesClient
 from clients.jira import JiraClient
 from clients.jellyfish import JellyfishClient
 from config.config_loader import load_config
-from utils.date_utils import format_date, get_report_date_range
+from utils.date_utils import format_date, get_report_date_range, get_weekly_lookback_range
 from utils.table_utils import prepare_merged_table
 from utils.filter_utils import filter_items
 from utils.due_date_utils import format_due_date_with_history
@@ -30,8 +30,6 @@ class StatusReportGenerator:
         self.jellyfish = JellyfishClient(config)
         self.jira = JiraClient(config)
         self.slides = GoogleSlidesClient(config)
-        self.seven_days_ago = datetime.now() - timedelta(days=7)
-        self.today = datetime.now()
         
         # Status mapping for Google Sheets
         self.status_mapping = STATUS_MAPPING
@@ -59,7 +57,11 @@ class StatusReportGenerator:
             if issue_key:
                 deliverable['date_history'] = self.jira.get_due_date_history(issue_key)
         
-        filtered_deliverables = filter_items(deliverables, self.seven_days_ago, self.today)
+        # Get the lookback range based on the completed week
+        lookback_start, lookback_end = get_weekly_lookback_range(end_date)
+        print(f"Using lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
+        
+        filtered_deliverables = filter_items(deliverables, lookback_start, lookback_end)
         
         print(f"Fetching epics for team {self.jellyfish.team_name}...")
         epics_response = self.jellyfish.get_work_items_by_category(
@@ -74,7 +76,7 @@ class StatusReportGenerator:
             if issue_key:
                 epic['date_history'] = self.jira.get_due_date_history(issue_key)
         
-        filtered_epics = filter_items(epics_response, self.seven_days_ago, self.today)
+        filtered_epics = filter_items(epics_response, lookback_start, lookback_end)
         
         slide_id = self.slides.slide_id
         try:

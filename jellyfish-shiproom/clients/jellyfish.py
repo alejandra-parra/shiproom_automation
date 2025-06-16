@@ -7,6 +7,7 @@ import requests
 from typing import List, Dict
 from datetime import datetime, timedelta
 import json
+from utils.date_utils import get_weekly_lookback_range
 
 class JellyfishClient:
     """Client for interacting with Jellyfish API"""
@@ -75,28 +76,46 @@ class JellyfishClient:
                 print("Response is empty!")
                 return []
             
-            # Extract deliverables from ONLY the last timeframe (most recent week)
-            all_items = []
-            if data:
-                # Get only the last week's data
-                last_week = data[-1]
-                last_timeframe = last_week.get('timeframe', {})
-                print(f"\nUsing ONLY last week: {last_timeframe.get('start')} to {last_timeframe.get('end')}")
-                
-                items = last_week.get('deliverables', [])
-                print(f"Found {len(items)} items in last week")
-                all_items = items
+            # Find the last completed week (where end date is in the past)
+            today = datetime.now()
+            last_completed_week = None
+            week_end_date = None
             
-            print(f"\nTotal items to process: {len(all_items)}")
+            for week in reversed(data):
+                timeframe = week.get('timeframe', {})
+                end_date_str = timeframe.get('end')
+                if end_date_str:
+                    try:
+                        # Handle both Z and +00:00 timezone formats
+                        end_date_str = end_date_str.replace('Z', '+00:00')
+                        week_end = datetime.fromisoformat(end_date_str)
+                        if week_end < today:
+                            last_completed_week = week
+                            week_end_date = week_end
+                            print(f"\nUsing last completed week: {timeframe.get('start')} to {timeframe.get('end')}")
+                            break
+                    except Exception as e:
+                        print(f"Error parsing end date {end_date_str}: {e}")
+            
+            if not last_completed_week:
+                print("No completed weeks found in the response!")
+                return []
+            
+            # Get the 7-day lookback range based on the Friday of the completed week
+            lookback_start, lookback_end = get_weekly_lookback_range(week_end_date)
+            print(f"\nUsing 7-day lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
+            
+            items = last_completed_week.get('deliverables', [])
+            print(f"Found {len(items)} items in last completed week")
             
             # Debug: Show structure of first item
-            if all_items:
+            if items:
                 print(f"\nSample item structure:")
-                first_item = all_items[0]
+                first_item = items[0]
                 print(f"Keys: {list(first_item.keys())}")
                 print(f"Sample item: {json.dumps(first_item, indent=2, default=str)[:500]}...")
             
-            return all_items
+            return items
             
         except requests.exceptions.RequestException as e:
             print(f"ERROR: Request failed for {work_category_slug}")

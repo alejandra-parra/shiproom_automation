@@ -3,13 +3,13 @@
 
 # Required: Google Slides presentation to update
 google_slides:
-  presentation_id: "1RRkMrjU4ntFSoWAx3gr_0I6cfgH66TtTUkujaY86o84"
-  slide_id: "g91ca33bb15_0_485"
+  presentation_id: "12QTdYJx_zNR17Vm7wtSKawWELxyeeUdQgq98pUcq2PI"
+  slide_id: "g3684ecb6890_0_0"
 
 # Required: Team configuration
 team:
-  team_id: "8032"
-  team_name: "Team Clippy"
+  team_id: "61505"
+  team_name: "Team CAPI"
   #team_id: "61505"
   #team_name: "Team Bumblebees"
 
