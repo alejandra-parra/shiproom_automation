@@ -8,11 +8,34 @@ Future versions may use different criteria for status determination.
 from datetime import datetime, timedelta
 from typing import List, Dict
 from utils.date_utils import get_weekly_lookback_range
+import json
+import os
 
 # Status constants - these may be expanded or modified in future versions
 STATUS_DONE = 'Done'
 STATUS_IN_PROGRESS = 'In Progress'
 STATUS_OVERDUE = 'Overdue'
+
+def save_excluded_items(excluded_items: List[Dict], output_dir: str = "logs"):
+    """
+    Save excluded items to a JSON file with timestamp.
+    
+    Args:
+        excluded_items: List of excluded items with their reasons
+        output_dir: Directory to save the log file
+    """
+    # Create logs directory if it doesn't exist
+    os.makedirs(output_dir, exist_ok=True)
+    
+    # Create filename with timestamp
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = os.path.join(output_dir, f"excluded_items_{timestamp}.json")
+    
+    # Save to file
+    with open(filename, 'w') as f:
+        json.dump(excluded_items, f, indent=2)
+    
+    print(f"\nExcluded items saved to: {filename}")
 
 def check_due_date_shift(date_history: List[Dict], lookback_start: datetime) -> bool:
     """
@@ -89,14 +112,16 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         List of items with added _status field
     """
     filtered = []
+    excluded_items = []
     
     for item in items:
-        completed_date_str = item.get('completed_date')
-        target_date_str = item.get('target_date')
         issue_key = item.get('source_issue_key', 'unknown')
-        date_history = item.get('date_history', [])
+        name = item.get('name', '')
         source_status = item.get('source_issue_status', '')
         investment_classification = item.get('investment_classification', '')
+        completed_date_str = item.get('completed_date')
+        target_date_str = item.get('target_date')
+        date_history = item.get('date_history', [])
         
         print(f"\nProcessing item {issue_key}:")
         print(f"  Target date: {target_date_str}")
@@ -107,6 +132,13 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         # Skip items that don't have "Roadmap" in their investment classification
         if "Roadmap" not in investment_classification:
             print(f"  Skipping item (not a roadmap item)")
+            excluded_items.append({
+                'issue_key': issue_key,
+                'name': name,
+                'status': source_status,
+                'investment_classification': investment_classification,
+                'exclusion_reason': 'Not a roadmap item'
+            })
             continue
         
         # Check if completed in the lookback period
@@ -122,9 +154,16 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
             except Exception as e:
                 print(f"Error parsing completed_date for {issue_key}: {e}")
         
-        # Skip items that are not "In Progress"
-        if source_status != "In Progress":
-            print(f"  Skipping item (not in progress)")
+        # Skip items that are not "In Progress", "In Review", or completed in lookback period
+        if source_status not in ["In Progress", "In Review"]:
+            print(f"  Skipping item (not in progress or in review)")
+            excluded_items.append({
+                'issue_key': issue_key,
+                'name': name,
+                'status': source_status,
+                'investment_classification': investment_classification,
+                'exclusion_reason': f'Not in progress or in review (status: {source_status})'
+            })
             continue
         
         # Check if overdue (past target date) or had a significant due date shift
@@ -159,5 +198,9 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         item['_status'] = STATUS_IN_PROGRESS
         filtered.append(item)
         print(f"  Final status: In Progress")
+    
+    # Save excluded items to file
+    if excluded_items:
+        save_excluded_items(excluded_items)
     
     return filtered 

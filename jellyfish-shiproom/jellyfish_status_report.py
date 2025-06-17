@@ -51,6 +51,9 @@ class StatusReportGenerator:
             end_date.strftime('%Y-%m-%d')
         )
         
+        print(f"\n=== DELIVERABLES DEBUG ===")
+        print(f"Total deliverables received from API: {len(deliverables)}")
+        
         # Add due date history to deliverables
         for deliverable in deliverables:
             issue_key = deliverable.get('source_issue_key')
@@ -62,13 +65,17 @@ class StatusReportGenerator:
         print(f"Using lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
         
         filtered_deliverables = filter_items(deliverables, lookback_start, lookback_end)
+        print(f"Deliverables after filtering: {len(filtered_deliverables)}")
         
-        print(f"Fetching epics for team {self.jellyfish.team_name}...")
+        print(f"\nFetching epics for team {self.jellyfish.team_name}...")
         epics_response = self.jellyfish.get_work_items_by_category(
             "epics",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d')
         )
+        
+        print(f"\n=== EPICS DEBUG ===")
+        print(f"Total epics received from API: {len(epics_response)}")
         
         # Add due date history to epics
         for epic in epics_response:
@@ -77,6 +84,12 @@ class StatusReportGenerator:
                 epic['date_history'] = self.jira.get_due_date_history(issue_key)
         
         filtered_epics = filter_items(epics_response, lookback_start, lookback_end)
+        print(f"Epics after filtering: {len(filtered_epics)}")
+        
+        print(f"\n=== FINAL SUMMARY ===")
+        print(f"Total items to include in report: {len(filtered_deliverables) + len(filtered_epics)}")
+        print(f"  - Deliverables: {len(filtered_deliverables)}")
+        print(f"  - Epics: {len(filtered_epics)}")
         
         slide_id = self.slides.slide_id
         try:

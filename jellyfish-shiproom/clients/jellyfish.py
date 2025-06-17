@@ -7,7 +7,7 @@ import requests
 from typing import List, Dict
 from datetime import datetime, timedelta
 import json
-from utils.date_utils import get_weekly_lookback_range
+from utils.date_utils import get_weekly_lookback_range, get_friday_of_week
 
 class JellyfishClient:
     """Client for interacting with Jellyfish API"""
@@ -49,8 +49,7 @@ class JellyfishClient:
             "format": "json",
             "start_date": start_date,
             "end_date": end_date,
-            "unit": "week",
-            "series": "true",
+            "series": "false",
             "work_category_slug": work_category_slug,
             "completed_only": "false",
             "inprogress_only": "false",
@@ -76,37 +75,63 @@ class JellyfishClient:
                 print("Response is empty!")
                 return []
             
-            # Find the last completed week (where end date is in the past)
+            # Since we removed unit=week, we get one result instead of weekly data
+            # Get the 7-day lookback range based on the previous Friday (or today if it's Friday)
             today = datetime.now()
-            last_completed_week = None
-            week_end_date = None
-            
-            for week in reversed(data):
-                timeframe = week.get('timeframe', {})
-                end_date_str = timeframe.get('end')
-                if end_date_str:
-                    try:
-                        # Handle both Z and +00:00 timezone formats
-                        end_date_str = end_date_str.replace('Z', '+00:00')
-                        week_end = datetime.fromisoformat(end_date_str)
-                        if week_end < today:
-                            last_completed_week = week
-                            week_end_date = week_end
-                            print(f"\nUsing last completed week: {timeframe.get('start')} to {timeframe.get('end')}")
-                            break
-                    except Exception as e:
-                        print(f"Error parsing end date {end_date_str}: {e}")
-            
-            if not last_completed_week:
-                print("No completed weeks found in the response!")
-                return []
-            
-            # Get the 7-day lookback range based on the Friday of the completed week
-            lookback_start, lookback_end = get_weekly_lookback_range(week_end_date)
+            friday = get_friday_of_week(today)
+            lookback_start, lookback_end = get_weekly_lookback_range(friday)
             print(f"\nUsing 7-day lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
             
-            items = last_completed_week.get('deliverables', [])
-            print(f"Found {len(items)} items in last completed week")
+            # The response should now be a single object with deliverables
+            if isinstance(data, dict):
+                items = data.get('deliverables', [])
+                print(f"\nResponse is a dictionary with keys: {list(data.keys())}")
+                print(f"Number of deliverables found: {len(items)}")
+            elif isinstance(data, list) and len(data) == 1:
+                # Handle the case where we get a single-element array with the entire month's data
+                print(f"\nResponse is a single-element array (entire month)")
+                month_data = data[0]
+                if isinstance(month_data, dict):
+                    items = month_data.get('deliverables', [])
+                    timeframe = month_data.get('timeframe', {})
+                    print(f"  Month timeframe: {timeframe.get('start', 'unknown')} to {timeframe.get('end', 'unknown')}")
+                    print(f"  Number of items in month: {len(items)}")
+                else:
+                    items = []
+                    print(f"  Month data is not a dictionary")
+            elif isinstance(data, list):
+                # Fallback for multiple elements (shouldn't happen without unit=week)
+                print(f"\nResponse is a list with {len(data)} items (unexpected)")
+                items = []
+                for week_data in data:
+                    if isinstance(week_data, dict):
+                        week_items = week_data.get('deliverables', [])
+                        items.extend(week_items)
+                        print(f"  Week {week_data.get('timeframe', {}).get('start', 'unknown')} to {week_data.get('timeframe', {}).get('end', 'unknown')}: {len(week_items)} items")
+                print(f"Total items extracted from all weeks: {len(items)}")
+            else:
+                # Fallback in case the response structure is different
+                items = data if isinstance(data, list) else []
+                print(f"\nResponse is a list with {len(items)} items")
+            
+            print(f"Found {len(items)} items in the response")
+            
+            # Deduplicate items based on source_issue_key to avoid duplicates from multiple timeframes
+            if items:
+                seen_keys = set()
+                unique_items = []
+                duplicates_removed = 0
+                
+                for item in items:
+                    issue_key = item.get('source_issue_key')
+                    if issue_key and issue_key not in seen_keys:
+                        seen_keys.add(issue_key)
+                        unique_items.append(item)
+                    elif issue_key:
+                        duplicates_removed += 1
+                
+                items = unique_items
+                print(f"Deduplication: Removed {duplicates_removed} duplicate items, kept {len(items)} unique items")
             
             # Debug: Show structure of first item
             if items:
@@ -114,6 +139,18 @@ class JellyfishClient:
                 first_item = items[0]
                 print(f"Keys: {list(first_item.keys())}")
                 print(f"Sample item: {json.dumps(first_item, indent=2, default=str)[:500]}...")
+                
+                # Show all items for debugging
+                print(f"\nAll items summary:")
+                for i, item in enumerate(items):
+                    issue_key = item.get('source_issue_key', 'NO_KEY')
+                    name = item.get('name', 'NO_NAME')
+                    status = item.get('source_issue_status', 'NO_STATUS')
+                    investment = item.get('investment_classification', 'NO_INVESTMENT')
+                    print(f"  {i+1}. {issue_key}: {name[:50]}... | Status: {status} | Investment: {investment}")
+            else:
+                print(f"\nNo items found in response!")
+                print(f"Full response structure: {json.dumps(data, indent=2, default=str)[:1000]}...")
             
             return items
             
