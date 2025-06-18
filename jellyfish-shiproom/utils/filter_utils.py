@@ -168,6 +168,8 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         
         # Check if overdue (past target date) or had a significant due date shift
         is_overdue = False
+        
+        # First check target_date_str if available
         if target_date_str:
             try:
                 target_date = datetime.fromisoformat(target_date_str.replace('Z', '+00:00'))
@@ -181,6 +183,43 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
             except Exception as e:
                 print(f"Error parsing target_date for {issue_key}: {e}")
         
+        # If no target_date_str or not overdue, check the most recent due date from date_history
+        if not is_overdue and date_history:
+            try:
+                # Get the most recent due date from date history
+                latest_due_date_str = date_history[-1]['date']
+                latest_due_date = datetime.fromisoformat(latest_due_date_str.replace('Z', '+00:00'))
+                print(f"  Latest due date from history: {latest_due_date}")
+                print(f"  Lookback end: {lookback_end}")
+                if latest_due_date < lookback_end:
+                    is_overdue = True
+                    print(f"  Is overdue: True (latest due date from history is in the past)")
+                else:
+                    print(f"  Is overdue: False (latest due date from history is in the future)")
+            except Exception as e:
+                print(f"Error parsing latest due date from history for {issue_key}: {e}")
+        
+        # If still not overdue, check for any other due date fields that might exist
+        if not is_overdue:
+            # Check for other potential due date fields in the item
+            due_date_fields = ['due_date', 'duedate', 'dueDate', 'targetDate', 'target_date']
+            for field in due_date_fields:
+                if field in item and item[field]:
+                    try:
+                        due_date_str = str(item[field])
+                        due_date = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
+                        print(f"  Found due date in field '{field}': {due_date}")
+                        print(f"  Lookback end: {lookback_end}")
+                        if due_date < lookback_end:
+                            is_overdue = True
+                            print(f"  Is overdue: True (due date from field '{field}' is in the past)")
+                            break
+                        else:
+                            print(f"  Is overdue: False (due date from field '{field}' is in the future)")
+                    except Exception as e:
+                        print(f"Error parsing due date from field '{field}' for {issue_key}: {e}")
+                        continue
+        
         # Check for significant due date shift
         has_significant_shift = check_due_date_shift(date_history, lookback_start)
         print(f"  Has significant shift: {has_significant_shift}")
@@ -189,7 +228,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
             item['_status'] = STATUS_OVERDUE
             filtered.append(item)
             if is_overdue:
-                print(f"  Final status: Overdue (past target date)")
+                print(f"  Final status: Overdue (past due date)")
             else:
                 print(f"  Final status: Overdue (due date shifted by 2+ weeks)")
             continue
