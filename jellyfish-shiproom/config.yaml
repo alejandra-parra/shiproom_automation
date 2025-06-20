@@ -1,0 +1,36 @@
+# Configuration file - credentials come from environment variables (.env file)
+# Non-sensitive configuration goes here
+
+# Required: Google Slides presentation to update
+google_slides:
+  presentation_id: "12QTdYJx_zNR17Vm7wtSKawWELxyeeUdQgq98pUcq2PI"
+  slide_id: "g3684ecb6890_0_0"
+
+# Required: Team configuration
+team:
+  team_id: "44743"
+  team_name: "Team Tolkien"
+  #team_id: "61505"
+  #team_name: "Team Bumblebees"
+
+# Optional: Override default status mappings
+status_mapping:
+  in_progress: ["In Progress", "Active", "Started"]
+  done: ["Done", "Completed", "Resolved", "Closed"]
+
+# Optional: Field mappings if different from defaults
+field_mappings:
+  deliverable:
+    key_field: "key"
+    name_field: "summary"
+    due_date_field: "due_date"
+    status_field: "status"
+  epic:
+    key_field: "key"
+    name_field: "summary"
+    due_date_field: "due_date"
+    status_field: "status"
+
+
+
+

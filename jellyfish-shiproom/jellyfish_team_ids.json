@@ -1,0 +1,354 @@
+[
+  {
+    "id": 184331,
+    "name": "[9T] Development: [DEV]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 200771,
+    "name": "Compliance & Admin Platform: [CAP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 51936,
+    "name": "Ecosystem: [ECO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184849,
+    "name": "Ninetailed (legacy)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 202019,
+    "name": "Ninetailed - Product & Design: [NTPD]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 182737,
+    "name": "Picard: [PIC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5934,
+    "name": "[PRD] Automation and Tooling: [ATOOLS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 17053,
+    "name": "[PRD] Bauhaus: [BAU]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5946,
+    "name": "[PRD] Engineering Management: [EM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 191503,
+    "name": "[PRD] Fusion: [FUS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 10422,
+    "name": "[PRD] Growth: [GROWTH]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 52475,
+    "name": "[PRD] Growth - Plato: [PLATO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 57210,
+    "name": "[PRD] Isotopes: [CFISO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 80893,
+    "name": "[PRD] Mechagodzilla: [MEC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 186261,
+    "name": "[PRD] Ninetailed: [NT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 184597,
+    "name": "[PRD] Picard: [PIC]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 64878,
+    "name": "[PRD] Prometheus: [PROM]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 13877,
+    "name": "[PRD] Sparks: [SPA]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5950,
+    "name": "[PRD] Team Ahoy: [AHOY]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 205723,
+    "name": "[PRD] Team Alpine (Developer Experience)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 93367,
+    "name": "[PRD] Team Altitude: [ALT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 93171,
+    "name": "[PRD] Team Altitude: [ALT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 121601,
+    "name": "[PRD] Team Arcee: [ARCEE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 210775,
+    "name": "[PRD] Team Clippy: [CLIP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 61505,
+    "name": "[PRD] Team Content API: [CAPI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 8032,
+    "name": "[PRD] Team Content Storage: [CSTORE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5982,
+    "name": "[PRD] Team Development Velocity: [DVEL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 52476,
+    "name": "[PRD] Team Groot: [GROOT]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5952,
+    "name": "[PRD] Team Hejo: [HEJO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 10781,
+    "name": "[PRD] Team Kraken: [KRK]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 171843,
+    "name": "[PRD] Team Lumos: [LUMOS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 11200,
+    "name": "[PRD] Team Mogwai: [MOGWAI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5953,
+    "name": "[PRD] Team Moi: [MOI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 68781,
+    "name": "[PRD] Team Pegasus: [PEGASUS]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 198433,
+    "name": "[PRD] Team Studio West: [STDWEST]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 65807,
+    "name": "[PRD] Team Taiga (Marketplace)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5983,
+    "name": "[PRD] Team Tundra (Extensibility)",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 90301,
+    "name": "[PRD] The Bumblebees: [BBEE]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 44743,
+    "name": "[PRD] Tolkien: [TOL]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 5947,
+    "name": "[PRD] UI Foundation: [UFO]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 25884,
+    "name": "[PRIV] Michael's Project: [PMP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 119019,
+    "name": "Sparks - Experience Builder: [SEB]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 93113,
+    "name": "Team Taiga Technical Roadmap: [TRMKTP]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  },
+  {
+    "id": 183001,
+    "name": "Team Tundra - Technical Improvements: [TTTI]",
+    "active": true,
+    "hierarchy_level": 3,
+    "hierarchy_level_name": "Team",
+    "child_teams": null
+  }
+]
