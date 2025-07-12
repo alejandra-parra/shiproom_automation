@@ -28,6 +28,10 @@ class JiraClient:
     def get_due_date_history(self, issue_key: str) -> List[Dict]:
         """
         Get the history of due date changes for an issue in chronological order.
+        Only includes the last change per day to filter out accidental/temporary changes.
+        
+        Handles the case where an item is created with an initial due date and then
+        that date gets changed multiple times on the same day.
         
         Returns:
             List of dicts containing:
@@ -58,45 +62,44 @@ class JiraClient:
             
             # Sort by timestamp (oldest first)
             changes.sort(key=lambda x: x['timestamp'])
-            
-            # Build the chronological list of due dates with timestamps
+
+            # Always include the original due date from the first change's "from" value (if it exists)
             due_dates = []
-            
-            if changes:
-                # Start with the "from" value of the first change (if it exists)
-                if changes[0]['from']:
+            if changes and changes[0]['from']:
+                due_dates.append({
+                    'date': changes[0]['from'],
+                    'timestamp': changes[0]['timestamp']
+                })
+
+            # Group changes by day and keep only the last change per day
+            daily_changes = {}
+            for change in changes:
+                date_key = change['timestamp'][:10]
+                daily_changes[date_key] = change  # this will keep the last change for the day
+
+            # For each day's last change, include the "to" value
+            for change in sorted(daily_changes.values(), key=lambda x: x['timestamp']):
+                if change['to']:
                     due_dates.append({
-                        'date': changes[0]['from'],
-                        'timestamp': changes[0]['timestamp']
+                        'date': change['to'],
+                        'timestamp': change['timestamp']
                     })
-                
-                # Add all the "to" values except the last one
-                for change in changes[:-1]:
-                    if change['to']:
-                        due_dates.append({
-                            'date': change['to'],
-                            'timestamp': change['timestamp']
-                        })
-                
-                # The current due date should be the last one (not struck through)
-                if current_due:
-                    due_dates.append({
-                        'date': current_due,
-                        'timestamp': changes[-1]['timestamp'] if changes else None
-                    })
-                elif changes[-1]['to']:
-                    # If no current due date, use the last "to" value
-                    due_dates.append({
-                        'date': changes[-1]['to'],
-                        'timestamp': changes[-1]['timestamp']
-                    })
-            else:
-                # No changes found, just use current due date if it exists
-                if current_due:
-                    due_dates.append({
-                        'date': current_due,
-                        'timestamp': None
-                    })
+
+            # Remove duplicates by timestamp (shouldn't be needed, but for safety)
+            seen_timestamps = set()
+            unique_due_dates = []
+            for due_date in due_dates:
+                if due_date['timestamp'] not in seen_timestamps:
+                    seen_timestamps.add(due_date['timestamp'])
+                    unique_due_dates.append(due_date)
+            due_dates = unique_due_dates
+
+            # If we have a current due date that's not in our history, add it
+            if current_due and not any(d['date'] == current_due for d in due_dates):
+                due_dates.append({
+                    'date': current_due,
+                    'timestamp': changes[-1]['timestamp'] if changes else None
+                })
             
             return due_dates
             
