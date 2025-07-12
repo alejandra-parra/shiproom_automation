@@ -166,7 +166,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
             })
             continue
         
-        # Check if overdue (past target date) or had a significant due date shift
+        # Check if overdue (2+ weeks past target date) or had a significant due date shift
         is_overdue = False
         
         # First check target_date_str if available
@@ -175,11 +175,13 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                 target_date = datetime.fromisoformat(target_date_str.replace('Z', '+00:00'))
                 print(f"  Target date parsed: {target_date}")
                 print(f"  Lookback end: {lookback_end}")
-                if target_date < lookback_end:
+                # Check if target date is 2+ weeks in the past
+                two_weeks_ago = lookback_end - timedelta(days=14)
+                if target_date < two_weeks_ago:
                     is_overdue = True
-                    print(f"  Is overdue: True (target date is in the past)")
+                    print(f"  Is overdue: True (target date is 2+ weeks in the past)")
                 else:
-                    print(f"  Is overdue: False (target date is in the future)")
+                    print(f"  Is overdue: False (target date is not 2+ weeks in the past)")
             except Exception as e:
                 print(f"Error parsing target_date for {issue_key}: {e}")
         
@@ -191,11 +193,13 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                 latest_due_date = datetime.fromisoformat(latest_due_date_str.replace('Z', '+00:00'))
                 print(f"  Latest due date from history: {latest_due_date}")
                 print(f"  Lookback end: {lookback_end}")
-                if latest_due_date < lookback_end:
+                # Check if latest due date is 2+ weeks in the past
+                two_weeks_ago = lookback_end - timedelta(days=14)
+                if latest_due_date < two_weeks_ago:
                     is_overdue = True
-                    print(f"  Is overdue: True (latest due date from history is in the past)")
+                    print(f"  Is overdue: True (latest due date from history is 2+ weeks in the past)")
                 else:
-                    print(f"  Is overdue: False (latest due date from history is in the future)")
+                    print(f"  Is overdue: False (latest due date from history is not 2+ weeks in the past)")
             except Exception as e:
                 print(f"Error parsing latest due date from history for {issue_key}: {e}")
         
@@ -210,12 +214,14 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                         due_date = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
                         print(f"  Found due date in field '{field}': {due_date}")
                         print(f"  Lookback end: {lookback_end}")
-                        if due_date < lookback_end:
+                        # Check if due date is 2+ weeks in the past
+                        two_weeks_ago = lookback_end - timedelta(days=14)
+                        if due_date < two_weeks_ago:
                             is_overdue = True
-                            print(f"  Is overdue: True (due date from field '{field}' is in the past)")
+                            print(f"  Is overdue: True (due date from field '{field}' is 2+ weeks in the past)")
                             break
                         else:
-                            print(f"  Is overdue: False (due date from field '{field}' is in the future)")
+                            print(f"  Is overdue: False (due date from field '{field}' is not 2+ weeks in the past)")
                     except Exception as e:
                         print(f"Error parsing due date from field '{field}' for {issue_key}: {e}")
                         continue
@@ -228,7 +234,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
             item['_status'] = STATUS_OVERDUE
             filtered.append(item)
             if is_overdue:
-                print(f"  Final status: Overdue (past due date)")
+                print(f"  Final status: Overdue (2+ weeks past due date)")
             else:
                 print(f"  Final status: Overdue (due date shifted by 2+ weeks)")
             continue

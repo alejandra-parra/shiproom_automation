@@ -8,10 +8,12 @@ google_slides:
 
 # Required: Team configuration
 team:
-  team_id: "44743"
-  team_name: "Team Tolkien"
-  #team_id: "61505"
+  #team_id: "90301"
   #team_name: "Team Bumblebees"
+  #team_id: "210775"
+  #team_name: "Team Clippy"
+  team_id: "8032"
+  team_name: "Team Content Storage"
 
 # Optional: Override default status mappings
 status_mapping:

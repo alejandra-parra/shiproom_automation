@@ -2,27 +2,97 @@
 
 This script generates status reports from Jellyfish data and writes them to Google Slides presentations. It creates formatted tables with deliverables and epics, including their status, maturity, and other relevant information.
 
+📋 **[Changelog](CHANGELOG.md)** - See what's new and what's changed
+
+## 🚀 Quick Start
+
+If you're switching between different projects in this repository, here's how to get this project running:
+
+```bash
+# 1. Navigate to this project directory
+cd jellyfish-shiproom
+
+# 2. Activate the virtual environment
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+
+# 3. Install dependencies (if not already installed)
+pip install -r requirements.txt
+
+# 4. Run the script
+python jellyfish_status_report.py --config config.yaml
+```
+
+**Note:** This project uses a `.venv` virtual environment (not `venv`). Make sure you're activating the correct one!
+
 ## Project Structure
 
 ```
-.
+jellyfish-shiproom/
 ├── jellyfish_status_report.py  # Main script
 ├── config.yaml                 # Configuration file
 ├── requirements.txt           # Python dependencies
 ├── .env                       # Environment variables (not in git)
-├── .gitignore                # Git ignore rules
+├── .venv/                     # Virtual environment (use this one!)
+├── venv/                      # Old virtual environment (ignore)
+├── clients/                   # API client modules
+├── config/                    # Configuration utilities
+├── utils/                     # Utility functions
+├── logs/                      # Log files
 └── README.md                 # This file
 ```
 
 ## Setup
 
-### 1. Install Dependencies
+### 1. Virtual Environment Setup
+
+This project uses a `.venv` virtual environment. If you need to create a new one:
 
 ```bash
+# Create new virtual environment
+python -m venv .venv
+
+# Activate it
+source .venv/bin/activate  # On macOS/Linux
+# OR
+.venv\Scripts\activate     # On Windows
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Google Service Account Setup
+### 2. Install Dependencies
+
+```bash
+# Make sure your virtual environment is activated
+source .venv/bin/activate
+
+# Install all required packages
+pip install -r requirements.txt
+```
+
+### 3. Environment Variables
+
+Create a `.env` file in the project root with the following variables:
+
+```bash
+# Google Service Account Configuration
+# Option 1: Path to JSON file
+GOOGLE_SERVICE_ACCOUNT_FILE=/path/to/your/service-account-key.json
+
+# Option 2: JSON content directly (recommended for deployment)
+# GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account","project_id":"your-project",...}'
+
+# Jellyfish API Configuration
+JELLYFISH_BASE_URL=https://app.jellyfish.co/endpoints/export/v0
+JELLYFISH_API_KEY=your-jellyfish-api-key-here
+
+# Jira API Configuration (Optional - for due date history)
+JIRA_URL=https://your-domain.atlassian.net
+JIRA_EMAIL=your-email@domain.com
+JIRA_API_TOKEN=your-jira-api-token
+```
+
+### 4. Google Service Account Setup
 
 1. Go to the [Google Cloud Console](https://console.cloud.google.com/)
 2. Create a new project or select an existing one
@@ -34,7 +104,7 @@ pip install -r requirements.txt
    - Download the JSON key file
 5. Share your Google Slides presentation with the service account email address (with Editor permissions)
 
-### 2.1. Service Account JSON Formatting
+### 4.1. Service Account JSON Formatting
 
 You have two options for providing the service account credentials:
 
@@ -63,31 +133,9 @@ cat your-service-account.json | tr -d '\n' | sed "s/'/\\\'/g"
 # GOOGLE_SERVICE_ACCOUNT_JSON='paste-the-output-here'
 ```
 
-### 3. Environment Variables
+### 5. Configuration File
 
-Create a `.env` file in the project root with the following variables:
-
-```bash
-# Google Service Account Configuration
-# Option 1: Path to JSON file
-GOOGLE_SERVICE_ACCOUNT_FILE=/path/to/your/service-account-key.json
-
-# Option 2: JSON content directly (recommended for deployment)
-# GOOGLE_SERVICE_ACCOUNT_JSON='{"type":"service_account","project_id":"your-project",...}'
-
-# Jellyfish API Configuration
-JELLYFISH_BASE_URL=https://app.jellyfish.co/endpoints/export/v0
-JELLYFISH_API_KEY=your-jellyfish-api-key-here
-
-# Jira API Configuration (Optional - for due date history)
-JIRA_URL=https://your-domain.atlassian.net
-JIRA_EMAIL=your-email@domain.com
-JIRA_API_TOKEN=your-jira-api-token
-```
-
-### 4. Configuration File
-
-Create a minimal `config.yaml` file. Most credentials are now in the `.env` file:
+The `config.yaml` file is already configured for Team Tolkien. Update it if needed:
 
 ```yaml
 # Configuration file - credentials come from environment variables
@@ -124,13 +172,121 @@ team:
 ### Generate Status Report
 
 ```bash
+# Make sure you're in the jellyfish-shiproom directory
+cd jellyfish-shiproom
+
+# Activate virtual environment
+source .venv/bin/activate
+
+# Run the script
 python jellyfish_status_report.py --config config.yaml
 ```
 
-### Test Authentication
+### Verify Setup
+
+The script will output detailed information about:
+- API connections (Jellyfish, Jira, Google Slides)
+- Data fetching and processing
+- Table generation in Google Slides
+
+If everything is working, you should see:
+- "Report generated in Google Slides" at the end
+- No error messages
+- Detailed logging of the process
+
+## Changelog Management
+
+This project maintains a detailed changelog to track all changes and improvements. The changelog follows the [Keep a Changelog](https://keepachangelog.com/) format.
+
+### Adding New Entries
+
+Use the helper script to easily add new changelog entries:
 
 ```bash
-python jellyfish_status_report.py --config config.yaml --test-auth
+# Add a new feature
+python scripts/update_changelog.py --type added --message "New feature description"
+
+# Fix a bug
+python scripts/update_changelog.py --type fixed --message "Fixed issue with date parsing"
+
+# Change existing functionality
+python scripts/update_changelog.py --type changed --message "Updated overdue logic to use 2-week grace period"
+
+# Remove deprecated feature
+python scripts/update_changelog.py --type removed --message "Removed deprecated API endpoint"
+```
+
+### Available Change Types
+
+- `added` - New features
+- `changed` - Changes to existing functionality
+- `deprecated` - Soon-to-be removed features
+- `removed` - Removed features
+- `fixed` - Bug fixes
+- `security` - Security-related changes
+
+### Version Management
+
+Since this is one feature folder in a larger repository, versioning is scoped to this feature:
+
+1. Update the version number in the changelog (e.g., `jellyfish-shiproom v1.1.0`)
+2. Move entries from the current version to a new version when ready
+3. Add a release date
+4. Optionally tag the release in git with feature prefix
+
+Example:
+```bash
+# Create a feature-specific version tag
+git tag -a jellyfish-shiproom-v1.1.0 -m "Jellyfish Status Report v1.1.0"
+git push origin jellyfish-shiproom-v1.1.0
+```
+
+### Multi-Project Repository Notes
+
+This changelog tracks changes specific to the jellyfish-shiproom feature. Other features in this repository may have their own changelogs or use a different versioning strategy.
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Wrong Virtual Environment**: Make sure you're using `.venv`, not `venv`
+   ```bash
+   # Check which Python you're using
+   which python
+   # Should show: /path/to/jellyfish-shiproom/.venv/bin/python
+   ```
+
+2. **Missing Dependencies**: If you get import errors
+   ```bash
+   source .venv/bin/activate
+   pip install -r requirements.txt
+   ```
+
+3. **Environment Variables**: Make sure your `.env` file exists and has the correct values
+   ```bash
+   # Check if .env file exists
+   ls -la .env
+   ```
+
+4. **API Permissions**: Ensure your service account has access to the Google Slides presentation
+
+### Switching Between Projects
+
+When switching between different projects in this repository:
+
+```bash
+# Deactivate current environment (if any)
+deactivate
+
+# Navigate to the jellyfish-shiproom project
+cd jellyfish-shiproom
+
+# Activate this project's environment
+source .venv/bin/activate
+
+# Verify you're in the right environment
+which python
+# Should show: .../jellyfish-shiproom/.venv/bin/python
 ```
 
 ## Features
