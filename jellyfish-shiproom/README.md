@@ -2,6 +2,8 @@
 
 This script generates status reports from Jellyfish data and writes them to Google Slides presentations. It creates formatted tables with deliverables and epics, including their status, maturity, and other relevant information.
 
+📋 **[Changelog](CHANGELOG.md)** - See what's new and what's changed
+
 ## 🚀 Quick Start
 
 If you're switching between different projects in this repository, here's how to get this project running:
@@ -191,6 +193,57 @@ If everything is working, you should see:
 - "Report generated in Google Slides" at the end
 - No error messages
 - Detailed logging of the process
+
+## Changelog Management
+
+This project maintains a detailed changelog to track all changes and improvements. The changelog follows the [Keep a Changelog](https://keepachangelog.com/) format.
+
+### Adding New Entries
+
+Use the helper script to easily add new changelog entries:
+
+```bash
+# Add a new feature
+python scripts/update_changelog.py --type added --message "New feature description"
+
+# Fix a bug
+python scripts/update_changelog.py --type fixed --message "Fixed issue with date parsing"
+
+# Change existing functionality
+python scripts/update_changelog.py --type changed --message "Updated overdue logic to use 2-week grace period"
+
+# Remove deprecated feature
+python scripts/update_changelog.py --type removed --message "Removed deprecated API endpoint"
+```
+
+### Available Change Types
+
+- `added` - New features
+- `changed` - Changes to existing functionality
+- `deprecated` - Soon-to-be removed features
+- `removed` - Removed features
+- `fixed` - Bug fixes
+- `security` - Security-related changes
+
+### Version Management
+
+Since this is one feature folder in a larger repository, versioning is scoped to this feature:
+
+1. Update the version number in the changelog (e.g., `jellyfish-shiproom v1.1.0`)
+2. Move entries from the current version to a new version when ready
+3. Add a release date
+4. Optionally tag the release in git with feature prefix
+
+Example:
+```bash
+# Create a feature-specific version tag
+git tag -a jellyfish-shiproom-v1.1.0 -m "Jellyfish Status Report v1.1.0"
+git push origin jellyfish-shiproom-v1.1.0
+```
+
+### Multi-Project Repository Notes
+
+This changelog tracks changes specific to the jellyfish-shiproom feature. Other features in this repository may have their own changelogs or use a different versioning strategy.
 
 ## Troubleshooting
 
