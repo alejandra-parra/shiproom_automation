@@ -286,6 +286,37 @@ class GoogleSlidesClient:
             traceback.print_exc()
             return {}
 
+    def add_bordered_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 250, height: float = 100, border_color: dict = None, border_weight: float = 1.5):
+        """Add a text box with a border to a slide and return its objectId."""
+        if border_color is None:
+            border_color = {'red': 0, 'green': 0, 'blue': 0}
+        text_id = self.add_text_box(slide_id, text, x, y, width, height)
+        border_request = {
+            'updateShapeProperties': {
+                'objectId': text_id,
+                'shapeProperties': {
+                    'outline': {
+                        'outlineFill': {
+                            'solidFill': {
+                                'color': {
+                                    'rgbColor': border_color
+                                }
+                            }
+                        },
+                        'weight': {'magnitude': border_weight, 'unit': 'PT'}
+                    }
+                },
+                'fields': 'outline'
+            }
+        }
+        self.service.presentations().batchUpdate(
+            presentationId=self.presentation_id,
+            body={'requests': [border_request]}
+        ).execute()
+        print(f"Added bordered text box to slide {slide_id}")
+        return text_id
+
+    # Update column widths in add_table for slimmer layout
     def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None, link_map: Dict = None):
         """Add a table to a slide, with optional text links for issue keys."""
         try:
@@ -307,12 +338,14 @@ class GoogleSlidesClient:
             # For deliverables: [Key, Name, Maturity, Due Date, Status]
             # For epics: [Key, Name, Due Date, Status]
             if cols == 5:  # Deliverables table
-                column_widths = [80, 250, 60, 100, 60]  # Key, Name, Maturity, Due Date, Status
+                column_widths = [65, 180, 45, 70, 40]  # Key, Name, Maturity, Due Date, Status (tuned)
+                print(f"DEBUG: Using deliverables column widths: {column_widths}")
             elif cols == 4:  # Epics table
-                column_widths = [80, 280, 100, 60]  # Key, Name, Due Date, Status
+                column_widths = [65, 225, 70, 40]  # Key, Name, Due Date, Status (tuned)
+                print(f"DEBUG: Using epics column widths: {column_widths}")
             else:
                 # Fallback to equal widths
-                column_widths = [140] * cols
+                column_widths = [120] * cols
             
             total_width = sum(column_widths)
             
@@ -694,7 +727,7 @@ class GoogleSlidesClient:
                     'x_position': x
                 }
             
-            return table_id, actual_dimensions
+            return table_id, actual_dimensions, column_widths, total_width
             
         except HttpError as e:
             print(f"Error adding table to slide {slide_id}: {e}")
@@ -740,7 +773,35 @@ class GoogleSlidesClient:
             ).execute()
             
             print(f"Added text box to slide {slide_id}")
-            
+            return text_id
         except HttpError as e:
             print(f"Error adding text box to slide {slide_id}: {e}")
             raise 
+
+    def update_textbox_style(self, object_id: str, font_size: int = None, bold: bool = False):
+        """Update the text style for a text box (font size, bold)."""
+        fields = []
+        style = {}
+        if font_size is not None:
+            style['fontSize'] = {'magnitude': font_size, 'unit': 'PT'}
+            fields.append('fontSize')
+        if bold:
+            style['bold'] = True
+            fields.append('bold')
+        if not fields:
+            return
+        requests = [
+            {
+                'updateTextStyle': {
+                    'objectId': object_id,
+                    'style': style,
+                    'textRange': {'type': 'ALL'},
+                    'fields': ','.join(fields)
+                }
+            }
+        ]
+        self.service.presentations().batchUpdate(
+            presentationId=self.presentation_id,
+            body={'requests': requests}
+        ).execute()
+        print(f"Updated text style for {object_id}: {style}") 
