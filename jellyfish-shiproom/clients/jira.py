@@ -46,11 +46,34 @@ class JiraClient:
             return []
         
         try:
-            # Get issue with changelog
-            issue = self.jira.issue(issue_key, expand='changelog')
-
-            # Get current due date
-            current_due = getattr(issue.fields, 'duedate', None)
+            # Get current due date first (without changelog to be efficient)
+            issue_basic = self.jira.issue(issue_key, fields='duedate')
+            current_due = getattr(issue_basic.fields, 'duedate', None)
+            
+            # Collect all histories using pagination
+            all_histories = []
+            start_at = 0
+            max_results = 100  # Jira's default pagination size
+            
+            while True:
+                # Get changelog with pagination
+                issue_with_changelog = self.jira.issue(
+                    issue_key, 
+                    expand=f'changelog[{start_at}:{start_at + max_results}]'
+                )
+                
+                # Check if we have any histories in this page
+                if not hasattr(issue_with_changelog.changelog, 'histories') or not issue_with_changelog.changelog.histories:
+                    break
+                
+                # Add histories from this page
+                all_histories.extend(issue_with_changelog.changelog.histories)
+                
+                # Check if we've reached the end
+                if len(issue_with_changelog.changelog.histories) < max_results:
+                    break
+                
+                start_at += max_results
             
             # Find when the issue was moved to "In Progress" status and what the due date was at that time
             in_progress_timestamp = None
@@ -59,7 +82,7 @@ class JiraClient:
             # Track the due date chronologically through the changelog
             current_tracked_due = None
             
-            for history in sorted(issue.changelog.histories, key=lambda x: x.created):
+            for history in sorted(all_histories, key=lambda x: x.created):
                 for item in history.items:
                     if item.field.lower() in ['duedate', 'due date']:
                         # Update our tracked due date
@@ -77,7 +100,7 @@ class JiraClient:
             
             # Collect all due date changes with timestamps
             changes = []
-            for history in issue.changelog.histories:
+            for history in all_histories:
                 created = history.created  # Timestamp of the change
                 for item in history.items:
                     if item.field.lower() in ['duedate', 'due date']:
