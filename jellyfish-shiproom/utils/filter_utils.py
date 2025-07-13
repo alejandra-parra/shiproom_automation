@@ -6,7 +6,7 @@ Future versions may use different criteria for status determination.
 """
 
 from datetime import datetime, timedelta
-from typing import List, Dict
+from typing import List, Dict, Tuple
 from utils.date_utils import get_weekly_lookback_range
 import json
 import os
@@ -36,6 +36,33 @@ def save_excluded_items(excluded_items: List[Dict], output_dir: str = "logs"):
         json.dump(excluded_items, f, indent=2)
     
     print(f"\nExcluded items saved to: {filename}")
+
+def format_excluded_items_for_display(excluded_items: List[Dict]) -> str:
+    """
+    Format excluded items into a readable string for display in slides.
+    
+    Args:
+        excluded_items: List of excluded items with their reasons
+        
+    Returns:
+        Formatted string with one item per line
+    """
+    if not excluded_items:
+        return "No items were excluded."
+    
+    formatted_lines = []
+    for item in excluded_items:
+        issue_key = item.get('issue_key', 'Unknown')
+        name = item.get('name', 'Unknown')
+        status = item.get('status', 'Unknown')
+        investment_classification = item.get('investment_classification', 'Unknown')
+        exclusion_reason = item.get('exclusion_reason', 'Unknown reason')
+        
+        # Format: DX-60 - MCP Server POC (Roadmap, Done) : Not in progress or in review (status: Done)
+        formatted_line = f"{issue_key} - {name} ({investment_classification}, {status}) : {exclusion_reason}"
+        formatted_lines.append(formatted_line)
+    
+    return "\n".join(formatted_lines)
 
 def check_due_date_shift(date_history: List[Dict], lookback_start: datetime) -> bool:
     """
@@ -88,7 +115,7 @@ def check_due_date_shift(date_history: List[Dict], lookback_start: datetime) -> 
         
     return False
 
-def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: datetime) -> List[Dict]:
+def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: datetime) -> Tuple[List[Dict], List[Dict]]:
     """
     Filter and determine status for work items based on completion and target dates.
     
@@ -109,7 +136,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         lookback_end: Datetime object representing the end of the lookback period
         
     Returns:
-        List of items with added _status field
+        Tuple of (filtered_items, excluded_items) where filtered_items have added _status field
     """
     filtered = []
     excluded_items = []
@@ -248,4 +275,4 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
     if excluded_items:
         save_excluded_items(excluded_items)
     
-    return filtered 
+    return filtered, excluded_items 
