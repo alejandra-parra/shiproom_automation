@@ -15,7 +15,7 @@ from clients.jellyfish import JellyfishClient
 from config.config_loader import load_config
 from utils.date_utils import format_date, get_report_date_range, get_weekly_lookback_range
 from utils.table_utils import prepare_merged_table
-from utils.filter_utils import filter_items
+from utils.filter_utils import filter_items, format_excluded_items_for_display
 from utils.due_date_utils import format_due_date_with_history
 from utils.status_utils import STATUS_MAPPING
 
@@ -64,8 +64,9 @@ class StatusReportGenerator:
         lookback_start, lookback_end = get_weekly_lookback_range(end_date)
         print(f"Using lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
         
-        filtered_deliverables = filter_items(deliverables, lookback_start, lookback_end)
+        filtered_deliverables, excluded_deliverables = filter_items(deliverables, lookback_start, lookback_end)
         print(f"Deliverables after filtering: {len(filtered_deliverables)}")
+        print(f"Deliverables excluded: {len(excluded_deliverables)}")
         
         print(f"\nFetching epics for team {self.jellyfish.team_name}...")
         epics_response = self.jellyfish.get_work_items_by_category(
@@ -83,8 +84,9 @@ class StatusReportGenerator:
             if issue_key:
                 epic['date_history'] = self.jira.get_due_date_history(issue_key)
         
-        filtered_epics = filter_items(epics_response, lookback_start, lookback_end)
+        filtered_epics, excluded_epics = filter_items(epics_response, lookback_start, lookback_end)
         print(f"Epics after filtering: {len(filtered_epics)}")
+        print(f"Epics excluded: {len(excluded_epics)}")
         
         print(f"\n=== FINAL SUMMARY ===")
         print(f"Total items to include in report: {len(filtered_deliverables) + len(filtered_epics)}")
@@ -173,6 +175,27 @@ class StatusReportGenerator:
             border_weight=RISKS_CONTENT_BORDER_WEIGHT
         )
         self.slides.update_textbox_style(risks_content_id, font_size=RISKS_CONTENT_FONT_SIZE, bold=False)
+        
+        # Add exclusion log to the right of the table (outside visible area)
+        all_excluded_items = excluded_deliverables + excluded_epics
+        if all_excluded_items:
+            exclusion_text = format_excluded_items_for_display(all_excluded_items)
+            # Position the text box to the right of the table, outside the visible slide area
+            # Google Slides dimensions are typically 720x405 points
+            exclusion_x = 750  # Right side of the slide (slide width is ~720)
+            exclusion_y = 20   # Top of the slide
+            exclusion_width = 600  # Wide width to avoid line breaks
+            exclusion_height = 400  # Reasonable height for multiple items
+            
+            self.slides.add_text_box(
+                slide_id,
+                f"EXCLUDED ITEMS:\n\n{exclusion_text}",
+                exclusion_x,
+                exclusion_y,
+                exclusion_width,
+                exclusion_height
+            )
+            print(f"Added exclusion log with {len(all_excluded_items)} items")
         print(f"Report generated in Google Slides")
 
 def main():

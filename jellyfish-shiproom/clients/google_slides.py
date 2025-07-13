@@ -733,8 +733,8 @@ class GoogleSlidesClient:
             print(f"Error adding table to slide {slide_id}: {e}")
             return None, None
     
-    def add_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 400, height: float = 100):
-        """Add a text box to a slide"""
+    def add_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 400, height: float = 100, font_size: float = 7):
+        """Add a text box to a slide with specified font size"""
         try:
             text_id = f"text_{int(time.time() * 1000000)}"
             
@@ -764,6 +764,18 @@ class GoogleSlidesClient:
                         'objectId': text_id,
                         'text': text
                     }
+                },
+                {
+                    'updateTextStyle': {
+                        'objectId': text_id,
+                        'style': {
+                            'fontSize': {'magnitude': font_size, 'unit': 'PT'}
+                        },
+                        'textRange': {
+                            'type': 'ALL'
+                        },
+                        'fields': 'fontSize'
+                    }
                 }
             ]
             
@@ -772,8 +784,9 @@ class GoogleSlidesClient:
                 body={'requests': requests}
             ).execute()
             
-            print(f"Added text box to slide {slide_id}")
+            print(f"Added text box to slide {slide_id} with font size {font_size}pt")
             return text_id
+            
         except HttpError as e:
             print(f"Error adding text box to slide {slide_id}: {e}")
             raise 
