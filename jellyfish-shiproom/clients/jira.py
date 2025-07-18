@@ -19,7 +19,8 @@ class JiraClient:
         if self.jira_url and self.jira_email and self.jira_token:
             self.jira = JIRA(
                 server=self.jira_url,
-                basic_auth=(self.jira_email, self.jira_token)
+                basic_auth=(self.jira_email, self.jira_token),
+                timeout=30  # 30 second timeout
             )
             print(f"Initialized Jira client for {self.jira_url}")
         else:
@@ -54,8 +55,11 @@ class JiraClient:
             all_histories = []
             start_at = 0
             max_results = 100  # Jira's default pagination size
+            max_pages = 10  # Safety limit to prevent infinite loops
+            seen_history_ids = set()  # Track seen history IDs to detect duplicates
             
-            while True:
+            page_count = 0
+            while page_count < max_pages:
                 # Get changelog with pagination
                 issue_with_changelog = self.jira.issue(
                     issue_key, 
@@ -67,13 +71,24 @@ class JiraClient:
                     break
                 
                 # Add histories from this page
-                all_histories.extend(issue_with_changelog.changelog.histories)
+                histories_in_page = len(issue_with_changelog.changelog.histories)
                 
-                # Check if we've reached the end
-                if len(issue_with_changelog.changelog.histories) < max_results:
+                # Check for duplicate data (same history IDs as before)
+                current_history_ids = {h.id for h in issue_with_changelog.changelog.histories}
+                if current_history_ids.issubset(seen_history_ids):
+                    # We're getting duplicate data, so we've reached the end
+                    break
+                
+                # Add new histories and track their IDs
+                all_histories.extend(issue_with_changelog.changelog.histories)
+                seen_history_ids.update(current_history_ids)
+                
+                # Check if we've reached the end (got fewer than max_results)
+                if histories_in_page < max_results:
                     break
                 
                 start_at += max_results
+                page_count += 1
             
             # Find when the issue was moved to "In Progress" status and what the due date was at that time
             in_progress_timestamp = None
