@@ -108,11 +108,12 @@ class StatusReportGenerator:
         )
         y_position = 80
         print(f"Merged table data: {len(merged_data)} rows")
-        # Add merged table (extend add_table to support merge_map if needed)
-        table_id, table_dimensions = self.slides.add_table(
+        # Use returned column_widths and total_width for text box placement
+        table_x = 50
+        table_id, table_dims, column_widths, total_table_width = self.slides.add_table(
             slide_id,
             merged_data,
-            50,
+            table_x,
             y_position,
             formatting_map,
             color_map,
@@ -120,6 +121,60 @@ class StatusReportGenerator:
             merge_map=merge_map,
             link_map=link_map
         )
+        margin = 20
+        text_box_x = table_x + total_table_width + margin
+        text_box_y = y_position
+        text_box_height = table_dims['height'] if table_dims else 220
+        slide_width = 960
+        max_text_box_width = max(100, slide_width - text_box_x - 30)
+        text_box_width = min(220, max_text_box_width)
+        print(f"DEBUG: Text box x={text_box_x}, y={text_box_y}, width={text_box_width}, height={text_box_height}")
+        # === Placement configuration for Risks/Mitigations section ===
+        # Offset to move the Risks/Mitigations title higher or lower relative to the table top
+        RISKS_TITLE_VERTICAL_OFFSET = -22  # Move up/down (negative = up)
+        RISKS_TITLE_HORIZONTAL_OFFSET = -5  # Move left/right (negative = left, positive = right)
+        RISKS_TITLE_FONT_SIZE = 10
+        RISKS_TITLE_HEIGHT = 18  # Height for one line of text at font size 10
+        RISKS_CONTENT_GAP = 4    # Gap between title and content box
+        RISKS_CONTENT_FONT_SIZE = 7
+        RISKS_CONTENT_BORDER_WEIGHT = 0.5
+        RISKS_CONTENT_BORDER_COLOR = {'red': 0, 'green': 0, 'blue': 0}
+        RISKS_CONTENT_INITIAL_TEXT = "- "
+        RISKS_CONTENT_HEIGHT = 260  # Set the height of the risks/mitigations content box (adjust as needed)
+        # Calculate coordinates for Risks/Mitigations title and content box
+        risks_title_x = text_box_x + RISKS_TITLE_HORIZONTAL_OFFSET
+        risks_title_y = text_box_y + RISKS_TITLE_VERTICAL_OFFSET
+        risks_title_width = text_box_width
+        risks_title_height = RISKS_TITLE_HEIGHT
+        risks_content_x = text_box_x
+        risks_content_y = risks_title_y + risks_title_height + RISKS_CONTENT_GAP
+        risks_content_width = text_box_width
+        risks_content_height = RISKS_CONTENT_HEIGHT
+
+        # --- Add Risks/Mitigations Title ---
+        risks_title_text = "Risks / Mitigations"
+        risks_title_id = self.slides.add_text_box(
+            slide_id,
+            risks_title_text,
+            risks_title_x,
+            risks_title_y,
+            risks_title_width,
+            risks_title_height
+        )
+        self.slides.update_textbox_style(risks_title_id, font_size=RISKS_TITLE_FONT_SIZE, bold=True)
+
+        # --- Add Risks/Mitigations Content Box ---
+        risks_content_id = self.slides.add_bordered_text_box(
+            slide_id,
+            RISKS_CONTENT_INITIAL_TEXT,
+            risks_content_x,
+            risks_content_y,
+            risks_content_width,
+            risks_content_height,
+            border_color=RISKS_CONTENT_BORDER_COLOR,
+            border_weight=RISKS_CONTENT_BORDER_WEIGHT
+        )
+        self.slides.update_textbox_style(risks_content_id, font_size=RISKS_CONTENT_FONT_SIZE, bold=False)
         
         # Add exclusion log to the right of the table (outside visible area)
         all_excluded_items = excluded_deliverables + excluded_epics
@@ -141,7 +196,6 @@ class StatusReportGenerator:
                 exclusion_height
             )
             print(f"Added exclusion log with {len(all_excluded_items)} items")
-        
         print(f"Report generated in Google Slides")
 
 def main():
