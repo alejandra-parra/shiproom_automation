@@ -51,9 +51,6 @@ class StatusReportGenerator:
             end_date.strftime('%Y-%m-%d')
         )
         
-        print(f"\n=== DELIVERABLES DEBUG ===")
-        print(f"Total deliverables received from API: {len(deliverables)}")
-        
         # Add due date history to deliverables
         for deliverable in deliverables:
             issue_key = deliverable.get('source_issue_key')
@@ -75,14 +72,17 @@ class StatusReportGenerator:
             end_date.strftime('%Y-%m-%d')
         )
         
-        print(f"\n=== EPICS DEBUG ===")
-        print(f"Total epics received from API: {len(epics_response)}")
-        
         # Add due date history to epics
         for epic in epics_response:
             issue_key = epic.get('source_issue_key')
             if issue_key:
-                epic['date_history'] = self.jira.get_due_date_history(issue_key)
+                try:
+                    epic['date_history'] = self.jira.get_due_date_history(issue_key)
+                except Exception as e:
+                    print(f"Error getting history for {issue_key}: {e}")
+                    epic['date_history'] = []
+            else:
+                epic['date_history'] = []
         
         filtered_epics, excluded_epics = filter_items(epics_response, lookback_start, lookback_end)
         print(f"Epics after filtering: {len(filtered_epics)}")
@@ -116,7 +116,7 @@ class StatusReportGenerator:
             y_position,
             formatting_map,
             color_map,
-            None,  # header_color handled per-row in formatting_map
+            {},  # header_color - empty dict for default behavior
             merge_map=merge_map,
             link_map=link_map
         )
