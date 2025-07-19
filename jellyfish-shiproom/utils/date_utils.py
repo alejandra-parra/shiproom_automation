@@ -40,19 +40,26 @@ def get_report_date_range() -> Tuple[datetime, datetime]:
 
 def get_weekly_lookback_range(end_date: datetime) -> Tuple[datetime, datetime]:
     """
-    Get the 7-day lookback range based on the Friday of the completed week.
+    Get the 7-day lookback range for the previous week (Monday-Sunday).
+    The lookback period is always the week before the current week.
     
     Args:
-        end_date (datetime): The end date of the completed week
+        end_date (datetime): The end date of the reporting period
         
     Returns:
         Tuple[datetime, datetime]: A tuple containing (start_date, end_date) for the 7-day lookback
     """
-    # Get the Friday of the completed week
-    friday = get_friday_of_week(end_date)
-    # The start date is 7 days before the Friday
-    start_date = friday - timedelta(days=7)
-    return start_date, friday
+    # Get the Friday of the current week
+    current_friday = get_friday_of_week(end_date)
+    
+    # The lookback period is always the previous week
+    # Lookback ends on the previous Friday
+    lookback_end = current_friday - timedelta(days=7)
+    
+    # Lookback starts 7 days before the lookback end (previous Monday)
+    lookback_start = lookback_end - timedelta(days=6)  # 6 days back from Friday = Monday
+    
+    return lookback_start, lookback_end
 
 def format_date(date_str: str) -> str:
     """

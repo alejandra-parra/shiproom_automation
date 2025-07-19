@@ -18,16 +18,7 @@ teams:
     team_name: "[PRD] Team Ahoy: [AHOY]"
     team_id: 5950
     presenter: ""
-    slide_id: ""
-    image_link: ""
-
-  # [PRD] Team Altitude: [ALT]
-  ALT:
-    jira_project_key: "ALT"
-    team_name: "[PRD] Team Altitude: [ALT]"
-    team_id: 93367
-    presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_150902"
     image_link: ""
 
   # [PRD] The Bumblebees: [BBEE]
@@ -36,7 +27,7 @@ teams:
     team_name: "[PRD] The Bumblebees: [BBEE]"
     team_id: 90301
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_150938"
     image_link: ""
 
   # Compliance & Admin Platform: [CAP]
@@ -45,7 +36,7 @@ teams:
     team_name: "Compliance & Admin Platform: [CAP]"
     team_id: 200771
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_150956"
     image_link: ""
 
   # [PRD] Team Content API: [CAPI]
@@ -54,7 +45,7 @@ teams:
     team_name: "[PRD] Team Content API: [CAPI]"
     team_id: 61505
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151021"
     image_link: ""
 
   # [PRD] Isotopes: [CFISO]
@@ -63,7 +54,7 @@ teams:
     team_name: "[PRD] Isotopes: [CFISO]"
     team_id: 57210
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151049"
     image_link: ""
 
   # [PRD] Team Clippy: [CLIP]
@@ -72,7 +63,7 @@ teams:
     team_name: "[PRD] Team Clippy: [CLIP]"
     team_id: 210775
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151113"
     image_link: ""
 
   # [PRD] Team Content Storage: [CSTORE]
@@ -81,17 +72,9 @@ teams:
     team_name: "[PRD] Team Content Storage: [CSTORE]"
     team_id: 8032
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151140"
     image_link: ""
 
-  # [9T] Development: [DEV]
-  DEV:
-    jira_project_key: "DEV"
-    team_name: "[9T] Development: [DEV]"
-    team_id: 184331
-    presenter: ""
-    slide_id: ""
-    image_link: ""
 
   # [PRD] Team Alpine (Developer Experience)
   DX:
@@ -99,16 +82,7 @@ teams:
     team_name: "[PRD] Team Alpine (Developer Experience)"
     team_id: 205723
     presenter: ""
-    slide_id: ""
-    image_link: ""
-
-  # Ecosystem: [ECO]
-  ECO:
-    jira_project_key: "ECO"
-    team_name: "Ecosystem: [ECO]"
-    team_id: 51936
-    presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151200"
     image_link: ""
 
   # [PRD] Team Tundra (Extensibility)
@@ -117,7 +91,7 @@ teams:
     team_name: "[PRD] Team Tundra (Extensibility)"
     team_id: 5983
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151231"
     image_link: ""
 
   # [PRD] Fusion: [FUS]
@@ -126,7 +100,7 @@ teams:
     team_name: "[PRD] Fusion: [FUS]"
     team_id: 191503
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151259"
     image_link: ""
 
   # [PRD] Team Groot: [GROOT]
@@ -135,7 +109,7 @@ teams:
     team_name: "[PRD] Team Groot: [GROOT]"
     team_id: 52476
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151322"
     image_link: ""
 
   # [PRD] Team Hejo: [HEJO]
@@ -144,7 +118,7 @@ teams:
     team_name: "[PRD] Team Hejo: [HEJO]"
     team_id: 5952
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151346"
     image_link: ""
 
   # [PRD] Team Taiga (Marketplace)
@@ -153,7 +127,7 @@ teams:
     team_name: "[PRD] Team Taiga (Marketplace)"
     team_id: 65807
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151421"
     image_link: ""
 
   # [PRD] Team Kraken: [KRK]
@@ -162,7 +136,7 @@ teams:
     team_name: "[PRD] Team Kraken: [KRK]"
     team_id: 10781
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151452"
     image_link: ""
 
   # [PRD] Mechagodzilla: [MEC]
@@ -171,7 +145,7 @@ teams:
     team_name: "[PRD] Mechagodzilla: [MEC]"
     team_id: 80893
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151518"
     image_link: ""
 
   # [PRD] Team Mogwai: [MOGWAI]
@@ -180,7 +154,7 @@ teams:
     team_name: "[PRD] Team Mogwai: [MOGWAI]"
     team_id: 11200
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151539"
     image_link: ""
 
   # [PRD] Team Moi: [MOI]
@@ -189,34 +163,16 @@ teams:
     team_name: "[PRD] Team Moi: [MOI]"
     team_id: 5953
     presenter: ""
-    slide_id: ""
-    image_link: ""
-
-  # Ninetailed (legacy)
-  NINETAILED_LEGACY:
-    jira_project_key: ""
-    team_name: "Ninetailed (legacy)"
-    team_id: 184849
-    presenter: ""
-    slide_id: ""
-    image_link: ""
-
-  # [PRD] Ninetailed: [NT]
-  NT:
-    jira_project_key: "NT"
-    team_name: "[PRD] Ninetailed: [NT]"
-    team_id: 186261
-    presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151608"
     image_link: ""
 
   # Picard: [PIC]
   PIC:
     jira_project_key: "PIC"
     team_name: "Picard: [PIC]"
-    team_id: 182737
+    team_id: 184597
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151624"
     image_link: ""
 
   # [PRD] Sparks: [SPA]
@@ -225,7 +181,7 @@ teams:
     team_name: "[PRD] Sparks: [SPA]"
     team_id: 13877
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151653"
     image_link: ""
 
   # [PRD] Tolkien: [TOL]
@@ -234,7 +190,7 @@ teams:
     team_name: "[PRD] Tolkien: [TOL]"
     team_id: 44743
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151730"
     image_link: ""
 
   # [PRD] UI Foundation: [UFO]
@@ -243,5 +199,5 @@ teams:
     team_name: "[PRD] UI Foundation: [UFO]"
     team_id: 5947
     presenter: ""
-    slide_id: ""
+    slide_id: "id.slide_20250719_151758"
     image_link: ""
