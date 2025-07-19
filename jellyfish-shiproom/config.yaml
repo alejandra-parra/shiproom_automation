@@ -3,17 +3,20 @@
 
 # Required: Google Slides presentation to update
 google_slides:
-  presentation_id: "12QTdYJx_zNR17Vm7wtSKawWELxyeeUdQgq98pUcq2PI"
-  slide_id: "g3684ecb6890_0_0"
+  presentation_id: "1MgnR_LZBQOVVbuQAZFgip09wHWnkB0U56mGziRREdPg"
+  # slide_id is now configured per team in teams_config.yaml
 
-# Required: Team configuration
-team:
-  #team_id: "90301"
-  #team_name: "Team Bumblebees"
-  #team_id: "210775"
-  #team_name: "Team Clippy"
-  team_id: "8032"
-  team_name: "Team Content Storage"
+# Teams Configuration
+teams_config_file: "teams_config.yaml"
+
+# Team Selection
+# Use "all" to generate slides for all teams, or specify a team identifier (e.g., "BBEE", "TOL", "CLIP")
+team_selection: "all"  # Options: "all" or specific team identifier like "BBEE"
+
+# Legacy single-team configuration (deprecated - use teams_config.yaml instead)
+# team:
+#   team_id: "90301"
+#   team_name: "Team Bumblebees"
 
 # Optional: Override default status mappings
 status_mapping:

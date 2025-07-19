@@ -152,6 +152,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         
         print(f"\nProcessing item {issue_key}:")
         print(f"  Target date: {target_date_str}")
+        print(f"  Completed date: {completed_date_str}")
         print(f"  Date history: {date_history}")
         print(f"  Source status: {source_status}")
         print(f"  Investment classification: {investment_classification}")
@@ -172,16 +173,23 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         if completed_date_str:
             try:
                 completed_date = datetime.fromisoformat(completed_date_str.replace('Z', '+00:00'))
+                print(f"  Parsed completed date: {completed_date}")
+                print(f"  Lookback range: {lookback_start} to {lookback_end}")
                 if lookback_start <= completed_date <= lookback_end:
                     # Completed in lookback period
                     item['_status'] = STATUS_DONE
                     filtered.append(item)
                     print(f"  Status: Done (completed on {completed_date_str})")
                     continue
+                else:
+                    print(f"  Completed date {completed_date} is not in lookback period")
             except Exception as e:
                 print(f"Error parsing completed_date for {issue_key}: {e}")
+        else:
+            print(f"  No completed_date field found")
         
-        # Skip items that are not "In Progress", "In Review", or completed in lookback period
+        # Skip items that are not "In Progress" or "In Review"
+        # Note: Items completed in lookback period are already handled above
         if source_status not in ["In Progress", "In Review"]:
             print(f"  Skipping item (not in progress or in review)")
             excluded_items.append({

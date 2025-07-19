@@ -67,17 +67,16 @@ class GoogleSlidesClient:
         socket.setdefaulttimeout(30)  # 30 second timeout
         self.service = build('slides', 'v1', credentials=self.credentials)
         
-        # Get presentation ID and slide ID from config
+        # Get presentation ID from config
         self.presentation_id = config.get('google_slides', {}).get('presentation_id')
         if not self.presentation_id:
             raise ValueError("Google Presentation ID not found in config file under 'google_slides.presentation_id'")
         
-        self.slide_id = config.get('google_slides', {}).get('slide_id')
-        if not self.slide_id:
-            raise ValueError("Google Slide ID not found in config file under 'google_slides.slide_id'")
+        # Slide ID will be set per team from teams_config.yaml
+        self.slide_id = None
         
         print(f"Initialized Google Slides client with presentation ID: {self.presentation_id}")
-        print(f"Will update slide ID: {self.slide_id}")
+        print(f"No default slide ID - will create new slides as needed")
     
     def get_presentation(self):
         """Get presentation metadata"""
@@ -211,7 +210,7 @@ class GoogleSlidesClient:
         except HttpError as e:
             print(f"Error adding title to slide {slide_id}: {e}")
     
-    def get_table_dimensions(self, table_id: str) -> Dict:
+    def get_table_dimensions(self, table_id: str, slide_id: str) -> Dict:
         """Get actual table dimensions after creation"""
         try:
             print(f"Getting dimensions for table: {table_id}")
@@ -220,9 +219,9 @@ class GoogleSlidesClient:
             # First, find our target slide
             target_slide = None
             for slide in presentation.get('slides', []):
-                if slide.get('objectId') == self.slide_id:
+                if slide.get('objectId') == slide_id:
                     target_slide = slide
-                    print(f"Found target slide: {self.slide_id}")
+                    print(f"Found target slide: {slide_id}")
                     break
             
             if not target_slide:
@@ -717,7 +716,7 @@ class GoogleSlidesClient:
             time.sleep(1)
             
             # Get actual dimensions after content is added
-            actual_dimensions = self.get_table_dimensions(table_id)
+            actual_dimensions = self.get_table_dimensions(table_id, slide_id)
             if not actual_dimensions:
                 # Fallback to initial dimensions if we can't get actual ones
                 actual_dimensions = {

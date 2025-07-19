@@ -30,16 +30,12 @@ class JellyfishClient:
             "accept": "application/json"
         }
         
-        # Team info comes from config file
-        self.team_id = config.get('team', {}).get('team_id', '')
-        self.team_name = config.get('team', {}).get('team_name', '')
-        
-        if not self.team_id:
-            raise ValueError("Jellyfish team ID not found in config file under 'team.team_id'")
+        # Team info will be set dynamically for each team
+        self.team_id = None
+        self.team_name = None
         
         print(f"Initialized with base_url: {self.base_url}")
-        print(f"Team ID: {self.team_id}")
-        print(f"Team Name: {self.team_name}")
+        print(f"Team info will be set dynamically for each team")
     
     def get_work_items_by_category(self, work_category_slug: str, 
                                    start_date: str, end_date: str) -> List[Dict]:
