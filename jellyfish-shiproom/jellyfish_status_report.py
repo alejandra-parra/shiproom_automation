@@ -8,6 +8,8 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Any
 import argparse
 from dotenv import load_dotenv
+import os
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
 from clients.google_slides import GoogleSlidesClient
 from clients.jira import JiraClient
@@ -18,9 +20,6 @@ from utils.table_utils import prepare_merged_table
 from utils.filter_utils import filter_items, format_excluded_items_for_display
 from utils.due_date_utils import format_due_date_with_history
 from utils.status_utils import STATUS_MAPPING
-
-# Load environment variables
-load_dotenv()
 
 class StatusReportGenerator:
     """Generates status reports from Jellyfish data"""
@@ -72,23 +71,26 @@ class StatusReportGenerator:
         
         print(f"Total deliverables received from API: {len(deliverables)}")
         
-        # Add due date history to deliverables
-        print(f"Adding due date history to {len(deliverables)} deliverables...")
+        # Add due date history and labels to deliverables
+        print(f"Adding due date history and labels to {len(deliverables)} deliverables...")
         for i, deliverable in enumerate(deliverables, 1):
             issue_key = deliverable.get('source_issue_key')
             if issue_key:
-                print(f"  [{i}/{len(deliverables)}] Fetching due date history for deliverable {issue_key}...")
+                print(f"  [{i}/{len(deliverables)}] Fetching due date history and labels for deliverable {issue_key}...")
                 try:
                     deliverable['date_history'] = self.jira.get_due_date_history(issue_key)
-                    print(f"  [{i}/{len(deliverables)}] ✓ Due date history fetched for {issue_key}")
+                    deliverable['labels'] = self.jira.get_issue_labels(issue_key)
+                    print(f"  [{i}/{len(deliverables)}] ✓ Due date history and labels fetched for {issue_key}")
                 except Exception as e:
-                    print(f"  [{i}/{len(deliverables)}] ✗ Error fetching due date history for {issue_key}: {e}")
+                    print(f"  [{i}/{len(deliverables)}] ✗ Error fetching due date history and labels for {issue_key}: {e}")
                     deliverable['date_history'] = []
+                    deliverable['labels'] = []
             else:
-                print(f"  [{i}/{len(deliverables)}] No issue key for deliverable, skipping due date history")
+                print(f"  [{i}/{len(deliverables)}] No issue key for deliverable, skipping due date history and labels")
                 deliverable['date_history'] = []
+                deliverable['labels'] = []
         
-        print(f"Due date history processing completed for deliverables")
+        print(f"Due date history and labels processing completed for deliverables")
         
         # Get the lookback range based on the completed week
         lookback_start, lookback_end = get_weekly_lookback_range(end_date)
@@ -106,23 +108,26 @@ class StatusReportGenerator:
         
         print(f"Total epics received from API: {len(epics_response)}")
         
-        # Add due date history to epics
-        print(f"Adding due date history to {len(epics_response)} epics...")
+        # Add due date history and labels to epics
+        print(f"Adding due date history and labels to {len(epics_response)} epics...")
         for i, epic in enumerate(epics_response, 1):
             issue_key = epic.get('source_issue_key')
             if issue_key:
-                print(f"  [{i}/{len(epics_response)}] Fetching due date history for epic {issue_key}...")
+                print(f"  [{i}/{len(epics_response)}] Fetching due date history and labels for epic {issue_key}...")
                 try:
                     epic['date_history'] = self.jira.get_due_date_history(issue_key)
-                    print(f"  [{i}/{len(epics_response)}] ✓ Due date history fetched for {issue_key}")
+                    epic['labels'] = self.jira.get_issue_labels(issue_key)
+                    print(f"  [{i}/{len(epics_response)}] ✓ Due date history and labels fetched for {issue_key}")
                 except Exception as e:
-                    print(f"  [{i}/{len(epics_response)}] ✗ Error fetching due date history for {issue_key}: {e}")
+                    print(f"  [{i}/{len(epics_response)}] ✗ Error fetching due date history and labels for {issue_key}: {e}")
                     epic['date_history'] = []
+                    epic['labels'] = []
             else:
-                print(f"  [{i}/{len(epics_response)}] No issue key for epic, skipping due date history")
+                print(f"  [{i}/{len(epics_response)}] No issue key for epic, skipping due date history and labels")
                 epic['date_history'] = []
+                epic['labels'] = []
         
-        print(f"Due date history processing completed for epics")
+        print(f"Due date history and labels processing completed for epics")
         
         filtered_epics, excluded_epics = filter_items(epics_response, lookback_start, lookback_end)
         print(f"Epics after filtering: {len(filtered_epics)}")

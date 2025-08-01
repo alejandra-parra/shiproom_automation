@@ -124,11 +124,18 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
     - Overdue: Past target date OR due date shifted by 2+ weeks in lookback period
     - In Progress: All other cases
     
+    Label-based override criteria:
+    - shiproom_include: Force include regardless of other criteria
+    - shiproom_exclude: Force exclude regardless of other criteria
+    - If both labels exist or neither exists, use normal criteria
+    
     Only includes items that are either:
     - "In Progress" (based on source_issue_status)
     - Completed in the lookback period
     AND
     - Have "Roadmap" in their investment_classification
+    OR
+    - Have shiproom_include label
     
     Args:
         items: List of work items (deliverables or epics)
@@ -149,6 +156,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         completed_date_str = item.get('completed_date')
         target_date_str = item.get('target_date')
         date_history = item.get('date_history', [])
+        labels = item.get('labels', [])
         
         print(f"\nProcessing item {issue_key}:")
         print(f"  Target date: {target_date_str}")
@@ -156,9 +164,40 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         print(f"  Date history: {date_history}")
         print(f"  Source status: {source_status}")
         print(f"  Investment classification: {investment_classification}")
+        print(f"  Labels: {labels}")
+        
+        # Check for shiproom labels first
+        has_shiproom_include = 'shiproom_include' in labels
+        has_shiproom_exclude = 'shiproom_exclude' in labels
+        
+        print(f"  Has shiproom_include: {has_shiproom_include}")
+        print(f"  Has shiproom_exclude: {has_shiproom_exclude}")
+        
+        # Handle label-based overrides
+        if has_shiproom_exclude and not has_shiproom_include:
+            # Force exclude - only shiproom_exclude label
+            print(f"  Force excluding item (shiproom_exclude label)")
+            excluded_items.append({
+                'issue_key': issue_key,
+                'name': name,
+                'status': source_status,
+                'investment_classification': investment_classification,
+                'exclusion_reason': 'Excluded by shiproom_exclude label'
+            })
+            continue
+        elif has_shiproom_include and not has_shiproom_exclude:
+            # Force include - only shiproom_include label
+            print(f"  Force including item (shiproom_include label)")
+            # We'll continue with normal status determination but skip other filters
+            force_include = True
+        else:
+            # No labels or both labels - use normal criteria
+            force_include = False
+            print(f"  Using normal filtering criteria (no labels or both labels)")
         
         # Skip items that don't have "Roadmap" in their investment classification
-        if "Roadmap" not in investment_classification:
+        # (unless they have shiproom_include label)
+        if "Roadmap" not in investment_classification and not force_include:
             print(f"  Skipping item (not a roadmap item)")
             excluded_items.append({
                 'issue_key': issue_key,
@@ -190,7 +229,8 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         
         # Skip items that are not "In Progress" or "In Review"
         # Note: Items completed in lookback period are already handled above
-        if source_status not in ["In Progress", "In Review"]:
+        # (unless they have shiproom_include label)
+        if source_status not in ["In Progress", "In Review"] and not force_include:
             print(f"  Skipping item (not in progress or in review)")
             excluded_items.append({
                 'issue_key': issue_key,

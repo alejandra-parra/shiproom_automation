@@ -27,6 +27,28 @@ class JiraClient:
             print("Warning: Jira credentials not configured. Due date history will not be available.")
             self.jira = None
     
+    def get_issue_labels(self, issue_key: str) -> List[str]:
+        """
+        Get the labels for a Jira issue.
+        
+        Args:
+            issue_key: The Jira issue key (e.g., 'PROJ-123')
+            
+        Returns:
+            List of label strings, or empty list if error or no labels
+        """
+        if not self.jira:
+            return []
+        
+        try:
+            # Get issue with labels field
+            issue = self.jira.issue(issue_key, fields='labels')
+            labels = getattr(issue.fields, 'labels', [])
+            return labels if labels else []
+        except Exception as e:
+            print(f"Error getting labels for {issue_key}: {e}")
+            return []
+    
     def get_due_date_history(self, issue_key: str) -> List[Dict]:
         """
         Get the history of due date changes for an issue in chronological order.
