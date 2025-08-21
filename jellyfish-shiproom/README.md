@@ -178,9 +178,95 @@ cd jellyfish-shiproom
 # Activate virtual environment
 source .venv/bin/activate
 
-# Run the script
+# Run the script for ALL teams (default behaviour if not specified)
+python jellyfish_status_report.py --config config.yaml --team all
+
+# Run the script for a SINGLE team (only that slide is updated)
+python jellyfish_status_report.py --config config.yaml --team TOL
+
+# You can also omit --team to fall back to whatever is set in config / defaults to all
 python jellyfish_status_report.py --config config.yaml
 ```
+
+### Team Selection Logic
+
+The script now supports generating slides for either:
+
+1. A single team (only that team's slide is cleared and re-generated)
+2. All teams listed in `teams_config.yaml`
+
+Selection priority (highest wins):
+1. `--team` CLI argument
+2. `team_selection` key in `config.yaml` (optional)
+3. Fallback default: `all`
+
+Valid values for `--team` / `team_selection`:
+- `all` – process every configured team
+- A team identifier key from `teams_config.yaml` (e.g. `BBEE`, `TOL`, `CLIP`, etc.)
+
+If you pass a team identifier that does not exist, the script will list all available keys.
+
+### Required Supporting File: `teams_config.yaml`
+
+Multi-team execution depends on `teams_config.yaml`, which defines each team's mapping:
+
+```yaml
+teams:
+   TOL:
+      jira_project_key: "TOL"
+      team_name: "[PRD] Tolkien: [TOL]"
+      team_id: 44743
+      slide_id: "id.slide_20250719_151730"   # Optional – strip leading 'id.' automatically
+      presenter: ""                           # Optional metadata
+      image_link: ""                          # Optional metadata
+```
+
+Fields:
+- `jira_project_key` (required)
+- `team_name` (required)
+- `team_id` (required – Jellyfish team ID)
+- `slide_id` (optional) If missing or invalid the script creates a new slide and prints its ID
+- `presenter`, `image_link` (optional)
+
+Validation: A team missing any required field or with an empty `jira_project_key` is skipped.
+
+### How Slides Are Updated
+
+For each selected team:
+1. Existing slide content is cleared (if `slide_id` exists and slide is found)
+2. If the slide does not exist or no `slide_id` is configured, a new blank slide is created and its new ID is printed (copy it back into `teams_config.yaml` for future runs)
+3. Deliverables and epics are fetched for the date range
+4. Each item is enriched with Jira due date history + labels (if available)
+5. Items are filtered based on lookback logic; excluded items are added off-canvas for traceability
+6. A merged table plus a Risks / Mitigations box is rendered
+
+### Example Workflows
+
+Update only Tolkien:
+```bash
+python jellyfish_status_report.py --config config.yaml --team TOL
+```
+
+Regenerate every team slide:
+```bash
+python jellyfish_status_report.py --config config.yaml --team all
+```
+
+Run using `team_selection` specified in `config.yaml` (e.g. set `team_selection: CLIP`):
+```bash
+python jellyfish_status_report.py --config config.yaml
+```
+
+### Adding a New Team
+1. Add an entry under `teams:` in `teams_config.yaml` with required fields
+2. (Optional) Leave out `slide_id` on the first run – the script will create a slide and print the new ID
+3. Re-run after copying the printed slide ID into the config for stable updates
+
+### Troubleshooting Team Runs
+- Slide not cleared: Ensure the `slide_id` matches the actual Google Slides object ID (remove any duplicated `id.` prefix; the script strips one automatically)
+- New slide created every run: You forgot to add / persist the created `slide_id` back into `teams_config.yaml`
+- Team skipped: Check logs for missing required field warning
+- No items shown: Confirm Jellyfish team ID is correct and date range has data
 
 ### Verify Setup
 
