@@ -17,14 +17,24 @@ class GoogleSlidesClient:
     
     def __init__(self, config: Dict):
         # Get credentials from environment - support both file path and JSON content
-        service_account_file = os.getenv('GOOGLE_SERVICE_ACCOUNT_FILE')
-        service_account_json = os.getenv('GOOGLE_SERVICE_ACCOUNT_JSON')
-        
+        service_account_file = (
+            os.getenv("GOOGLE_APPLICATION_CREDENTIALS")      # standard Google var
+            or os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")      # legacy/fallback
+        )
+        service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
+
         if not service_account_file and not service_account_json:
-            raise ValueError("Either GOOGLE_SERVICE_ACCOUNT_FILE or GOOGLE_SERVICE_ACCOUNT_JSON environment variable must be set")
+            raise ValueError(
+                "Set GOOGLE_APPLICATION_CREDENTIALS (preferred) or GOOGLE_SERVICE_ACCOUNT_FILE, "
+                "or provide GOOGLE_SERVICE_ACCOUNT_JSON"
+            )
+
         
         # Define the scope
-        scopes = ['https://www.googleapis.com/auth/presentations']
+        scopes = [
+            'https://www.googleapis.com/auth/presentations',
+            'https://www.googleapis.com/auth/drive'
+]
         
         # Create credentials
         if service_account_json:
@@ -93,39 +103,61 @@ class GoogleSlidesClient:
         except Exception as e:
             print(f"Unexpected error getting presentation: {e}")
             raise
+
+    def get_page_elements(self, slide_id: str) -> List[dict]:
+        """Return the pageElements array for a given slide_id."""
+        presentation = self.get_presentation()
+        for page in presentation.get('slides', []):
+            if page.get('objectId') == slide_id:
+                return page.get('pageElements', [])
+        return []
+
+    def shape_exists(self, slide_id: str, object_id: str) -> bool:
+        """True if a pageElement with object_id exists on slide."""
+        for el in self.get_page_elements(slide_id):
+            if el.get('objectId') == object_id:
+                return True
+        return False
+
+    def get_shape_text(self, slide_id: str, object_id: str) -> str:
+        """
+        Return concatenated text from a shape on slide.
+        If not found or no text, returns "".
+        """
+        for el in self.get_page_elements(slide_id):
+            if el.get('objectId') == object_id and el.get('shape'):
+                text = el['shape'].get('text', {})
+                out = []
+                for te in text.get('textElements', []):
+                    tr = te.get('textRun')
+                    if tr and 'content' in tr:
+                        out.append(tr['content'])
+                return ''.join(out).rstrip('\n')
+        return ""
     
-    def clear_slide_content(self, slide_id: str):
-        """Clear all content from a slide except the slide itself"""
+    def clear_slide_content(self, slide_id: str, preserve_object_ids: List[str] = None):
+        """Delete all elements on a slide EXCEPT those whose ids are in preserve_object_ids."""
         try:
-            presentation = self.get_presentation()
-            
-            # Find the slide
-            slide = None
-            for s in presentation.get('slides', []):
-                if s['objectId'] == slide_id:
-                    slide = s
-                    break
-            
-            if not slide:
-                print(f"Slide {slide_id} not found")
+            preserve = set(preserve_object_ids or [])
+            slide_elements = self.get_page_elements(slide_id)
+            if not slide_elements:
+                print(f"No elements found on slide {slide_id} (or slide missing).")
                 return
-            
-            # Collect all element IDs to delete
+
             delete_requests = []
-            for element in slide.get('pageElements', []):
-                delete_requests.append({
-                    'deleteObject': {
-                        'objectId': element['objectId']
-                    }
-                })
-            
+            for el in slide_elements:
+                oid = el.get('objectId')
+                if oid and oid not in preserve:
+                    delete_requests.append({'deleteObject': {'objectId': oid}})
+
             if delete_requests:
                 self.service.presentations().batchUpdate(
                     presentationId=self.presentation_id,
                     body={'requests': delete_requests}
                 ).execute()
-                print(f"Cleared {len(delete_requests)} elements from slide {slide_id}")
-            
+                print(f"Cleared {len(delete_requests)} elements from slide {slide_id}, preserved {len(preserve)}.")
+            else:
+                print(f"Nothing to clear on slide {slide_id}.")
         except HttpError as e:
             print(f"Error clearing slide {slide_id}: {e}")
     
@@ -285,11 +317,11 @@ class GoogleSlidesClient:
             traceback.print_exc()
             return {}
 
-    def add_bordered_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 250, height: float = 100, border_color: dict = None, border_weight: float = 1.5):
-        """Add a text box with a border to a slide and return its objectId."""
+    def add_bordered_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 250, height: float = 100, border_color: dict = None, border_weight: float = 1.5, font_size: float= 7, object_id: str = None):
+        """Add a text box with border; supports stable object_id."""
         if border_color is None:
             border_color = {'red': 0, 'green': 0, 'blue': 0}
-        text_id = self.add_text_box(slide_id, text, x, y, width, height)
+        text_id = self.add_text_box(slide_id, text, x, y, width, height, font_size=font_size, object_id=object_id)
         border_request = {
             'updateShapeProperties': {
                 'objectId': text_id,
@@ -312,12 +344,12 @@ class GoogleSlidesClient:
             presentationId=self.presentation_id,
             body={'requests': [border_request]}
         ).execute()
-        print(f"Added bordered text box to slide {slide_id}")
+        print(f"Added bordered text box {text_id} to slide {slide_id}")
         return text_id
 
     # Update column widths in add_table for slimmer layout
-    def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None, link_map: Dict = None):
-        """Add a table to a slide, with optional text links for issue keys."""
+    def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None, link_map: Dict = None, spacer_row_height_pt: int = 8, normal_row_height_pt: int = 10):
+        """Add a table to a slide, with optional text links for issue keys. Spacer rows (merge_map entries with is_spacer=True) are shrunk using minRowHeight."""
         try:
             # Use microseconds for unique table ID
             table_id = f"table_{int(time.time() * 1000000)}"
@@ -348,10 +380,16 @@ class GoogleSlidesClient:
             
             total_width = sum(column_widths)
             
-            # Calculate initial height based on number of rows
-            # Each row is 25pt high, plus 20pt for padding
-            initial_height = rows * 25 + 20
-            
+            # Detect spacer rows and compute per-row initial height
+            spacer_rows = {m['row'] for m in (merge_map or []) if m.get('is_spacer')}
+            row_heights = []
+            for r in range(rows):
+                if r in spacer_rows:
+                    row_heights.append(spacer_row_height_pt)
+                else:
+                    row_heights.append(normal_row_height_pt)
+            initial_height = sum(row_heights) + 20  # padding
+
             # Step 1: Create table first
             create_table_request = {
                 'createTable': {
@@ -375,7 +413,6 @@ class GoogleSlidesClient:
                 }
             }
             
-            # Create the table first
             self.service.presentations().batchUpdate(
                 presentationId=self.presentation_id,
                 body={'requests': [create_table_request]}
@@ -410,6 +447,26 @@ class GoogleSlidesClient:
                 ).execute()
                 print(f"Set column widths: {column_widths}")
             
+            # --- NEW: shrink spacer rows with minRowHeight ---
+            if spacer_rows:
+                row_height_requests = []
+                for r in sorted(spacer_rows):
+                    row_height_requests.append({
+                        "updateTableRowProperties": {
+                            "objectId": table_id,
+                            "rowIndices": [r],
+                            "tableRowProperties": {
+                                "minRowHeight": {"magnitude": spacer_row_height_pt, "unit": "PT"}
+                            },
+                            "fields": "minRowHeight"
+                        }
+                    })
+                self.service.presentations().batchUpdate(
+                    presentationId=self.presentation_id,
+                    body={'requests': row_height_requests}
+                ).execute()
+                print(f"Applied minRowHeight={spacer_row_height_pt}pt to spacer rows: {sorted(spacer_rows)}")
+                
             # Step 2: Add content to all cells in one batch
             all_cell_requests = []
             for row_idx, row in enumerate(data):
@@ -732,10 +789,10 @@ class GoogleSlidesClient:
             print(f"Error adding table to slide {slide_id}: {e}")
             return None, None
     
-    def add_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 400, height: float = 100, font_size: float = 7):
-        """Add a text box to a slide with specified font size"""
+    def add_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 400, height: float = 100, font_size: float = 7,object_id: str = None):
+        """Add a text box; if object_id is provided, reuse that id for stable element identity."""
         try:
-            text_id = f"text_{int(time.time() * 1000000)}"
+            text_id = object_id or f"text_{int(time.time() * 1000000)}"
             
             requests = [
                 {
@@ -783,7 +840,7 @@ class GoogleSlidesClient:
                 body={'requests': requests}
             ).execute()
             
-            print(f"Added text box to slide {slide_id} with font size {font_size}pt")
+            print(f"Added text box {text_id} to slide {slide_id} with font size {font_size}pt")
             return text_id
             
         except HttpError as e:

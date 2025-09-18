@@ -28,7 +28,7 @@ def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_hi
         row = [
             issue_key,  # Issue key (to be hyperlinked)
             name,
-            'GA',  # Default maturity
+            item.get('maturity', 'N/A'),  # Default maturity
             due_date_display,
             ''  # Empty text for status - will be color-coded
         ]
