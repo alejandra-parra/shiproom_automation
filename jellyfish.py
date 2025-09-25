@@ -7,7 +7,7 @@ import json
 from typing import List, Dict
 from datetime import datetime
 import requests
-from utils.date_utils import get_weekly_lookback_range, get_friday_of_week
+from date_utils import get_weekly_lookback_range, get_friday_of_week
 
 class JellyfishClient:
     """Client for interacting with Jellyfish API"""

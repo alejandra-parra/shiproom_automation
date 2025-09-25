@@ -6,7 +6,7 @@ Future versions may modify how historical dates are displayed or tracked.
 """
 
 from typing import List, Dict, Tuple
-from utils.date_utils import format_date
+from date_utils import format_date
 
 def format_due_date_with_history(current_date: str, date_history: List[Dict]) -> Tuple[str, List[Dict]]:
     """

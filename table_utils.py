@@ -4,7 +4,7 @@ This module handles the preparation and formatting of tables for the status repo
 """
 
 from typing import List, Dict, Tuple, Callable
-from utils.status_utils import get_status_color
+from status_utils import get_status_color
 
 def prepare_deliverables_table(deliverables: List[Dict], format_due_date_with_history: Callable) -> Tuple[List[List], Dict, Dict, Dict]:
     """Prepare deliverables data for table rendering, including a map of (row, col) to issue key URLs."""

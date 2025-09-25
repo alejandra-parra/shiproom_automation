@@ -11,15 +11,15 @@ from dotenv import load_dotenv
 import os, yaml
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
-from clients.google_slides import GoogleSlidesClient
-from clients.jira import JiraClient
-from clients.jellyfish import JellyfishClient
-from config.config_loader import load_config, load_teams_config, get_team_config, get_all_teams, validate_team_config, get_team_ids
-from utils.date_utils import format_date, get_report_date_range, get_weekly_lookback_range
-from utils.table_utils import prepare_merged_table
-from utils.filter_utils import filter_items, format_excluded_items_for_display
-from utils.due_date_utils import format_due_date_with_history
-from utils.status_utils import STATUS_MAPPING
+from google_slides import GoogleSlidesClient
+from jira_client import JiraClient
+from jellyfish import JellyfishClient
+from config_loader import load_config, load_teams_config, get_team_config, get_all_teams, validate_team_config, get_team_ids
+from date_utils import format_date, get_report_date_range, get_weekly_lookback_range
+from table_utils import prepare_merged_table
+from filter_utils import filter_items, format_excluded_items_for_display
+from due_date_utils import format_due_date_with_history
+from status_utils import STATUS_MAPPING
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError

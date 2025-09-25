@@ -7,7 +7,7 @@ Future versions may use different criteria for status determination.
 
 from datetime import datetime, timedelta
 from typing import List, Dict, Tuple
-from utils.date_utils import get_weekly_lookback_range
+from date_utils import get_weekly_lookback_range
 import json
 import os
 
