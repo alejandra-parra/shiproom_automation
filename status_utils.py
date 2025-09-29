@@ -37,9 +37,9 @@ def get_status_color(status: str) -> Dict:
     """
     colors = {
         STATUS_DONE: {
-            'red': 0.8,    # Muted green
-            'green': 0.9,
-            'blue': 0.8
+            'red': 0.6,    # Muted green
+            'green': 0.8,
+            'blue': 0.6
         },
         STATUS_IN_PROGRESS: {
             'red': 1.0,    # Muted yellow
@@ -47,9 +47,9 @@ def get_status_color(status: str) -> Dict:
             'blue': 0.7
         },
         STATUS_OVERDUE: {
-            'red': 1.0,    # Muted red
-            'green': 0.8,
-            'blue': 0.8
+            'red': 0.9,    # Muted red
+            'green': 0.5,
+            'blue': 0.5
         }
     }
     return colors.get(status, colors[STATUS_IN_PROGRESS]) 

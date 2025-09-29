@@ -52,9 +52,9 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
     Returns (archive_id, new_title).
     """
     meta = slides_svc.presentations().get(presentationId=template_id).execute()
-    base_title = meta.get("title", "Status Report")
+    base_title = "Shiproom"
     date_str = last_week_friday_str()
-    new_title = f"{base_title} - {date_str}"
+    new_title = f"{date_str} - {base_title}"
 
     body = {"name": new_title}
     if parent_folder_id:
@@ -426,16 +426,24 @@ class StatusReportGenerator:
         self.slides.update_textbox_style(risks_title_oid, font_size=RISKS_TITLE_FONT_SIZE, bold=True)
 
         # --- Risks/Mitigations Content Box (manual input that must persist) ---
+                # --- Risks/Mitigations Content Box (manual input that must persist) ---
+        def _normalize_text(s: str) -> str:
+            if not s:
+                return ""
+            # Strip whitespace and zero-width chars that Slides sometimes leaves behind
+            return "".join(ch for ch in s.strip() if ch not in ("\u200b", "\ufeff"))
+
         # 1) Try to read any existing text (in case we need to recreate it)
         existing_risks_text = ""
         try:
-            existing_risks_text = self.slides.get_shape_text(slide_id, risks_content_oid)
+            existing_risks_text = self.slides.get_shape_text(slide_id, risks_content_oid) or ""
         except Exception as e:
             print(f"Warn: could not read risks text: {e}")
+        existing_risks_text_norm = _normalize_text(existing_risks_text)
 
         if not self.slides.shape_exists(slide_id, risks_content_oid):
-            # First run (or the box was deleted): create it with previous text if available
-            initial_text = existing_risks_text or RISKS_CONTENT_INITIAL_TEXT
+            # First run (or the box was deleted): create it with previous text if available, else "- "
+            initial_text = existing_risks_text if existing_risks_text_norm else RISKS_CONTENT_INITIAL_TEXT
             self.slides.add_bordered_text_box(
                 slide_id,
                 initial_text,
@@ -452,36 +460,49 @@ class StatusReportGenerator:
         else:
             # Box already exists. Do not overwrite user text.
             # Optionally: keep position/size consistent if your table width changed.
-            self.slides.service.presentations().batchUpdate(
-                presentationId=self.slides.presentation_id,
-                body={"requests": [
-                    {
-                        "updatePageElementTransform": {
-                            "objectId": risks_content_oid,
-                            "applyMode": "ABSOLUTE",
-                            "transform": {
-                                "scaleX": 1, "scaleY": 1, "shearX": 0, "shearY": 0,
-                                "translateX": risks_content_x, "translateY": risks_content_y, "unit": "PT"
-                            }
-                        }
-                    },
-                    # Ensure border exists/looks right (idempotent)
-                    {
-                        "updateShapeProperties": {
-                            "objectId": risks_content_oid,
-                            "shapeProperties": {
-                                "outline": {
-                                    "outlineFill": {
-                                        "solidFill": {"color": {"rgbColor": RISKS_CONTENT_BORDER_COLOR}}
-                                    },
-                                    "weight": {"magnitude": RISKS_CONTENT_BORDER_WEIGHT, "unit": "PT"}
-                                }
-                            },
-                            "fields": "outline"
+            requests = [
+                {
+                    "updatePageElementTransform": {
+                        "objectId": risks_content_oid,
+                        "applyMode": "ABSOLUTE",
+                        "transform": {
+                            "scaleX": 1, "scaleY": 1, "shearX": 0, "shearY": 0,
+                            "translateX": risks_content_x, "translateY": risks_content_y, "unit": "PT"
                         }
                     }
-                ]}
+                },
+                # Ensure border exists/looks right (idempotent)
+                {
+                    "updateShapeProperties": {
+                        "objectId": risks_content_oid,
+                        "shapeProperties": {
+                            "outline": {
+                                "outlineFill": {
+                                    "solidFill": {"color": {"rgbColor": RISKS_CONTENT_BORDER_COLOR}}
+                                },
+                                "weight": {"magnitude": RISKS_CONTENT_BORDER_WEIGHT, "unit": "PT"}
+                            }
+                        },
+                        "fields": "outline"
+                    }
+                }
+            ]
+
+            if existing_risks_text_norm == "":
+                # Seed the empty box so downstream code won't choke on styling empty runs
+                # Note: Do NOT call deleteText on an empty shape (Slides 400 error). Just insert.
+                requests.extend([
+                    {"insertText": {"objectId": risks_content_oid, "insertionIndex": 0, "text": RISKS_CONTENT_INITIAL_TEXT}}
+                ])
+                print("Risks/Mitigations text box was empty. Seeded with '- ' to keep script running.")
+
+            self.slides.service.presentations().batchUpdate(
+                presentationId=self.slides.presentation_id,
+                body={"requests": requests}
             ).execute()
+            self.slides.update_textbox_style(risks_content_oid, font_size=RISKS_CONTENT_FONT_SIZE, bold=False)
+            print("Preserved existing Risks/Mitigations content box and its text.")
+
             self.slides.update_textbox_style(risks_content_oid, font_size=RISKS_CONTENT_FONT_SIZE, bold=False)
             print("Preserved existing Risks/Mitigations content box and its text.")
                 

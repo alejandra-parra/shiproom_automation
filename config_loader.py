@@ -94,7 +94,6 @@ def validate_team_config(team_config: Dict[str, Any], team_identifier: str) -> b
         return False
 
     # If your pipeline STILL relies on jira_project_key somewhere, keep a soft check:
-    # (You can delete this block if Jira project is truly irrelevant.)
     if "jira_project_key" in team_config and not team_config.get("jira_project_key"):
         print(f"Warning: Team {team_identifier} has empty jira_project_key")
         # Do not return False — make it a soft warning to keep compatibility.
