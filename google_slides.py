@@ -74,7 +74,7 @@ class GoogleSlidesClient:
             print(f"Using Google Service Account from file: {service_account_file}")
         
         # Build the service with timeout
-        socket.setdefaulttimeout(30)  # 30 second timeout
+        socket.setdefaulttimeout(60)  # 30 second timeout
         self.service = build('slides', 'v1', credentials=self.credentials)
         
         # Get presentation ID from config

@@ -321,7 +321,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         print(f"  Final status: In Progress")
     
     # Save excluded items to file
-    if excluded_items:
-        save_excluded_items(excluded_items)
+    #if excluded_items:
+        #save_excluded_items(excluded_items)
     
     return filtered, excluded_items 

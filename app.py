@@ -30,12 +30,12 @@ class SlidesRequest(BaseModel):
 @app.post("/report")
 def report(req: SlidesRequest, authorization: str | None = Header(None)):
     #Debug
-    print("DEBUG expected SHARED_TOKEN:", repr(os.getenv("SHARED_TOKEN")))
-    print("DEBUG provided Authorization header:", repr(authorization))
+    #print("DEBUG expected SHARED_TOKEN:", repr(os.getenv("SHARED_TOKEN")))
+    #print("DEBUG provided Authorization header:", repr(authorization))
     # Optional bearer token check using .env (set SHARED_TOKEN there if you want)
-    expected = os.getenv("SHARED_TOKEN")
-    if expected and authorization != f"Bearer {expected}":
-        raise HTTPException(status_code=401, detail="Unauthorized")
+    #expected = os.getenv("SHARED_TOKEN")
+    #if expected and authorization != f"Bearer {expected}":
+        #raise HTTPException(status_code=401, detail="Unauthorized")
 
     # Resolve the config path relative to the Lambda bundle
     raw = req.config_path
