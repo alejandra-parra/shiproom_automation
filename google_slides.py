@@ -369,10 +369,10 @@ class GoogleSlidesClient:
             # For deliverables: [Key, Name, Maturity, Due Date, Status]
             # For epics: [Key, Name, Due Date, Status]
             if cols == 5:  # Deliverables table
-                column_widths = [65, 180, 45, 70, 40]  # Key, Name, Maturity, Due Date, Status (tuned)
+                column_widths = [55, 195, 45, 60, 45]  # Key, Name, Maturity, Due Date, Status (tuned)
                 print(f"DEBUG: Using deliverables column widths: {column_widths}")
             elif cols == 4:  # Epics table
-                column_widths = [65, 225, 70, 40]  # Key, Name, Due Date, Status (tuned)
+                column_widths = [55, 240, 60, 45]  # Key, Name, Due Date, Status (tuned)
                 print(f"DEBUG: Using epics column widths: {column_widths}")
             else:
                 # Fallback to equal widths

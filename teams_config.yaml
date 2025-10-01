@@ -15,9 +15,9 @@ teams:
   # [PRD] Team Ahoy: [AHOY]
   AHOY:
     jira_project_key: "AHOY"
-    team_name: "[PRD] Team Ahoy: [AHOY]"
+    team_name: "[PRD] Team Ahoy - Identity and Access: [AHOY]"
     team_id: 5950
-    presenter: ""
+    presenter: "Timur Nugmanov"
     slide_id: "id.slide_20250909_121125"
     image_link: ""
 
@@ -26,16 +26,16 @@ teams:
     jira_project_key: "BBEE"
     team_name: "[PRD] The Bumblebees: [BBEE]"
     team_id: 90301
-    presenter: ""
+    presenter: "Christian Bieneck"
     slide_id: "id.slide_20250909_155018"
     image_link: ""
 
-  # Compliance & Admin Platform: [CAP]
+  # Compliant Admin Platform: [CAP]
   CAP:
     jira_project_key: "CAP"
-    team_name: "Team Compliance & Admin Platform: [CAP]"
+    team_name: "Team Compliant Admin Platform: [CAP]"
     team_id: 200771
-    presenter: ""
+    presenter: "Jonathan Stoye"
     slide_id: "id.g32b5d11736d_5_0"
     image_link: ""
 
@@ -44,7 +44,7 @@ teams:
     jira_project_key: "CAPI"
     team_name: "[PRD] Team Content API: [CAPI]"
     team_id: 61505
-    presenter: ""
+    presenter: "Noel O'Flaherty"
     slide_id: "id.g2e7564e189d_0_586"
     image_link: ""
 
@@ -53,7 +53,7 @@ teams:
     jira_project_key: "CFISO"
     team_name: "[PRD] Team Isotopes: [CFISO]"
     team_id: 57210
-    presenter: ""
+    presenter: "Yiotis Kaltsikis"
     slide_id: "id.g369214abfc4_0_10"
     image_link: ""
 
@@ -62,7 +62,7 @@ teams:
     jira_project_key: "CLIP"
     team_name: "[PRD] Team Clippy: [CLIP]"
     team_id: 210775
-    presenter: ""
+    presenter: "Christian Bieneck"
     slide_id: "id.g3684ecb6890_0_0"
     image_link: ""
 
@@ -71,7 +71,7 @@ teams:
     jira_project_key: "CSTORE"
     team_name: "[PRD] Team Content Storage: [CSTORE]"
     team_id: 8032
-    presenter: ""
+    presenter: "Meike Pollakowski"
     slide_id: "g36c8b2d0b60_0_0"
     image_link: ""
 
@@ -81,7 +81,7 @@ teams:
     jira_project_key: "DX"
     team_name: "[PRD] Team Developer Experience (Alpine)"
     team_id: 205723
-    presenter: ""
+    presenter: "Morgan Whitney"
     slide_id: "id.g36ec2456e65_0_10"
     image_link: ""
 
@@ -90,7 +90,7 @@ teams:
     jira_project_key: "EXT"
     team_name: "[PRD] Team Extensibility (Tundra)"
     team_id: 5983
-    presenter: ""
+    presenter: "Morgan Whitney"
     slide_id: "g21bb3c3ca71_44_0"
     image_link: ""
 
@@ -99,16 +99,16 @@ teams:
     jira_project_key: "FUS"
     team_name: "[PRD] Team Content Operations: [FUS]"
     team_id: 191503
-    presenter: ""
+    presenter: "Holli Holweger"
     slide_id: "id.g2e7564e189d_0_625"
     image_link: ""
 
   # [PRD] Team Groot: [GROOT]
   GROOT:
     jira_project_key: "GROOT"
-    team_name: "[PRD] Team Groot: [GROOT]"
+    team_name: "[PRD] Team Groot - Discoverability & Semantics: [GROOT]"
     team_id: 52476
-    presenter: ""
+    presenter: "Liam Stokinger"
     slide_id: "id.g2e7564e189d_0_599"
     image_link: ""
 
@@ -117,7 +117,7 @@ teams:
     jira_project_key: "HEJO"
     team_name: "[PRD] Team Hejo: [HEJO]"
     team_id: 5952
-    presenter: ""
+    presenter: "Jonathan Duarte"
     slide_id: "id.g2ec5d2811d2_6_42"
     image_link: ""
 
@@ -126,7 +126,7 @@ teams:
     jira_project_key: "INTEG"
     team_name: "[PRD] Team Marketplace (Taiga)"
     team_id: 65807
-    presenter: ""
+    presenter: "Michael Kivisto"
     slide_id: "g305cc313dc5_2_0"
     image_link: ""
 
@@ -135,7 +135,7 @@ teams:
     jira_project_key: "KRK"
     team_name: "[PRD] Team Kraken: [KRK]"
     team_id: 10781
-    presenter: ""
+    presenter: "Holger Strom"
     slide_id: "id.g35015920ad0_53_25"
     image_link: ""
 
@@ -144,34 +144,34 @@ teams:
     jira_project_key: "MEC"
     team_name: "[PRD] Team Mechagodzilla: [MEC]"
     team_id: 80893
-    presenter: ""
+    presenter: "Michael Pearce"
     slide_id: "id.g2ec5d2811d2_27_13"
     image_link: ""
 
   # [PRD] Team Mogwai: [MOGWAI]
   MOGWAI:
     jira_project_key: "MOGWAI"
-    team_name: "[PRD] Team Mogwai: [MOGWAI]"
+    team_name: "[PRD] Team Mogwai - Infrastructure (Fleet & Edge ops): [MOGWAI]"
     team_id: 11200
-    presenter: ""
+    presenter: "Lewis Cowper"
     slide_id: "id.g35015920ad0_53_39"
     image_link: ""
 
   # [PRD] Team Moi: [MOI]
   MOI:
     jira_project_key: "MOI"
-    team_name: "[PRD] Team Moi: [MOI]"
+    team_name: "[PRD] Team Moi - Platform insights: [MOI]"
     team_id: 5953
-    presenter: ""
+    presenter: "Dan Strydom"
     slide_id: "id.g2f57620c5c0_13_7"
     image_link: ""
 
   # Picard: [PIC]
   PIC:
     jira_project_key: "PIC"
-    team_name: "Picard: [PIC]"
+    team_name: "Team Picard: [PIC]"
     team_id: 184597
-    presenter: ""
+    presenter: "Christian Bieneck"
     slide_id: "id.g316d527e0e1_0_2"
     image_link: ""
 
@@ -180,7 +180,7 @@ teams:
     jira_project_key: "SPA"
     team_name: "[PRD] Team Sparks: [SPA]"
     team_id: 13877
-    presenter: ""
+    presenter: "Chirantan Rajhans"
     slide_id: "id.g369214abfc4_0_27"
     image_link: ""
 
@@ -189,7 +189,7 @@ teams:
     jira_project_key: "TOL"
     team_name: "[PRD] Team Tolkien: [TOL]"
     team_id: 44743
-    presenter: ""
+    presenter: "Rafaela Felix"
     slide_id: "g36f16ad6077_0_0"
     image_link: ""
 
@@ -198,7 +198,7 @@ teams:
     jira_project_key: "UFO"
     team_name: "[PRD] Team UI Foundation: [UFO]"
     team_id: 5947
-    presenter: ""
+    presenter: "Jonathan Stoye"
     slide_id: "id.g2d473010025_5_0"
     image_link: ""
 
@@ -207,7 +207,7 @@ teams:
     jira_project_key: "NT"
     team_name: "[PRD] Team Personalization: [NT]"
     team_id: 213625
-    presenter: ""
+    presenter: "Sebastian Mühr"
     slide_id: "id.slide_20250918_160539"
     image_link: ""
 
@@ -216,7 +216,7 @@ teams:
     jira_project_key: "EXA"
     team_name: "[PRD] Experience Analytics: [EXA]"
     team_id: 210691
-    presenter: ""
+    presenter: "Sebastian Mühr"
     slide_id: "id.slide_20250918_161548"
     image_link: ""
 
@@ -228,7 +228,7 @@ teams:
     team_ids: 
     - 213441
     - 213101
-    presenter: ""
+    presenter: "Stephen Lloyd"
     slide_id: "id.slide_20250919_115038"
     image_link: ""
 

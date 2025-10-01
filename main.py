@@ -15,10 +15,10 @@ from google_slides import GoogleSlidesClient
 from jira_client import JiraClient
 from jellyfish import JellyfishClient
 from config_loader import load_config, load_teams_config, get_team_config, get_all_teams, validate_team_config, get_team_ids
-from date_utils import format_date, get_report_date_range, get_weekly_lookback_range
+from date_utils import get_report_date_range, get_weekly_lookback_range
 from table_utils import prepare_merged_table
 from filter_utils import filter_items, format_excluded_items_for_display
-from due_date_utils import format_due_date_with_history
+from due_date_utils import format_due_date_with_history as format_due_epic, format_due_date_with_history_deliverable as format_due_deliv
 from status_utils import STATUS_MAPPING
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
@@ -164,12 +164,8 @@ class StatusReportGenerator:
 
         # Run the report updates AGAINST THE TEMPLATE (not the copy)
         self.generate_slides()    
-    
-    def get_formatted_due_date(self, current_date: str, issue_key: str) -> Tuple[str, List[Dict]]:
-        """Get formatted due date with history for an issue"""
-        # Get due date history from Jira
-        date_history = self.jira.get_due_date_history(issue_key)
-        return format_due_date_with_history(current_date, date_history)
+        
+
     
     def generate_slide_for_team(self, team_identifier: str, team_config: Dict[str, Any]) -> None:
         """Generate a single slide for a specific team"""
@@ -215,19 +211,35 @@ class StatusReportGenerator:
                     deliverable['date_history'] = self.jira.get_due_date_history(issue_key)
                     deliverable['labels'] = self.jira.get_issue_labels(issue_key)
                     deliverable['maturity'] = self.jira.get_issue_maturity(issue_key) or "N/A"
+
+                    current_due = (
+                        deliverable.get('target_date')
+                        or deliverable.get('due_date')
+                        or deliverable.get('current_due_date')
+                    )
+                    if current_due:
+                        text, fmt = format_due_deliv(current_due, deliverable.get('date_history') or [])
+                    else:
+                        text, fmt = ("N/A", [])
+                    deliverable['due_tape_text'] = text
+                    deliverable['due_tape_fmt'] = fmt
                     print(f"  [{i}/{len(deliverables)}] ✓ Metadata fetched for {issue_key} (maturity='{deliverable['maturity']}')")
                 except Exception as e:
                     print(f"  [{i}/{len(deliverables)}] ✗ Error fetching metadata for {issue_key}: {e}")
                     deliverable['date_history'] = []
                     deliverable['labels'] = []
                     deliverable['maturity'] = "N/A"
+                    deliverable['due_tape_text'] = "N/A"
+                    deliverable['due_tape_fmt'] = []
             else:
                 print(f"  [{i}/{len(deliverables)}] No issue key for deliverable, skipping metadata")
                 deliverable['date_history'] = []
                 deliverable['labels'] = []
                 deliverable['maturity'] = "N/A"
+                deliverable['due_tape_text'] = "N/A"
+                deliverable['due_tape_fmt'] = []
 
-        print(f"Due date history and labels processing completed for deliverables")
+        print(f"Due date history, labels and maturity processing completed for deliverables")
         
         # Get the lookback range based on the completed week
         lookback_start, lookback_end = get_weekly_lookback_range(end_date)
@@ -257,6 +269,20 @@ class StatusReportGenerator:
                     epic['date_history'] = self.jira.get_due_date_history(issue_key)
                     epic['labels'] = self.jira.get_issue_labels(issue_key)
                     epic['maturity'] = self.jira.get_issue_maturity(issue_key) or 'N/A'
+
+                    # Display and formatting for epics
+                    current_due = (
+                        epic.get('target_date')           # common in your codebase
+                        or epic.get('due_date')           # fallback if present
+                        or epic.get('current_due_date')   # last-resort naming
+                    )
+                    if current_due:
+                        text, fmt = format_due_epic(current_due, epic.get('date_history') or [])
+                    else:
+                        text, fmt = ("N/A", [])
+                    epic['due_tape_text'] = text
+                    epic['due_tape_fmt'] = fmt
+                     
                     print(f"  [{i}/{len(epics_response)}] ✓ Due date history, labels and maturity fetched for {issue_key}")
                 except Exception as e:
                     print(f"  [{i}/{len(epics_response)}] ✗ Error fetching due date history, labels and maturity for {issue_key}: {e}")
@@ -325,21 +351,56 @@ class StatusReportGenerator:
         trimmed_name = raw_name.removeprefix("[PRD] ")
         parts = trimmed_name.split(":", 1)
         display_name = parts[0].strip()
-        self.jellyfish.team_name = display_name  
+        self.jellyfish.team_name = display_name
+
+        # Include the team's EM 
+        presenter = team_config.get("presenter", "Presenter")
+        presenter_name = presenter.split()[0] if presenter else "Presenter" 
 
         # Add title to slide
-        self.slides.add_title(slide_id, f"{self.jellyfish.team_name} - Status Report", 50, 20)
+        self.slides.add_title(slide_id, f"{self.jellyfish.team_name} - {presenter_name}", 50, 20)
         
-        # Prepare merged table
+        
+        # Get formatted due dates with history for all items
+
+        deliverable_keys = {
+            d.get('source_issue_key')
+            for d in (filtered_deliverables or [])
+            if d.get('source_issue_key')
+        }
+
+        # Reuse the already-fetched histories so we don't re-call Jira here
+        _date_histories = {}
+        for _it in (filtered_deliverables or []) + (filtered_epics or []):
+            _k = _it.get('source_issue_key')
+            if _k:
+                _date_histories[_k] = _it.get('date_history') or []
+
+        def get_formatted_due_date(current_date: str, issue_key: str):
+            if not current_date:
+                return ("N/A", [])
+            history = _date_histories.get(issue_key, [])
+
+            # Deliverables: last 2 (previous struck, current clean)
+            if issue_key in deliverable_keys:
+                return format_due_deliv(current_date, history)
+
+            # Epics (default): last 4 (previous 3 struck, current clean)
+            return format_due_epic(current_date, history)
         merged_data, formatting_map, color_map, merge_map, link_map = prepare_merged_table(
             filtered_deliverables, 
             filtered_epics,
-            self.get_formatted_due_date
+            get_formatted_due_date
         )
         
         y_position = 80
         print(f"Merged table data: {len(merged_data)} rows")
-        
+
+        merged_data, formatting_map, color_map, merge_map, link_map = prepare_merged_table(
+            filtered_deliverables,
+            filtered_epics,
+            get_formatted_due_date,   # <— use the local dispatcher here
+        )
         # Add merged table
         table_result = self.slides.add_table(
             slide_id,
