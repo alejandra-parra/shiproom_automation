@@ -17,10 +17,7 @@ class GoogleSlidesClient:
     
     def __init__(self, config: Dict):
         # Get credentials from environment - support both file path and JSON content
-        service_account_file = (
-            os.getenv("GOOGLE_APPLICATION_CREDENTIALS")      # standard Google var
-            or os.getenv("GOOGLE_SERVICE_ACCOUNT_FILE")      # legacy/fallback
-        )
+        service_account_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
         service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
 
         if not service_account_file and not service_account_json:
