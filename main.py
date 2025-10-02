@@ -35,13 +35,17 @@ def last_week_friday_str(today=None) -> str:
     """
     if today is None:
         today = datetime.now(BERLIN_TZ).date()
-    # Monday of this week
+        print(f"[DEBUG] Set today: {today}")
     monday_this_week = today - timedelta(days=today.isoweekday() - 1)
-    # Monday of previous week
+    print(f"[DEBUG] Set monday_this_week: {monday_this_week}")
     monday_prev_week = monday_this_week - timedelta(days=7)
-    # Friday is Monday + 4 days
+    print(f"[DEBUG] Set monday_prev_week: {monday_prev_week}")
     friday_prev_week = monday_prev_week + timedelta(days=4)
-    return friday_prev_week.strftime("%Y-%m-%d")
+    print(f"[DEBUG] Set friday_prev_week: {friday_prev_week}")
+    result = friday_prev_week.strftime("%Y-%m-%d")
+    print(f"[DEBUG] Set result: {result}")
+    print("[DEBUG] Completed: last_week_friday_str - main.py")
+    return result
 
 # Duplicate the template presentation and name it with last week's Friday
 # The duplicated version contains the comments made in the risk section and is archived for documentation purposes
@@ -52,13 +56,19 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
     Returns (archive_id, new_title).
     """
     meta = slides_svc.presentations().get(presentationId=template_id).execute()
+    print(f"[DEBUG] Set meta: {meta}")
     base_title = "Shiproom"
+    print(f"[DEBUG] Set base_title: {base_title}")
     date_str = last_week_friday_str()
+    print(f"[DEBUG] Set date_str: {date_str}")
     new_title = f"{date_str} - {base_title}"
+    print(f"[DEBUG] Set new_title: {new_title}")
 
     body = {"name": new_title}
+    print(f"[DEBUG] Set body: {body}")
     if parent_folder_id:
         body["parents"] = [parent_folder_id]
+        print(f"[DEBUG] Updated body with parents: {body}")
     print(f"[COPY FROM PREVIOUS WEEK] title={new_title}  parent_folder_id={parent_folder_id or '(none)'}")
 
     try:
@@ -67,14 +77,16 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
             body=body,
             supportsAllDrives=True  # set True if you use Shared Drives
         ).execute()
+        print(f"[DEBUG] Set copied: {copied}")
 
         archive_id = copied["id"]
+        print(f"[DEBUG] Set archive_id: {archive_id}")
         meta = drive_svc.files().get(
-        fileId=archive_id,
-        fields="id,name,parents,driveId,owners(emailAddress,displayName),webViewLink",
-        supportsAllDrives=True,
+            fileId=archive_id,
+            fields="id,name,parents,driveId,owners(emailAddress,displayName),webViewLink",
+            supportsAllDrives=True,
         ).execute()
-        
+        print(f"[DEBUG] Updated meta: {meta}")
 
         print("COPY META:",
         "\n  name:", meta.get("name"),
@@ -83,15 +95,18 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
         "\n  parents:", meta.get("parents"),
         "\n  owners:", meta.get("owners"),
         "\n  open:", meta.get("webViewLink"))
-        
+
         print(f"Archived: {new_title} → https://docs.google.com/presentation/d/{archive_id}/edit")
+        print("[DEBUG] Completed: duplicate_template_as_last_week_friday - main.py")
         return archive_id, new_title
-    
+
     except HttpError as e:
-        # Whose creds are being used and what’s the quota?
         about = drive_svc.about().get(fields="user(emailAddress),storageQuota").execute()
+        print(f"[DEBUG] Set about: {about}")
         print("[DRV ABOUT] user:", about.get("user", {}), "quota:", about.get("storageQuota", {}))
+        print(f"[DEBUG] Set HttpError: {e}")
         print("[ERROR] Drive copy failed:", e)
+        print("[DEBUG] Completed: duplicate_template_as_last_week_friday (exception) - main.py")
         raise
     
 class StatusReportGenerator:
@@ -100,29 +115,42 @@ class StatusReportGenerator:
     def __init__(self, config: Dict[str, Any]):
         # Keep the loaded config dict (stop re-reading YAML here)
         self.config = config or {}
+        print(f"[DEBUG] Set self.config: {self.config}")
 
         # Set up existing clients (keep your wrapper!)
         self.jellyfish = JellyfishClient(self.config)
+        print(f"[DEBUG] Set self.jellyfish: {self.jellyfish}")
         self.jira = JiraClient(self.config)
+        print(f"[DEBUG] Set self.jira: {self.jira}")
         self.slides = GoogleSlidesClient(self.config)  # <- keep as the wrapper
+        print(f"[DEBUG] Set self.slides: {self.slides}")
 
         # Status mapping for Google Sheets
         self.status_mapping = STATUS_MAPPING
+        print(f"[DEBUG] Set self.status_mapping: {self.status_mapping}")
 
         # Teams config and selection
         teams_config_path = self.config.get('teams_config_file', 'teams_config.yaml')
+        print(f"[DEBUG] Set teams_config_path: {teams_config_path}")
         self.teams_config = load_teams_config(teams_config_path)
+        print(f"[DEBUG] Set self.teams_config: {self.teams_config}")
         self.team_selection = self.config.get('team_selection', 'all')
+        print(f"[DEBUG] Set self.team_selection: {self.team_selection}")
 
         # Google Slides IDs from config.yaml (already loaded)
         slides_cfg = (self.config.get("google_slides") or {})
+        print(f"[DEBUG] Set slides_cfg: {slides_cfg}")
         template_id = slides_cfg.get("presentation_id")
+        print(f"[DEBUG] Set template_id: {template_id}")
         if not template_id:
             raise RuntimeError("Missing 'google_slides.presentation_id' in config")
         self.template_presentation_id = template_id
+        print(f"[DEBUG] Set self.template_presentation_id: {self.template_presentation_id}")
         self.presentation_id = template_id  # you said: update the template itself
+        print(f"[DEBUG] Set self.presentation_id: {self.presentation_id}")
         self.output_folder_id = os.getenv("GOOGLE_DRIVE_OUTPUT_FOLDER_ID") or slides_cfg.get("output_folder_id")
-        
+        print(f"[DEBUG] Set self.output_folder_id: {self.output_folder_id}")
+
         print("Output folder ID:", self.output_folder_id or "(none)")
         if not self.output_folder_id:
             raise RuntimeError(
@@ -133,25 +161,34 @@ class StatusReportGenerator:
         # Build raw Google API services alongside wrapper
         # Try to reuse creds from your wrapper if it exposes them; otherwise read from env.
         creds = getattr(self.slides, "credentials", None)
+        print(f"[DEBUG] Set creds: {creds}")
         if creds is None:
             key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+            print(f"[DEBUG] Set key_path: {key_path}")
             if not key_path:
                 raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS is not set")
             scopes = [
                 "https://www.googleapis.com/auth/presentations",
                 "https://www.googleapis.com/auth/drive",
             ]
+            print(f"[DEBUG] Set scopes: {scopes}")
             creds = service_account.Credentials.from_service_account_file(key_path, scopes=scopes)
+            print(f"[DEBUG] Updated creds: {creds}")
 
         # Build raw API services for duplication/moves
         self.slides_svc = build("slides", "v1", credentials=creds)
+        print(f"[DEBUG] Set self.slides_svc: {self.slides_svc}")
         self.drive_svc  = build("drive",  "v3", credentials=creds)
+        print(f"[DEBUG] Set self.drive_svc: {self.drive_svc}")
 
         # Make sure your wrapper targets the template deck
         if hasattr(self.slides, "presentation_id"):
             self.slides.presentation_id = self.template_presentation_id
+            print(f"[DEBUG] Updated self.slides.presentation_id: {self.slides.presentation_id}")
 
         print(f"Using permanent template (from config): {self.template_presentation_id}")
+        print("[DEBUG] Completed: StatusReportGenerator.__init__ - main.py")
+
     # Function to duplicate the template before running the report
     def run(self):
         # Make the archive copy named with last week's Friday
@@ -161,12 +198,12 @@ class StatusReportGenerator:
             self.template_presentation_id,
             self.output_folder_id
         )
-
+        print(f"[DEBUG] Ran duplicate_template_as_last_week_friday")
         # Run the report updates AGAINST THE TEMPLATE (not the copy)
-        self.generate_slides()    
-        
+        self.generate_slides()
+        print(f"[DEBUG] Ran generate_slides")
+        print("[DEBUG] Completed: StatusReportGenerator.run - main.py")
 
-    
     def generate_slide_for_team(self, team_identifier: str, team_config: Dict[str, Any]) -> None:
         """Generate a single slide for a specific team"""
         print(f"\n=== Generating slide for team: {team_identifier} ===")
@@ -588,6 +625,7 @@ class StatusReportGenerator:
             print(f"Added exclusion log with {len(all_excluded_items)} items")
             
         print(f"Slide generated for team {team_identifier}")
+        print("[DEBUG] Completed: StatusReportGenerator.generate_slide_for_team - main.py")
     
     def generate_slides(self):
         """Generate Google Slides status reports based on team selection"""
@@ -611,29 +649,33 @@ class StatusReportGenerator:
                     all_teams = get_all_teams(self.teams_config)
                     for team_id, _ in all_teams:
                         print(f"  - {team_id}")
+        print("[DEBUG] Completed: StatusReportGenerator.generate_slides - main.py")
 
 def main():
     """Main entry point"""
     parser = argparse.ArgumentParser(description='Generate Jellyfish status report')
+    print(f"[DEBUG] Set parser: {parser}")
     parser.add_argument('--config', required=True, help='Path to config file')
     parser.add_argument('--team', help='Team identifier (e.g., BBEE, TOL, CLIP) or "all" for all teams')
     args = parser.parse_args()
-    
-    # Load configuration
+    print(f"[DEBUG] Set args: {args}")
+
     config = load_config(args.config)
+    print(f"[DEBUG] Set config: {config}")
     print("Loaded config:", os.path.abspath(args.config))
     print("google_slides section:", config.get("google_slides"))
     print("presentation_id seen:", config.get("google_slides", {}).get("presentation_id"))
 
-    
-    # Override team selection if provided via command line
     if args.team:
         config['team_selection'] = args.team
-    
-    # Generate report
+        print(f"[DEBUG] Updated config['team_selection']: {config['team_selection']}")
 
     generator = StatusReportGenerator(config)
+    print(f"[DEBUG] Set generator: {generator}")
     generator.run()
+    print(f"[DEBUG] Ran generator.run()")
+    print("[DEBUG] Completed: main - main.py")
 
 if __name__ == '__main__':
     main()
+    print("[DEBUG] Completed: __main__ - main.py")
