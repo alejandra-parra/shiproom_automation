@@ -9,7 +9,9 @@ from typing import Dict, List, Tuple, Any
 import argparse
 from dotenv import load_dotenv
 import os, yaml
-load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+#load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
+load_dotenv(dotenv_path="/var/task/.env", override=True)
+print("[DEBUG] Completed: load_dotenv - main.py")
 
 from google_slides import GoogleSlidesClient
 from jira_client import JiraClient

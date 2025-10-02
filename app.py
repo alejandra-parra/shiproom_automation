@@ -11,8 +11,8 @@ from mangum import Mangum
 # In Lambda your code is at /var/task (read-only)
 load_dotenv(dotenv_path="/var/task/.env", override=True)
 print("[DEBUG] Completed: load_dotenv - app.py")
-os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/var/task/slides_service_account.json")
-print(f"[DEBUG] Set GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')}")
+#os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/var/task/slides_service_account.json")
+#print(f"[DEBUG] Set GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')}")
 
 # Import your existing CLI module (main.py) without changing it
 main_mod = importlib.import_module("main")

@@ -12,12 +12,16 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+from dotenv import load_dotenv
+load_dotenv(dotenv_path="/var/task/.env", override=True)
+print("[DEBUG] Completed: load_dotenv - google_slides.py")
+
 class GoogleSlidesClient:
     """Client for interacting with Google Slides API"""
     
     def __init__(self, config: Dict):
         # Get credentials from environment - support both file path and JSON content
-        service_account_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+        service_account_file = os.getenv("GOOGLE_APPLICATION_CREDENTIALS") 
         service_account_json = os.getenv("GOOGLE_SERVICE_ACCOUNT_JSON")
 
         if not service_account_file and not service_account_json:
@@ -25,7 +29,6 @@ class GoogleSlidesClient:
                 "Set GOOGLE_APPLICATION_CREDENTIALS (preferred) or GOOGLE_SERVICE_ACCOUNT_FILE, "
                 "or provide GOOGLE_SERVICE_ACCOUNT_JSON"
             )
-
         
         # Define the scope
         scopes = [
