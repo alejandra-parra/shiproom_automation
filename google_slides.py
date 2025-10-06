@@ -348,7 +348,7 @@ class GoogleSlidesClient:
         return text_id
 
     # Update column widths in add_table for slimmer layout
-    def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None, link_map: Dict = None, spacer_row_height_pt: int = 8, normal_row_height_pt: int = 10):
+    def add_table(self, slide_id: str, data: List[List], x: float = 50, y: float = 120, formatting_map: Dict = None, color_map: Dict = None, header_color: Dict = None, merge_map: List[Dict] = None, link_map: Dict = None, spacer_row_height_pt: int = 5, normal_row_height_pt: int = 10):
         """Add a table to a slide, with optional text links for issue keys. Spacer rows (merge_map entries with is_spacer=True) are shrunk using minRowHeight."""
         try:
             # Use microseconds for unique table ID
@@ -388,7 +388,7 @@ class GoogleSlidesClient:
                     row_heights.append(spacer_row_height_pt)
                 else:
                     row_heights.append(normal_row_height_pt)
-            initial_height = sum(row_heights) + 20  # padding
+            initial_height = sum(row_heights) + 0.1  # padding
 
             # Step 1: Create table first
             create_table_request = {
