@@ -367,10 +367,6 @@ class StatusReportGenerator:
 
         # Add title to slide
         self.slides.add_title(slide_id, title_text, 50, 20)
-
-        # Add title to slide
-        #self.slides.add_title(slide_id, f"{self.jellyfish.team_name} - {presenter_name} - {domain} " , 50, 20)
-        
         
         # Get formatted due dates with history for all items
 
