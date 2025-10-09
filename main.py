@@ -9,9 +9,16 @@ from typing import Dict, List, Tuple, Any
 import argparse
 from dotenv import load_dotenv
 import os, yaml
+import logging
+# Set up logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s"
+)
+logger = logging.getLogger(__name__)
 #load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 load_dotenv(dotenv_path="/var/task/.env", override=True)
-print("[DEBUG] Completed: load_dotenv - main.py")
+logger.debug("Completed: load_dotenv - main.py")
 
 from google_slides import GoogleSlidesClient
 from jira_client import JiraClient
@@ -37,16 +44,16 @@ def last_week_friday_str(today=None) -> str:
     """
     if today is None:
         today = datetime.now(BERLIN_TZ).date()
-        print(f"[DEBUG] Set today: {today}")
+    logger.debug(f"Set today: {today}")
     monday_this_week = today - timedelta(days=today.isoweekday() - 1)
-    print(f"[DEBUG] Set monday_this_week: {monday_this_week}")
+    logger.debug(f"Set monday_this_week: {monday_this_week}")
     monday_prev_week = monday_this_week - timedelta(days=7)
-    print(f"[DEBUG] Set monday_prev_week: {monday_prev_week}")
+    logger.debug(f"Set monday_prev_week: {monday_prev_week}")
     friday_prev_week = monday_prev_week + timedelta(days=4)
-    print(f"[DEBUG] Set friday_prev_week: {friday_prev_week}")
+    logger.debug(f"Set friday_prev_week: {friday_prev_week}")
     result = friday_prev_week.strftime("%Y-%m-%d")
-    print(f"[DEBUG] Set result: {result}")
-    print("[DEBUG] Completed: last_week_friday_str - main.py")
+    logger.debug(f"Set result: {result}")
+    logger.debug("Completed: last_week_friday_str - main.py")
     return result
 
 # Duplicate the template presentation and name it with last week's Friday
@@ -57,21 +64,26 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
     where the date is last week's Friday (Europe/Berlin).
     Returns (archive_id, new_title).
     """
-    meta = slides_svc.presentations().get(presentationId=template_id).execute()
-    print(f"[DEBUG] Set meta: {meta}")
+
+    try:
+        meta = slides_svc.presentations().get(presentationId=template_id).execute()
+        logger.debug(f"Set meta: {meta}")
+    except Exception as e:
+        logger.exception("Error fetching presentation metadata")
+        raise
     base_title = "Shiproom"
-    print(f"[DEBUG] Set base_title: {base_title}")
+    logger.debug(f"Set base_title: {base_title}")
     date_str = last_week_friday_str()
-    print(f"[DEBUG] Set date_str: {date_str}")
+    logger.debug(f"Set date_str: {date_str}")
     new_title = f"{date_str} - {base_title}"
-    print(f"[DEBUG] Set new_title: {new_title}")
+    logger.debug(f"Set new_title: {new_title}")
 
     body = {"name": new_title}
-    print(f"[DEBUG] Set body: {body}")
+    logger.debug(f"Set body: {body}")
     if parent_folder_id:
         body["parents"] = [parent_folder_id]
-        print(f"[DEBUG] Updated body with parents: {body}")
-    print(f"[COPY FROM PREVIOUS WEEK] title={new_title}  parent_folder_id={parent_folder_id or '(none)'}")
+        logger.debug(f"Updated body with parents: {body}")
+    logger.info(f"[COPY FROM PREVIOUS WEEK] title={new_title}  parent_folder_id={parent_folder_id or '(none)'}")
 
     try:
         copied = drive_svc.files().copy(
@@ -79,36 +91,41 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
             body=body,
             supportsAllDrives=True  # set True if you use Shared Drives
         ).execute()
-        print(f"[DEBUG] Set copied: {copied}")
+        logger.debug(f"Set copied: {copied}")
 
         archive_id = copied["id"]
-        print(f"[DEBUG] Set archive_id: {archive_id}")
+        logger.debug(f"Set archive_id: {archive_id}")
         meta = drive_svc.files().get(
             fileId=archive_id,
             fields="id,name,parents,driveId,owners(emailAddress,displayName),webViewLink",
             supportsAllDrives=True,
         ).execute()
-        print(f"[DEBUG] Updated meta: {meta}")
+        logger.debug(f"Updated meta: {meta}")
 
-        print("COPY META:",
-        "\n  name:", meta.get("name"),
-        "\n  id:", meta.get("id"),
-        "\n  driveId:", meta.get("driveId"),
-        "\n  parents:", meta.get("parents"),
-        "\n  owners:", meta.get("owners"),
-        "\n  open:", meta.get("webViewLink"))
+        logger.info(
+            "COPY META:"
+            f"\n  name: {meta.get('name')}"
+            f"\n  id: {meta.get('id')}"
+            f"\n  driveId: {meta.get('driveId')}"
+            f"\n  parents: {meta.get('parents')}"
+            f"\n  owners: {meta.get('owners')}"
+            f"\n  open: {meta.get('webViewLink')}"
+        )
 
-        print(f"Archived: {new_title} → https://docs.google.com/presentation/d/{archive_id}/edit")
-        print("[DEBUG] Completed: duplicate_template_as_last_week_friday - main.py")
+        logger.info(f"Archived: {new_title} → https://docs.google.com/presentation/d/{archive_id}/edit")
+        logger.debug("Completed: duplicate_template_as_last_week_friday - main.py")
         return archive_id, new_title
 
     except HttpError as e:
-        about = drive_svc.about().get(fields="user(emailAddress),storageQuota").execute()
-        print(f"[DEBUG] Set about: {about}")
-        print("[DRV ABOUT] user:", about.get("user", {}), "quota:", about.get("storageQuota", {}))
-        print(f"[DEBUG] Set HttpError: {e}")
-        print("[ERROR] Drive copy failed:", e)
-        print("[DEBUG] Completed: duplicate_template_as_last_week_friday (exception) - main.py")
+        try:
+            about = drive_svc.about().get(fields="user(emailAddress),storageQuota").execute()
+            logger.debug(f"Set about: {about}")
+            logger.error(f"[DRV ABOUT] user: {about.get('user', {})} quota: {about.get('storageQuota', {})}")
+        except Exception as about_exc:
+            logger.error(f"Error fetching Drive about info: {about_exc}")
+        logger.error(f"HttpError: {e}")
+        logger.error("Drive copy failed", exc_info=True)
+        logger.debug("Completed: duplicate_template_as_last_week_friday (exception) - main.py")
         raise
     
 class StatusReportGenerator:
@@ -117,43 +134,43 @@ class StatusReportGenerator:
     def __init__(self, config: Dict[str, Any]):
         # Keep the loaded config dict (stop re-reading YAML here)
         self.config = config or {}
-        print(f"[DEBUG] Set self.config: {self.config}")
+        logger.debug(f"Set self.config: {self.config}")
 
         # Set up existing clients (keep your wrapper!)
         self.jellyfish = JellyfishClient(self.config)
-        print(f"[DEBUG] Set self.jellyfish: {self.jellyfish}")
+        logger.debug(f"Set self.jellyfish: {self.jellyfish}")
         self.jira = JiraClient(self.config)
-        print(f"[DEBUG] Set self.jira: {self.jira}")
+        logger.debug(f"Set self.jira: {self.jira}")
         self.slides = GoogleSlidesClient(self.config)  # <- keep as the wrapper
-        print(f"[DEBUG] Set self.slides: {self.slides}")
+        logger.debug(f"Set self.slides: {self.slides}")
 
         # Status mapping for Google Sheets
         self.status_mapping = STATUS_MAPPING
-        print(f"[DEBUG] Set self.status_mapping: {self.status_mapping}")
+        logger.debug(f"Set self.status_mapping: {self.status_mapping}")
 
         # Teams config and selection
         teams_config_path = self.config.get('teams_config_file', 'teams_config.yaml')
-        print(f"[DEBUG] Set teams_config_path: {teams_config_path}")
+        logger.debug(f"Set teams_config_path: {teams_config_path}")
         self.teams_config = load_teams_config(teams_config_path)
-        print(f"[DEBUG] Set self.teams_config: {self.teams_config}")
+        logger.debug(f"Set self.teams_config: {self.teams_config}")
         self.team_selection = self.config.get('team_selection', 'all')
-        print(f"[DEBUG] Set self.team_selection: {self.team_selection}")
+        logger.debug(f"Set self.team_selection: {self.team_selection}")
 
         # Google Slides IDs from config.yaml (already loaded)
         slides_cfg = (self.config.get("google_slides") or {})
-        print(f"[DEBUG] Set slides_cfg: {slides_cfg}")
+        logger.debug(f"Set slides_cfg: {slides_cfg}")
         template_id = slides_cfg.get("presentation_id")
-        print(f"[DEBUG] Set template_id: {template_id}")
+        logger.debug(f"Set template_id: {template_id}")
         if not template_id:
             raise RuntimeError("Missing 'google_slides.presentation_id' in config")
         self.template_presentation_id = template_id
-        print(f"[DEBUG] Set self.template_presentation_id: {self.template_presentation_id}")
+        logger.debug(f"Set self.template_presentation_id: {self.template_presentation_id}")
         self.presentation_id = template_id  # you said: update the template itself
-        print(f"[DEBUG] Set self.presentation_id: {self.presentation_id}")
+        logger.debug(f"Set self.presentation_id: {self.presentation_id}")
         self.output_folder_id = os.getenv("GOOGLE_DRIVE_OUTPUT_FOLDER_ID") or slides_cfg.get("output_folder_id")
-        print(f"[DEBUG] Set self.output_folder_id: {self.output_folder_id}")
+        logger.debug(f"Set self.output_folder_id: {self.output_folder_id}")
 
-        print("Output folder ID:", self.output_folder_id or "(none)")
+        logger.info(f"Output folder ID: {self.output_folder_id or '(none)'}")
         if not self.output_folder_id:
             raise RuntimeError(
                 "GOOGLE_DRIVE_OUTPUT_FOLDER_ID is not set. Without a destination folder, "
@@ -163,48 +180,52 @@ class StatusReportGenerator:
         # Build raw Google API services alongside wrapper
         # Try to reuse creds from your wrapper if it exposes them; otherwise read from env.
         creds = getattr(self.slides, "credentials", None)
-        print(f"[DEBUG] Set creds: {creds}")
+        logger.debug(f"Set creds: {creds}")
         if creds is None:
             key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
-            print(f"[DEBUG] Set key_path: {key_path}")
+            logger.debug(f"Set key_path: {key_path}")
             if not key_path:
                 raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS is not set")
             scopes = [
                 "https://www.googleapis.com/auth/presentations",
                 "https://www.googleapis.com/auth/drive",
             ]
-            print(f"[DEBUG] Set scopes: {scopes}")
+            logger.debug(f"Set scopes: {scopes}")
             creds = service_account.Credentials.from_service_account_file(key_path, scopes=scopes)
-            print(f"[DEBUG] Updated creds: {creds}")
+            logger.debug(f"Updated creds: {creds}")
 
         # Build raw API services for duplication/moves
         self.slides_svc = build("slides", "v1", credentials=creds)
-        print(f"[DEBUG] Set self.slides_svc: {self.slides_svc}")
+        logger.debug(f"Set self.slides_svc: {self.slides_svc}")
         self.drive_svc  = build("drive",  "v3", credentials=creds)
-        print(f"[DEBUG] Set self.drive_svc: {self.drive_svc}")
+        logger.debug(f"Set self.drive_svc: {self.drive_svc}")
 
         # Make sure your wrapper targets the template deck
         if hasattr(self.slides, "presentation_id"):
             self.slides.presentation_id = self.template_presentation_id
-            print(f"[DEBUG] Updated self.slides.presentation_id: {self.slides.presentation_id}")
+            logger.debug(f"Updated self.slides.presentation_id: {self.slides.presentation_id}")
 
-        print(f"Using permanent template (from config): {self.template_presentation_id}")
-        print("[DEBUG] Completed: StatusReportGenerator.__init__ - main.py")
+        logger.info(f"Using permanent template (from config): {self.template_presentation_id}")
+        logger.debug("Completed: StatusReportGenerator.__init__ - main.py")
 
     # Function to duplicate the template before running the report
     def run(self):
         # Make the archive copy named with last week's Friday
-        duplicate_template_as_last_week_friday(
-            self.slides_svc,  # raw Slides service
-            self.drive_svc,   # raw Drive service
-            self.template_presentation_id,
-            self.output_folder_id
-        )
-        print(f"[DEBUG] Ran duplicate_template_as_last_week_friday")
-        # Run the report updates AGAINST THE TEMPLATE (not the copy)
-        self.generate_slides()
-        print(f"[DEBUG] Ran generate_slides")
-        print("[DEBUG] Completed: StatusReportGenerator.run - main.py")
+        try:
+            duplicate_template_as_last_week_friday(
+                self.slides_svc,  # raw Slides service
+                self.drive_svc,   # raw Drive service
+                self.template_presentation_id,
+                self.output_folder_id
+            )
+            logger.debug("Ran duplicate_template_as_last_week_friday")
+            # Run the report updates AGAINST THE TEMPLATE (not the copy)
+            self.generate_slides()
+            logger.debug("Ran generate_slides")
+            logger.debug("Completed: StatusReportGenerator.run - main.py")
+        except Exception as e:
+            logger.exception("Exception in StatusReportGenerator.run")
+            raise
 
     def generate_slide_for_team(self, team_identifier: str, team_config: Dict[str, Any]) -> None:
         """Generate a single slide for a specific team"""
@@ -426,14 +447,6 @@ class StatusReportGenerator:
 
             # Epics (default): last 4 (previous 3 struck, current clean)
             return format_due_epic(current_date, history)
-        merged_data, formatting_map, color_map, merge_map, link_map = prepare_merged_table(
-            filtered_deliverables, 
-            filtered_epics,
-            get_formatted_due_date
-        )
-        
-        y_position = 80
-        print(f"Merged table data: {len(merged_data)} rows")
 
         merged_data, formatting_map, color_map, merge_map, link_map = prepare_merged_table(
             filtered_deliverables,
@@ -679,5 +692,8 @@ def main():
     print("[DEBUG] Completed: main - main.py")
 
 if __name__ == '__main__':
-    main()
-    print("[DEBUG] Completed: __main__ - main.py")
+    try:
+        main()
+        logger.debug("Completed: __main__ - main.py")
+    except Exception as e:
+        logger.exception("Exception in __main__")
