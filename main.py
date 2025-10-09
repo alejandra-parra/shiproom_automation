@@ -353,13 +353,20 @@ class StatusReportGenerator:
         display_name = parts[0].strip()
         self.jellyfish.team_name = display_name
 
-        # Include the team's EM 
+        # Include the team's EM and domain
         presenter = team_config.get("presenter", "Presenter")
         presenter_name = presenter.split()[0] if presenter else "Presenter" 
+        domain = team_config.get('domain', '') or ''
+        domain = domain.strip()
+
+        # Build title: include domain only if non-empty
+        if domain:
+            title_text = f"{self.jellyfish.team_name} - {presenter_name} - {domain}"
+        else:
+            title_text = f"{self.jellyfish.team_name} - {presenter_name}"
 
         # Add title to slide
-        self.slides.add_title(slide_id, f"{self.jellyfish.team_name} - {presenter_name}", 50, 20)
-        
+        self.slides.add_title(slide_id, title_text, 50, 20)
         
         # Get formatted due dates with history for all items
 
