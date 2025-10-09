@@ -2,12 +2,25 @@
 Jellyfish client for interacting with Jellyfish API
 """
 
-import os
 import json
 from typing import List, Dict
 from datetime import datetime
 import requests
 from date_utils import get_weekly_lookback_range, get_friday_of_week
+
+import os
+from dotenv import load_dotenv
+
+# Try to load .env from the current directory (local dev) or /var/task (Lambda)
+env_paths = [
+    os.path.join(os.path.dirname(__file__), '.env'),  # Local
+    "/var/task/.env"                                  # Lambda
+]
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(dotenv_path=env_path, override=True)
+        break
+
 
 class JellyfishClient:
     """Client for interacting with Jellyfish API"""

@@ -7,8 +7,21 @@ Generates Google Sheets status reports for engineering teams based on Jellyfish 
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Any
 import argparse
+import yaml
+
+import os
 from dotenv import load_dotenv
-import os, yaml
+
+# Try to load .env from the current directory (local dev) or /var/task (Lambda)
+env_paths = [
+    os.path.join(os.path.dirname(__file__), '.env'),  # Local
+    "/var/task/.env"                                  # Lambda
+]
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(dotenv_path=env_path, override=True)
+        break
+
 import logging
 # Set up logging
 logging.basicConfig(
@@ -16,9 +29,7 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s"
 )
 logger = logging.getLogger(__name__)
-#load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
-load_dotenv(dotenv_path="/var/task/.env", override=True)
-logger.debug("Completed: load_dotenv - main.py")
+
 
 from google_slides import GoogleSlidesClient
 from jira_client import JiraClient

@@ -1,18 +1,23 @@
 # app.py
-import os
 import sys
 import importlib
-from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
 from mangum import Mangum
 
 # --- Load local secrets and set Google creds path ---
-# In Lambda your code is at /var/task (read-only)
-load_dotenv(dotenv_path="/var/task/.env", override=True)
-print("[DEBUG] Completed: load_dotenv - app.py")
-#os.environ.setdefault("GOOGLE_APPLICATION_CREDENTIALS", "/var/task/slides_service_account.json")
-#print(f"[DEBUG] Set GOOGLE_APPLICATION_CREDENTIALS: {os.environ.get('GOOGLE_APPLICATION_CREDENTIALS')}")
+import os
+from dotenv import load_dotenv
+
+# Try to load .env from the current directory (local dev) or /var/task (Lambda)
+env_paths = [
+    os.path.join(os.path.dirname(__file__), '.env'),  # Local
+    "/var/task/.env"                                  # Lambda
+]
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(dotenv_path=env_path, override=True)
+        break
 
 # Import your existing CLI module (main.py) without changing it
 main_mod = importlib.import_module("main")

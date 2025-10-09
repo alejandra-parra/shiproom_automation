@@ -2,10 +2,21 @@
 Jira client for interacting with Jira API
 """
 
-import os
 from typing import List, Dict, Optional
 from jira import JIRA
 
+import os
+from dotenv import load_dotenv
+
+# Try to load .env from the current directory (local dev) or /var/task (Lambda)
+env_paths = [
+    os.path.join(os.path.dirname(__file__), '.env'),  # Local
+    "/var/task/.env"                                  # Lambda
+]
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(dotenv_path=env_path, override=True)
+        break
 
 class JiraClient:
     """Client for interacting with Jira API to get issue metadata"""

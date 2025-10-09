@@ -2,7 +2,6 @@
 Google Slides client for interacting with Google Slides API
 """
 
-import os
 import json
 import socket
 import time
@@ -12,9 +11,18 @@ from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
+import os
 from dotenv import load_dotenv
-load_dotenv(dotenv_path="/var/task/.env", override=True)
-print("[DEBUG] Completed: load_dotenv - google_slides.py")
+
+# Try to load .env from the current directory (local dev) or /var/task (Lambda)
+env_paths = [
+    os.path.join(os.path.dirname(__file__), '.env'),  # Local
+    "/var/task/.env"                                  # Lambda
+]
+for env_path in env_paths:
+    if os.path.exists(env_path):
+        load_dotenv(dotenv_path=env_path, override=True)
+        break
 
 class GoogleSlidesClient:
     """Client for interacting with Google Slides API"""
