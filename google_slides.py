@@ -1,3 +1,7 @@
+import logging
+# Set up logging
+logging.getLogger().setLevel(logging.DEBUG)
+logger = logging.getLogger(__name__)
 """
 Google Slides client for interacting with Google Slides API
 """
@@ -42,8 +46,8 @@ class GoogleSlidesClient:
             try:
                 service_account_info = json.loads(service_account_json)
             except json.JSONDecodeError as e:
-                print(f"JSON parsing error: {e}")
-                print("Attempting to fix JSON formatting issues...")
+                logger.error(f"JSON parsing error: {e}")
+                logger.info("Attempting to fix JSON formatting issues...")
                 
                 # Fix common JSON issues:
                 # 1. Replace actual newlines with escaped newlines
@@ -57,21 +61,21 @@ class GoogleSlidesClient:
                 
                 try:
                     service_account_info = json.loads(fixed_json)
-                    print("Successfully fixed JSON formatting")
+                    logger.info("Successfully fixed JSON formatting")
                 except json.JSONDecodeError as e2:
-                    print(f"Could not fix JSON automatically: {e2}")
-                    print("Please check your .env file and ensure the JSON is properly formatted.")
+                    logger.error(f"Could not fix JSON automatically: {e2}")
+                    logger.error("Please check your .env file and ensure the JSON is properly formatted.")
                     raise
             self.credentials = Credentials.from_service_account_info(
                 service_account_info, scopes=scopes
             )
-            print("Using Google Service Account from JSON content in environment variable")
+            logger.info("Using Google Service Account from JSON content in environment variable")
         else:
             # Use file path
             self.credentials = Credentials.from_service_account_file(
                 service_account_file, scopes=scopes
             )
-            print(f"Using Google Service Account from file: {service_account_file}")
+            logger.info(f"Using Google Service Account from file: {service_account_file}")
         
         # Build the service with timeout
         socket.setdefaulttimeout(60)  # 30 second timeout
@@ -85,23 +89,23 @@ class GoogleSlidesClient:
         # Slide ID will be set per team from teams_config.yaml
         self.slide_id = None
         
-        print(f"Initialized Google Slides client with presentation ID: {self.presentation_id}")
-        print(f"No default slide ID - will create new slides as needed")
+        logger.info(f"Initialized Google Slides client with presentation ID: {self.presentation_id}")
+        logger.info(f"No default slide ID - will create new slides as needed")
     
     def get_presentation(self):
         """Get presentation metadata"""
         try:
-            print(f"Fetching presentation metadata for ID: {self.presentation_id}")
+            logger.info(f"Fetching presentation metadata for ID: {self.presentation_id}")
             presentation = self.service.presentations().get(
                 presentationId=self.presentation_id
             ).execute()
-            print("Successfully retrieved presentation metadata")
+            logger.info("Successfully retrieved presentation metadata")
             return presentation
         except HttpError as e:
-            print(f"Error getting presentation: {e}")
+            logger.error(f"Error getting presentation: {e}")
             raise
         except Exception as e:
-            print(f"Unexpected error getting presentation: {e}")
+            logger.error(f"Unexpected error getting presentation: {e}")
             raise
 
     def get_page_elements(self, slide_id: str) -> List[dict]:
@@ -141,7 +145,7 @@ class GoogleSlidesClient:
             preserve = set(preserve_object_ids or [])
             slide_elements = self.get_page_elements(slide_id)
             if not slide_elements:
-                print(f"No elements found on slide {slide_id} (or slide missing).")
+                logger.info(f"No elements found on slide {slide_id} (or slide missing).")
                 return
 
             delete_requests = []
@@ -155,11 +159,11 @@ class GoogleSlidesClient:
                     presentationId=self.presentation_id,
                     body={'requests': delete_requests}
                 ).execute()
-                print(f"Cleared {len(delete_requests)} elements from slide {slide_id}, preserved {len(preserve)}.")
+                logger.info(f"Cleared {len(delete_requests)} elements from slide {slide_id}, preserved {len(preserve)}.")
             else:
-                print(f"Nothing to clear on slide {slide_id}.")
+                logger.info(f"Nothing to clear on slide {slide_id}.")
         except HttpError as e:
-            print(f"Error clearing slide {slide_id}: {e}")
+            logger.error(f"Error clearing slide {slide_id}: {e}")
     
     def create_slide(self, slide_id: str = None):
         """Create a new slide"""
@@ -181,11 +185,11 @@ class GoogleSlidesClient:
                 body={'requests': requests}
             ).execute()
             
-            print(f"Created slide: {slide_id}")
+            logger.info(f"Created slide: {slide_id}")
             return slide_id
             
         except HttpError as e:
-            print(f"Error creating slide: {e}")
+            logger.error(f"Error creating slide: {e}")
             raise
     
     def add_title(self, slide_id: str, title: str, x: float = 50, y: float = 50):
@@ -237,15 +241,15 @@ class GoogleSlidesClient:
                 body={'requests': requests}
             ).execute()
             
-            print(f"Added title to slide {slide_id}")
+            logger.info(f"Added title to slide {slide_id}")
             
         except HttpError as e:
-            print(f"Error adding title to slide {slide_id}: {e}")
+            logger.error(f"Error adding title to slide {slide_id}: {e}")
     
     def get_table_dimensions(self, table_id: str, slide_id: str) -> Dict:
         """Get actual table dimensions after creation"""
         try:
-            print(f"Getting dimensions for table: {table_id}")
+            logger.info(f"Getting dimensions for table: {table_id}")
             presentation = self.get_presentation()
             
             # First, find our target slide
@@ -253,24 +257,24 @@ class GoogleSlidesClient:
             for slide in presentation.get('slides', []):
                 if slide.get('objectId') == slide_id:
                     target_slide = slide
-                    print(f"Found target slide: {slide_id}")
+                    logger.debug(f"Found target slide: {slide_id}")
                     break
             
             if not target_slide:
-                print(f"Target slide {self.slide_id} not found in presentation")
+                logger.warning(f"Target slide {self.slide_id} not found in presentation")
                 return {}
             
             # Now look for our table in the target slide
             for element in target_slide.get('pageElements', []):
                 element_id = element.get('objectId', '')
                 if element_id == table_id:
-                    print(f"Found table element: {table_id}")
+                    logger.debug(f"Found table element: {table_id}")
                     size = element.get('size', {})
                     transform = element.get('transform', {})
                     
                     # Check if we have the expected data structure
                     if not size or not transform:
-                        print(f"Missing size or transform data for table {table_id}")
+                        logger.warning(f"Missing size or transform data for table {table_id}")
                         return {}
                     
                     # Google Slides API returns dimensions in EMU (English Metric Units)
@@ -280,11 +284,11 @@ class GoogleSlidesClient:
                     y_emu = transform.get('translateY', 0)
                     x_emu = transform.get('translateX', 0)
                     
-                    print(f"Raw EMU dimensions for table {table_id}:")
-                    print(f"  Height: {height_emu} EMU")
-                    print(f"  Width: {width_emu} EMU")
-                    print(f"  Y position: {y_emu} EMU")
-                    print(f"  X position: {x_emu} EMU")
+                    logger.debug(f"Raw EMU dimensions for table {table_id}:")
+                    logger.debug(f"  Height: {height_emu} EMU")
+                    logger.debug(f"  Width: {width_emu} EMU")
+                    logger.debug(f"  Y position: {y_emu} EMU")
+                    logger.debug(f"  X position: {x_emu} EMU")
                     
                     # Convert EMU to points (1 point = 12,700 EMUs)
                     height_pt = height_emu / 12700
@@ -292,11 +296,11 @@ class GoogleSlidesClient:
                     y_pt = y_emu / 12700
                     x_pt = x_emu / 12700
                     
-                    print(f"Converted to points for table {table_id}:")
-                    print(f"  Height: {height_pt:.2f} PT")
-                    print(f"  Width: {width_pt:.2f} PT")
-                    print(f"  Y position: {y_pt:.2f} PT")
-                    print(f"  X position: {x_pt:.2f} PT")
+                    logger.debug(f"Converted to points for table {table_id}:")
+                    logger.debug(f"  Height: {height_pt:.2f} PT")
+                    logger.debug(f"  Width: {width_pt:.2f} PT")
+                    logger.debug(f"  Y position: {y_pt:.2f} PT")
+                    logger.debug(f"  X position: {x_pt:.2f} PT")
                     
                     dimensions = {
                         'height': height_pt,
@@ -307,12 +311,12 @@ class GoogleSlidesClient:
                     
                     return dimensions
                 else:
-                    print(f"Found element: {element_id} (not our table)")
+                    logger.debug(f"Found element: {element_id} (not our table)")
             
-            print(f"Table {table_id} not found in slide {self.slide_id}")
+            logger.warning(f"Table {table_id} not found in slide {self.slide_id}")
             return {}
         except Exception as e:
-            print(f"Error getting table dimensions for {table_id}: {e}")
+            logger.error(f"Error getting table dimensions for {table_id}: {e}")
             import traceback
             traceback.print_exc()
             return {}
@@ -344,7 +348,7 @@ class GoogleSlidesClient:
             presentationId=self.presentation_id,
             body={'requests': [border_request]}
         ).execute()
-        print(f"Added bordered text box {text_id} to slide {slide_id}")
+        logger.info(f"Added bordered text box {text_id} to slide {slide_id}")
         return text_id
 
     # Update column widths in add_table for slimmer layout
@@ -355,14 +359,14 @@ class GoogleSlidesClient:
             table_id = f"table_{int(time.time() * 1000000)}"
             
             if not data:
-                print("No data to add to table")
+                logger.warning("No data to add to table")
                 return None, None
             
             rows = len(data)
             cols = len(data[0]) if data else 0
             
             if rows == 0 or cols == 0:
-                print("Invalid table dimensions")
+                logger.warning("Invalid table dimensions")
                 return None, None
             
             # Define column widths based on content type
@@ -370,10 +374,10 @@ class GoogleSlidesClient:
             # For epics: [Key, Name, Due Date, Status]
             if cols == 5:  # Deliverables table
                 column_widths = [55, 195, 45, 60, 45]  # Key, Name, Maturity, Due Date, Status (tuned)
-                print(f"DEBUG: Using deliverables column widths: {column_widths}")
+                logger.debug(f"DEBUG: Using deliverables column widths: {column_widths}")
             elif cols == 4:  # Epics table
                 column_widths = [55, 240, 60, 45]  # Key, Name, Due Date, Status (tuned)
-                print(f"DEBUG: Using epics column widths: {column_widths}")
+                logger.debug(f"DEBUG: Using epics column widths: {column_widths}")
             else:
                 # Fallback to equal widths
                 column_widths = [120] * cols
@@ -445,7 +449,7 @@ class GoogleSlidesClient:
                     presentationId=self.presentation_id,
                     body={'requests': column_width_requests}
                 ).execute()
-                print(f"Set column widths: {column_widths}")
+                logger.info(f"Set column widths: {column_widths}")
             
             # --- NEW: shrink spacer rows with minRowHeight ---
             if spacer_rows:
@@ -465,7 +469,7 @@ class GoogleSlidesClient:
                     presentationId=self.presentation_id,
                     body={'requests': row_height_requests}
                 ).execute()
-                print(f"Applied minRowHeight={spacer_row_height_pt}pt to spacer rows: {sorted(spacer_rows)}")
+                logger.info(f"Applied minRowHeight={spacer_row_height_pt}pt to spacer rows: {sorted(spacer_rows)}")
                 
             # Step 2: Add content to all cells in one batch
             all_cell_requests = []
@@ -628,7 +632,7 @@ class GoogleSlidesClient:
                         presentationId=self.presentation_id,
                         body={'requests': formatting_requests}
                     ).execute()
-                    print(f"Applied formatting to {len(formatting_requests)} text ranges")
+                    logger.info(f"Applied formatting to {len(formatting_requests)} text ranges")
 
             # Apply background colors if provided
             if color_map:
@@ -663,7 +667,7 @@ class GoogleSlidesClient:
                         presentationId=self.presentation_id,
                         body={'requests': color_requests}
                     ).execute()
-                    print(f"Applied background colors to {len(color_requests)} cells")
+                    logger.info(f"Applied background colors to {len(color_requests)} cells")
 
             # --- Handle merged cells and custom background/border for merged cells ---
             if merge_map:
@@ -759,15 +763,15 @@ class GoogleSlidesClient:
                         presentationId=self.presentation_id,
                         body={'requests': merge_requests}
                     ).execute()
-                    print(f"Applied {len(merge_requests)} merged cell requests (mergeTableCells)")
+                    logger.info(f"Applied {len(merge_requests)} merged cell requests (mergeTableCells)")
                 if border_requests:
                     self.service.presentations().batchUpdate(
                         presentationId=self.presentation_id,
                         body={'requests': border_requests}
                     ).execute()
-                    print(f"Applied {len(border_requests)} border color requests for spacer row separation")
+                    logger.info(f"Applied {len(border_requests)} border color requests for spacer row separation")
 
-            print(f"Added content to table with {rows}x{cols} on slide {slide_id}")
+            logger.info(f"Added content to table with {rows}x{cols} on slide {slide_id}")
             
             # Wait for content to be fully rendered
             time.sleep(1)
@@ -786,7 +790,7 @@ class GoogleSlidesClient:
             return table_id, actual_dimensions, column_widths, total_width
             
         except HttpError as e:
-            print(f"Error adding table to slide {slide_id}: {e}")
+            logger.error(f"Error adding table to slide {slide_id}: {e}")
             return None, None
     
     def add_text_box(self, slide_id: str, text: str, x: float, y: float, width: float = 400, height: float = 100, font_size: float = 7,object_id: str = None):
@@ -840,11 +844,11 @@ class GoogleSlidesClient:
                 body={'requests': requests}
             ).execute()
             
-            print(f"Added text box {text_id} to slide {slide_id} with font size {font_size}pt")
+            logger.info(f"Added text box {text_id} to slide {slide_id} with font size {font_size}pt")
             return text_id
             
         except HttpError as e:
-            print(f"Error adding text box to slide {slide_id}: {e}")
+            logger.error(f"Error adding text box to slide {slide_id}: {e}")
             raise 
 
     def update_textbox_style(self, object_id: str, font_size: int = None, bold: bool = False):

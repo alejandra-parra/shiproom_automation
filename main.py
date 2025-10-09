@@ -7,8 +7,20 @@ Generates Google Sheets status reports for engineering teams based on Jellyfish 
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple, Any
 import argparse
+import yaml
+import logging
+
+# --- Logging setup ---
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s %(levelname)s %(filename)s:%(lineno)d %(message)s"
+)
+logger = logging.getLogger(__name__)
+
+# --- Load secrets to access Google, Jira, Jellyfish header if set in .env ---
+
+import os
 from dotenv import load_dotenv
-import os, yaml
 load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
 from google_slides import GoogleSlidesClient
@@ -35,145 +47,170 @@ def last_week_friday_str(today=None) -> str:
     """
     if today is None:
         today = datetime.now(BERLIN_TZ).date()
-    # Monday of this week
+        logger.debug(f"Set today: {today}")
     monday_this_week = today - timedelta(days=today.isoweekday() - 1)
-    # Monday of previous week
+    logger.debug(f"Set monday_this_week: {monday_this_week}")
     monday_prev_week = monday_this_week - timedelta(days=7)
-    # Friday is Monday + 4 days
+    logger.debug(f"Set monday_prev_week: {monday_prev_week}")
     friday_prev_week = monday_prev_week + timedelta(days=4)
-    return friday_prev_week.strftime("%Y-%m-%d")
+    logger.debug(f"Set friday_prev_week: {friday_prev_week}")
+    result = friday_prev_week.strftime("%Y-%m-%d")
+    logger.debug(f"Set result: {result}")
+    logger.debug("Completed: last_week_friday_str - main.py")
+    return result
 
-# Duplicate the template presentation and name it with last week's Friday
-# The duplicated version contains the comments made in the risk section and is archived for documentation purposes
 def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, parent_folder_id=None):
     """
     Duplicates the template and names it "<Template Title> - YYYY-MM-DD",
     where the date is last week's Friday (Europe/Berlin).
     Returns (archive_id, new_title).
     """
+    logger.info("Starting duplicate_template_as_last_week_friday")
     meta = slides_svc.presentations().get(presentationId=template_id).execute()
+    logger.debug(f"Set meta: {meta}")
     base_title = "Shiproom"
+    logger.debug(f"Set base_title: {base_title}")
     date_str = last_week_friday_str()
+    logger.debug(f"Set date_str: {date_str}")
     new_title = f"{date_str} - {base_title}"
+    logger.debug(f"Set new_title: {new_title}")
 
     body = {"name": new_title}
+    logger.debug(f"Set body: {body}")
     if parent_folder_id:
         body["parents"] = [parent_folder_id]
-    print(f"[COPY FROM PREVIOUS WEEK] title={new_title}  parent_folder_id={parent_folder_id or '(none)'}")
+        logger.debug(f"Updated body with parents: {body}")
+    logger.info(f"[COPY FROM PREVIOUS WEEK] title={new_title}  parent_folder_id={parent_folder_id or '(none)'}")
 
     try:
         copied = drive_svc.files().copy(
             fileId=template_id,
             body=body,
-            supportsAllDrives=True  # set True if you use Shared Drives
+            supportsAllDrives=True
         ).execute()
+        logger.debug(f"Set copied: {copied}")
 
         archive_id = copied["id"]
+        logger.debug(f"Set archive_id: {archive_id}")
         meta = drive_svc.files().get(
-        fileId=archive_id,
-        fields="id,name,parents,driveId,owners(emailAddress,displayName),webViewLink",
-        supportsAllDrives=True,
+            fileId=archive_id,
+            fields="id,name,parents,driveId,owners(emailAddress,displayName),webViewLink",
+            supportsAllDrives=True,
         ).execute()
-        
+        logger.debug(f"Updated meta: {meta}")
 
-        print("COPY META:",
-        "\n  name:", meta.get("name"),
-        "\n  id:", meta.get("id"),
-        "\n  driveId:", meta.get("driveId"),
-        "\n  parents:", meta.get("parents"),
-        "\n  owners:", meta.get("owners"),
-        "\n  open:", meta.get("webViewLink"))
+        logger.info("COPY META: name: %s, id: %s, driveId: %s, parents: %s, owners: %s, open: %s",
+            meta.get("name"),
+            meta.get("id"),
+            meta.get("driveId"),
+            meta.get("parents"),
+            meta.get("owners"),
+            meta.get("webViewLink"))
         
-        print(f"Archived: {new_title} → https://docs.google.com/presentation/d/{archive_id}/edit")
+        logger.info(f"Archived: {new_title} → https://docs.google.com/presentation/d/{archive_id}/edit")
+        logger.debug("Completed: duplicate_template_as_last_week_friday - main.py")
         return archive_id, new_title
     
     except HttpError as e:
-        # Whose creds are being used and what’s the quota?
         about = drive_svc.about().get(fields="user(emailAddress),storageQuota").execute()
-        print("[DRV ABOUT] user:", about.get("user", {}), "quota:", about.get("storageQuota", {}))
-        print("[ERROR] Drive copy failed:", e)
+        logger.error("[DRV ABOUT] user: %s quota: %s", about.get("user", {}), about.get("storageQuota", {}))
+        logger.error("[ERROR] Drive copy failed: %s", e)
+        logger.debug("Completed: duplicate_template_as_last_week_friday (exception) - main.py")
         raise
-    
+
 class StatusReportGenerator:
     """Generates status reports from Jellyfish data"""
     
     def __init__(self, config: Dict[str, Any]):
-        # Keep the loaded config dict (stop re-reading YAML here)
         self.config = config or {}
+        logger.debug(f"Set self.config: {self.config}")
 
-        # Set up existing clients (keep your wrapper!)
         self.jellyfish = JellyfishClient(self.config)
+        logger.debug(f"Set self.jellyfish: {self.jellyfish}")
         self.jira = JiraClient(self.config)
-        self.slides = GoogleSlidesClient(self.config)  # <- keep as the wrapper
+        logger.debug(f"Set self.jira: {self.jira}")
+        self.slides = GoogleSlidesClient(self.config)
+        logger.debug(f"Set self.slides: {self.slides}")
 
-        # Status mapping for Google Sheets
         self.status_mapping = STATUS_MAPPING
+        logger.debug(f"Set self.status_mapping: {self.status_mapping}")
 
-        # Teams config and selection
         teams_config_path = self.config.get('teams_config_file', 'teams_config.yaml')
+        logger.debug(f"Set teams_config_path: {teams_config_path}")
         self.teams_config = load_teams_config(teams_config_path)
+        logger.debug(f"Set self.teams_config: {self.teams_config}")
         self.team_selection = self.config.get('team_selection', 'all')
+        logger.debug(f"Set self.team_selection: {self.team_selection}")
 
-        # Google Slides IDs from config.yaml (already loaded)
         slides_cfg = (self.config.get("google_slides") or {})
+        logger.debug(f"Set slides_cfg: {slides_cfg}")
         template_id = slides_cfg.get("presentation_id")
+        logger.debug(f"Set template_id: {template_id}")
         if not template_id:
+            logger.error("Missing 'google_slides.presentation_id' in config")
             raise RuntimeError("Missing 'google_slides.presentation_id' in config")
         self.template_presentation_id = template_id
-        self.presentation_id = template_id  # you said: update the template itself
+        logger.debug(f"Set self.template_presentation_id: {self.template_presentation_id}")
+        self.presentation_id = template_id
+        logger.debug(f"Set self.presentation_id: {self.presentation_id}")
         self.output_folder_id = os.getenv("GOOGLE_DRIVE_OUTPUT_FOLDER_ID") or slides_cfg.get("output_folder_id")
-        
-        print("Output folder ID:", self.output_folder_id or "(none)")
+        logger.debug(f"Set self.output_folder_id: {self.output_folder_id}")
+
+        logger.info("Output folder ID: %s", self.output_folder_id or "(none)")
         if not self.output_folder_id:
+            logger.error("GOOGLE_DRIVE_OUTPUT_FOLDER_ID is not set. Without a destination folder, the copy goes to the service account’s My Drive (which usually has no storage).")
             raise RuntimeError(
                 "GOOGLE_DRIVE_OUTPUT_FOLDER_ID is not set. Without a destination folder, "
                 "the copy goes to the service account’s My Drive (which usually has no storage)."
             )
 
-        # Build raw Google API services alongside wrapper
-        # Try to reuse creds from your wrapper if it exposes them; otherwise read from env.
         creds = getattr(self.slides, "credentials", None)
+        logger.debug(f"Set creds: {creds}")
         if creds is None:
             key_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
+            logger.debug(f"Set key_path: {key_path}")
             if not key_path:
+                logger.error("GOOGLE_APPLICATION_CREDENTIALS is not set")
                 raise RuntimeError("GOOGLE_APPLICATION_CREDENTIALS is not set")
             scopes = [
                 "https://www.googleapis.com/auth/presentations",
                 "https://www.googleapis.com/auth/drive",
             ]
+            logger.debug(f"Set scopes: {scopes}")
             creds = service_account.Credentials.from_service_account_file(key_path, scopes=scopes)
+            logger.debug(f"Updated creds: {creds}")
 
-        # Build raw API services for duplication/moves
         self.slides_svc = build("slides", "v1", credentials=creds)
+        logger.debug(f"Set self.slides_svc: {self.slides_svc}")
         self.drive_svc  = build("drive",  "v3", credentials=creds)
+        logger.debug(f"Set self.drive_svc: {self.drive_svc}")
 
-        # Make sure your wrapper targets the template deck
         if hasattr(self.slides, "presentation_id"):
             self.slides.presentation_id = self.template_presentation_id
+            logger.debug(f"Updated self.slides.presentation_id: {self.slides.presentation_id}")
 
-        print(f"Using permanent template (from config): {self.template_presentation_id}")
-    # Function to duplicate the template before running the report
+        logger.info(f"Using permanent template (from config): {self.template_presentation_id}")
+
     def run(self):
-        # Make the archive copy named with last week's Friday
+        logger.info("Running StatusReportGenerator.run")
         duplicate_template_as_last_week_friday(
-            self.slides_svc,  # raw Slides service
-            self.drive_svc,   # raw Drive service
+            self.slides_svc,
+            self.drive_svc,
             self.template_presentation_id,
             self.output_folder_id
         )
+        logger.info("Duplicated template as last week Friday")
+        self.generate_slides()
+        logger.info("Completed generate_slides")
+        logger.debug("Completed: StatusReportGenerator.run - main.py")
 
-        # Run the report updates AGAINST THE TEMPLATE (not the copy)
-        self.generate_slides()    
-        
-
-    
     def generate_slide_for_team(self, team_identifier: str, team_config: Dict[str, Any]) -> None:
         """Generate a single slide for a specific team"""
-        print(f"\n=== Generating slide for team: {team_identifier} ===")
+        logger.info(f"\n=== Generating slide for team: {team_identifier} ===")
         
         # Validate team configuration
         if not validate_team_config(team_config, team_identifier):
-            print(f"Skipping team {team_identifier} due to invalid configuration")
+            logger.warning(f"Skipping team {team_identifier} due to invalid configuration")
             return
         
         # Update Jellyfish client with team-specific configuration
@@ -184,12 +221,12 @@ class StatusReportGenerator:
             team_scope = [str(team_config['team_id'])]
 
         if not team_scope:
-            print(f"Error: no Jellyfish team IDs configured for {team_identifier}")
+            logger.error(f"Error: no Jellyfish team IDs configured for {team_identifier}")
             return
         
         start_date, end_date = get_report_date_range()
-        print(f"Date range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
-        print(f"Fetching deliverables for team {self.jellyfish.team_name}...")
+        logger.info(f"Date range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
+        logger.info(f"Fetching deliverables for team {self.jellyfish.team_name}...")
         
         deliverables = self.jellyfish.get_work_items_by_category(
             "deliverable-new",
@@ -198,15 +235,15 @@ class StatusReportGenerator:
             team_ids=team_scope
         )
         
-        print(f"Total deliverables received from API: {len(deliverables)}")
+        logger.info(f"Total deliverables received from API: {len(deliverables)}")
         
         # Add due date history, labels and maturity level to deliverables
 
-        print(f"Adding due date history, labels, and maturity to {len(deliverables)} deliverables...")
+        logger.info(f"Adding due date history, labels, and maturity to {len(deliverables)} deliverables...")
         for i, deliverable in enumerate(deliverables, 1):
             issue_key = deliverable.get('source_issue_key')
             if issue_key:
-                print(f"  [{i}/{len(deliverables)}] Fetching due date history, labels, maturity for deliverable {issue_key}...")
+                logger.info(f"  [{i}/{len(deliverables)}] Fetching due date history, labels, maturity for deliverable {issue_key}...")
                 try:
                     deliverable['date_history'] = self.jira.get_due_date_history(issue_key)
                     deliverable['labels'] = self.jira.get_issue_labels(issue_key)
@@ -223,32 +260,32 @@ class StatusReportGenerator:
                         text, fmt = ("N/A", [])
                     deliverable['due_tape_text'] = text
                     deliverable['due_tape_fmt'] = fmt
-                    print(f"  [{i}/{len(deliverables)}] ✓ Metadata fetched for {issue_key} (maturity='{deliverable['maturity']}')")
+                    logger.info(f"  [{i}/{len(deliverables)}] ✓ Metadata fetched for {issue_key} (maturity='{deliverable['maturity']}')")
                 except Exception as e:
-                    print(f"  [{i}/{len(deliverables)}] ✗ Error fetching metadata for {issue_key}: {e}")
+                    logger.warning(f"  [{i}/{len(deliverables)}] ✗ Error fetching metadata for {issue_key}: {e}")
                     deliverable['date_history'] = []
                     deliverable['labels'] = []
                     deliverable['maturity'] = "N/A"
                     deliverable['due_tape_text'] = "N/A"
                     deliverable['due_tape_fmt'] = []
             else:
-                print(f"  [{i}/{len(deliverables)}] No issue key for deliverable, skipping metadata")
+                logger.info(f"  [{i}/{len(deliverables)}] No issue key for deliverable, skipping metadata")
                 deliverable['date_history'] = []
                 deliverable['labels'] = []
                 deliverable['maturity'] = "N/A"
                 deliverable['due_tape_text'] = "N/A"
                 deliverable['due_tape_fmt'] = []
 
-        print(f"Due date history, labels and maturity processing completed for deliverables")
+        logger.info(f"Due date history, labels and maturity processing completed for deliverables")
         
         # Get the lookback range based on the completed week
         lookback_start, lookback_end = get_weekly_lookback_range(end_date)
-        print(f"Using lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
+        logger.info(f"Using lookback range: {lookback_start.strftime('%Y-%m-%d')} to {lookback_end.strftime('%Y-%m-%d')}")
         
         filtered_deliverables, excluded_deliverables = filter_items(deliverables, lookback_start, lookback_end)
-        print(f"Deliverables after filtering: {len(filtered_deliverables)}")
+        logger.info(f"Deliverables after filtering: {len(filtered_deliverables)}")
         
-        print(f"Fetching epics for team {self.jellyfish.team_name}...")
+        logger.info(f"Fetching epics for team {self.jellyfish.team_name}...")
         epics_response = self.jellyfish.get_work_items_by_category(
             "epics",
             start_date.strftime('%Y-%m-%d'),
@@ -256,15 +293,15 @@ class StatusReportGenerator:
             team_ids=team_scope
         )
         
-        print(f"Total epics received from API: {len(epics_response)}")
+        logger.info(f"Total epics received from API: {len(epics_response)}")
 
         
         # Add due date history, labels and maturity to epics
-        print(f"Adding due date history, labels and maturity to {len(epics_response)} epics...")
+        logger.info(f"Adding due date history, labels and maturity to {len(epics_response)} epics...")
         for i, epic in enumerate(epics_response, 1):
             issue_key = epic.get('source_issue_key')
             if issue_key:
-                print(f"  [{i}/{len(epics_response)}] Fetching due date history, labels and maturity for epic {issue_key}...")
+                logger.info(f"  [{i}/{len(epics_response)}] Fetching due date history, labels and maturity for epic {issue_key}...")
                 try:
                     epic['date_history'] = self.jira.get_due_date_history(issue_key)
                     epic['labels'] = self.jira.get_issue_labels(issue_key)
@@ -283,40 +320,40 @@ class StatusReportGenerator:
                     epic['due_tape_text'] = text
                     epic['due_tape_fmt'] = fmt
                      
-                    print(f"  [{i}/{len(epics_response)}] ✓ Due date history, labels and maturity fetched for {issue_key}")
+                    logger.info(f"  [{i}/{len(epics_response)}] ✓ Due date history, labels and maturity fetched for {issue_key}")
                 except Exception as e:
-                    print(f"  [{i}/{len(epics_response)}] ✗ Error fetching due date history, labels and maturity for {issue_key}: {e}")
+                    logger.warning(f"  [{i}/{len(epics_response)}] ✗ Error fetching due date history, labels and maturity for {issue_key}: {e}")
                     epic['date_history'] = []
                     epic['labels'] = []
                     epic['maturity'] = 'N/A'
             else:
-                print(f"  [{i}/{len(epics_response)}] No issue key for epic, skipping due date history and labels")
+                logger.info(f"  [{i}/{len(epics_response)}] No issue key for epic, skipping due date history and labels")
                 epic['date_history'] = []
                 epic['labels'] = []
                 epic['maturity'] = 'N/A'
         
-        print(f"Due date history, labels and maturity level processing completed for epics")
+        logger.info(f"Due date history, labels and maturity level processing completed for epics")
         
         filtered_epics, excluded_epics = filter_items(epics_response, lookback_start, lookback_end)
-        print(f"Epics after filtering: {len(filtered_epics)}")
+        logger.info(f"Epics after filtering: {len(filtered_epics)}")
         
-        print(f"Total items to include in report: {len(filtered_deliverables) + len(filtered_epics)}")
+        logger.info(f"Total items to include in report: {len(filtered_deliverables) + len(filtered_epics)}")
         
         # Determine slide ID
         slide_id = team_config.get('slide_id')
         if slide_id and slide_id.startswith('id.'):
             slide_id = slide_id[3:]
-            print(f"Stripped 'id.' prefix from slide ID: {slide_id}")
+            logger.info(f"Stripped 'id.' prefix from slide ID: {slide_id}")
 
         if slide_id:
-            print(f"Using existing slide ID: {slide_id}")
+            logger.info(f"Using existing slide ID: {slide_id}")
         else:
-            print("No slide ID provided - creating new slide")
+            logger.info("No slide ID provided - creating new slide")
             slide_id = self.slides.create_slide()
             if slide_id:
-                print(f"NEW SLIDE CREATED: {slide_id} - Please add this to teams_config.yaml for team {team_identifier}")
+                logger.info(f"NEW SLIDE CREATED: {slide_id} - Please add this to teams_config.yaml for team {team_identifier}")
             else:
-                print(f"Error: Failed to create new slide for team {team_identifier}")
+                logger.error(f"Error: Failed to create new slide for team {team_identifier}")
                 return
 
         # Define stable ids for Risks widgets
@@ -328,9 +365,9 @@ class StatusReportGenerator:
         try:
             existing_risks_text = self.slides.get_shape_text(slide_id, risks_content_oid)
             if existing_risks_text:
-                print("Read existing Risks/Mitigations text (will restore if needed).")
+                logger.info("Read existing Risks/Mitigations text (will restore if needed).")
         except Exception as e:
-            print(f"Warning: could not read existing risks text: {e}")
+            logger.warning(f"Warning: could not read existing risks text: {e}")
 
         # Selective clear that preserves the manual input box if it exists
         try:
@@ -339,11 +376,11 @@ class StatusReportGenerator:
                 preserve_ids.append(risks_content_oid)
             self.slides.clear_slide_content(slide_id, preserve_object_ids=preserve_ids)
         except Exception as e:
-            print(f"Warning: Could not clear slide content: {e}")
-            print("Slide may not exist - creating new slide...")
+            logger.warning(f"Warning: Could not clear slide content: {e}")
+            logger.info("Slide may not exist - creating new slide...")
             slide_id = self.slides.create_slide()
             if not slide_id:
-                print(f"Error: Failed to create new slide for team {team_identifier}")
+                logger.error(f"Error: Failed to create new slide for team {team_identifier}")
                 return
             
         # --- Clean up the team name for display ---
@@ -401,12 +438,12 @@ class StatusReportGenerator:
         )
         
         y_position = 80
-        print(f"Merged table data: {len(merged_data)} rows")
+        logger.info(f"Merged table data: {len(merged_data)} rows")
 
         merged_data, formatting_map, color_map, merge_map, link_map = prepare_merged_table(
             filtered_deliverables,
             filtered_epics,
-            get_formatted_due_date,   # <— use the local dispatcher here
+            get_formatted_due_date,
         )
         # Add merged table
         table_result = self.slides.add_table(
@@ -422,7 +459,7 @@ class StatusReportGenerator:
         )
         
         if table_result[0] is None:
-            print("Error: Failed to create table")
+            logger.error("Error: Failed to create table")
             return
             
         table_id, table_dimensions, column_widths, total_table_width = table_result
@@ -506,7 +543,7 @@ class StatusReportGenerator:
         try:
             existing_risks_text = self.slides.get_shape_text(slide_id, risks_content_oid) or ""
         except Exception as e:
-            print(f"Warn: could not read risks text: {e}")
+            logger.warning(f"Warn: could not read risks text: {e}")
         existing_risks_text_norm = _normalize_text(existing_risks_text)
 
         if not self.slides.shape_exists(slide_id, risks_content_oid):
@@ -562,17 +599,17 @@ class StatusReportGenerator:
                 requests.extend([
                     {"insertText": {"objectId": risks_content_oid, "insertionIndex": 0, "text": RISKS_CONTENT_INITIAL_TEXT}}
                 ])
-                print("Risks/Mitigations text box was empty. Seeded with '- ' to keep script running.")
+                logger.info("Risks/Mitigations text box was empty. Seeded with '- ' to keep script running.")
 
             self.slides.service.presentations().batchUpdate(
                 presentationId=self.slides.presentation_id,
                 body={"requests": requests}
             ).execute()
             self.slides.update_textbox_style(risks_content_oid, font_size=RISKS_CONTENT_FONT_SIZE, bold=False)
-            print("Preserved existing Risks/Mitigations content box and its text.")
+            logger.info("Preserved existing Risks/Mitigations content box and its text.")
 
             self.slides.update_textbox_style(risks_content_oid, font_size=RISKS_CONTENT_FONT_SIZE, bold=False)
-            print("Preserved existing Risks/Mitigations content box and its text.")
+            logger.info("Preserved existing Risks/Mitigations content box and its text.")
                 
         # Add exclusion log to the right of the table (outside visible area)
         all_excluded_items = excluded_deliverables + excluded_epics
@@ -592,55 +629,59 @@ class StatusReportGenerator:
                 exclusion_width,
                 exclusion_height
             )
-            print(f"Added exclusion log with {len(all_excluded_items)} items")
+            logger.info(f"Added exclusion log with {len(all_excluded_items)} items")
             
-        print(f"Slide generated for team {team_identifier}")
+        logger.info(f"Slide generated for team {team_identifier}")
     
     def generate_slides(self):
         """Generate Google Slides status reports based on team selection"""
         if self.team_selection == 'all':
-            print("Generating slides for all teams...")
+            logger.info("Generating slides for all teams...")
             all_teams = get_all_teams(self.teams_config)
                 
             for team_identifier, team_config in all_teams:
                 self.generate_slide_for_team(team_identifier, team_config)
                 
-            print(f"\nCompleted generating slides for all teams")
+            logger.info(f"\nCompleted generating slides for all teams")
         else:
             # Generate slide for specific team
             team_config = get_team_config(self.teams_config, self.team_selection)
             if team_config:
                     self.generate_slide_for_team(self.team_selection, team_config)
-                    print(f"\nCompleted generating slide for team {self.team_selection}")
+                    logger.info(f"\nCompleted generating slide for team {self.team_selection}")
             else:
-                    print(f"Error: Team '{self.team_selection}' not found in teams configuration")
-                    print("Available teams:")
+                    logger.error(f"Error: Team '{self.team_selection}' not found in teams configuration")
+                    logger.info("Available teams:")
                     all_teams = get_all_teams(self.teams_config)
                     for team_id, _ in all_teams:
-                        print(f"  - {team_id}")
+                        logger.info(f"  - {team_id}")
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description='Generate Jellyfish status report')
-    parser.add_argument('--config', required=True, help='Path to config file')
-    parser.add_argument('--team', help='Team identifier (e.g., BBEE, TOL, CLIP) or "all" for all teams')
-    args = parser.parse_args()
-    
-    # Load configuration
-    config = load_config(args.config)
-    print("Loaded config:", os.path.abspath(args.config))
-    print("google_slides section:", config.get("google_slides"))
-    print("presentation_id seen:", config.get("google_slides", {}).get("presentation_id"))
+    try:
+        parser = argparse.ArgumentParser(description='Generate Jellyfish status report')
+        parser.add_argument('--config', required=True, help='Path to config file')
+        parser.add_argument('--team', help='Team identifier (e.g., BBEE, TOL, CLIP) or "all" for all teams')
+        args = parser.parse_args()
+        logger.debug(f"Set args: {args}")
+        
+        config = load_config(args.config)
+        logger.info("Loaded config: %s", os.path.abspath(args.config))
+        logger.info("google_slides section: %s", config.get("google_slides"))
+        logger.info("presentation_id seen: %s", config.get("google_slides", {}).get("presentation_id"))
 
-    
-    # Override team selection if provided via command line
-    if args.team:
-        config['team_selection'] = args.team
-    
-    # Generate report
+        if args.team:
+            config['team_selection'] = args.team
+            logger.debug(f"Updated config['team_selection']: {config['team_selection']}")
 
-    generator = StatusReportGenerator(config)
-    generator.run()
+        generator = StatusReportGenerator(config)
+        logger.debug(f"Set generator: {generator}")
+        generator.run()
+        logger.info("Ran generator.run()")
+        logger.debug("Completed: main - main.py")
+    except Exception as e:
+        logger.exception("Unhandled exception in main()")
+        raise
 
 if __name__ == '__main__':
     main()
