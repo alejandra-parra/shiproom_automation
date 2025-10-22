@@ -19,7 +19,7 @@ source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 
 # 4. Run the script
-python jellyfish_status_report.py --config config.yaml
+python main.py --config config.yaml
 ```
 
 **Note:** This project uses a `.venv` virtual environment (not `venv`). Make sure you're activating the correct one!
@@ -216,9 +216,10 @@ teams:
       jira_project_key: "TOL"
       team_name: "[PRD] Tolkien: [TOL]"
       team_id: 44743
-      slide_id: "id.slide_20250719_151730"   # Optional – strip leading 'id.' automatically
-      presenter: ""                           # Optional metadata
-      image_link: ""                          # Optional metadata
+      presenter:
+      domain:
+      slide_id: "id.slide_20250719_151730"   # Optional – strip leading 'id.' automatically                
+      image_link: ""                         
 ```
 
 Fields:
@@ -226,19 +227,21 @@ Fields:
 - `team_name` (required)
 - `team_id` (required – Jellyfish team ID)
 - `slide_id` (optional) If missing or invalid the script creates a new slide and prints its ID
-- `presenter`, `image_link` (optional)
+- `presenter` (required- team EM)
+- `domain` (optional)  
+-  `image_link` (optional)
 
 Validation: A team missing any required field or with an empty `jira_project_key` is skipped.
 
 ### How Slides Are Updated
 
 For each selected team:
-1. Existing slide content is cleared except for comments in Risk box (if `slide_id` exists and slide is found)
+1. Existing slide content is cleared except for comments in Risks /Mitigations box (if `slide_id` exists and slide is found)
 2. If the slide does not exist or no `slide_id` is configured, a new blank slide is created and its new ID is printed (copy it back into `teams_config.yaml` for future runs)
 3. Deliverables and epics are fetched for the date range
 4. Each item is enriched with Jira due date history + labels + maturity (if available)
 5. Items are filtered based on lookback logic; excluded items are added off-canvas for traceability
-6. A merged table plus a Risks / Mitigations box is rendered
+
 
 ### Example Workflows
 
@@ -382,6 +385,7 @@ which python
 - Creates formatted tables in Google Slides
 - Color-codes status (Done, In Progress, Overdue)
 - Automatically positions content on slides
+- Preserves content previously added to the Risk/Mitigations box
 - Supports both file-based and JSON-based Google Service Account authentication
 - Configurable through environment variables and YAML config
 
@@ -390,7 +394,7 @@ which python
 - Google Slides API access
 - Editor access to the target Google Slides presentation
 - Jellyfish API access
-- Jira API access (optional, for due date history)
+- Jira API access
 
 ## Security Notes
 

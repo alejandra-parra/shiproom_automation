@@ -244,20 +244,20 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
         
         # Check if overdue (2+ weeks past target date) or had a significant due date shift
         is_overdue = False
+
+        now = datetime.now(tz=lookback_end.tzinfo) if lookback_end and lookback_end.tzinfo else datetime.now()
         
         # First check target_date_str if available
         if target_date_str:
             try:
                 target_date = datetime.fromisoformat(target_date_str.replace('Z', '+00:00'))
                 print(f"  Target date parsed: {target_date}")
-                print(f"  Lookback end: {lookback_end}")
-                # Check if target date is 2+ weeks in the past
-                two_weeks_ago = lookback_end - timedelta(days=14)
-                if target_date < two_weeks_ago:
+                print(f"  Now: {now}")
+                if target_date < now:
                     is_overdue = True
-                    print(f"  Is overdue: True (target date is 2+ weeks in the past)")
+                    print(f"  Is overdue: True (target date is in the past)")
                 else:
-                    print(f"  Is overdue: False (target date is not 2+ weeks in the past)")
+                    print(f"  Is overdue: False (target date is not in the past)")
             except Exception as e:
                 print(f"Error parsing target_date for {issue_key}: {e}")
         
@@ -268,17 +268,15 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                 latest_due_date_str = date_history[-1]['date']
                 latest_due_date = datetime.fromisoformat(latest_due_date_str.replace('Z', '+00:00'))
                 print(f"  Latest due date from history: {latest_due_date}")
-                print(f"  Lookback end: {lookback_end}")
-                # Check if latest due date is 2+ weeks in the past
-                two_weeks_ago = lookback_end - timedelta(days=14)
-                if latest_due_date < two_weeks_ago:
+                print(f"  Now: {now}")
+                if latest_due_date < now:
                     is_overdue = True
-                    print(f"  Is overdue: True (latest due date from history is 2+ weeks in the past)")
+                    print(f"  Is overdue: True (latest due date from history is in the past)")
                 else:
-                    print(f"  Is overdue: False (latest due date from history is not 2+ weeks in the past)")
+                    print(f"  Is overdue: False (latest due date from history is not in the past)")
             except Exception as e:
                 print(f"Error parsing latest due date from history for {issue_key}: {e}")
-        
+
         # If still not overdue, check for any other due date fields that might exist
         if not is_overdue:
             # Check for other potential due date fields in the item
@@ -289,15 +287,13 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                         due_date_str = str(item[field])
                         due_date = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
                         print(f"  Found due date in field '{field}': {due_date}")
-                        print(f"  Lookback end: {lookback_end}")
-                        # Check if due date is 2+ weeks in the past
-                        two_weeks_ago = lookback_end - timedelta(days=14)
-                        if due_date < two_weeks_ago:
+                        print(f"  Now: {now}")
+                        if due_date < now:
                             is_overdue = True
-                            print(f"  Is overdue: True (due date from field '{field}' is 2+ weeks in the past)")
+                            print(f"  Is overdue: True (due date from field '{field}' is in the past)")
                             break
                         else:
-                            print(f"  Is overdue: False (due date from field '{field}' is not 2+ weeks in the past)")
+                            print(f"  Is overdue: False (due date from field '{field}' is not in the past)")
                     except Exception as e:
                         print(f"Error parsing due date from field '{field}' for {issue_key}: {e}")
                         continue

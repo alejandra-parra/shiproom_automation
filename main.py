@@ -272,7 +272,7 @@ class StatusReportGenerator:
 
                     # Display and formatting for epics
                     current_due = (
-                        epic.get('target_date')           # common in your codebase
+                        epic.get('target_date')           
                         or epic.get('due_date')           # fallback if present
                         or epic.get('current_due_date')   # last-resort naming
                     )
