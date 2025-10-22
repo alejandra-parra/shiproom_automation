@@ -230,7 +230,7 @@ teams:
   # [PRD] Experience Analytics: [EXA]
   EXA:
     jira_project_key: "EXA"
-    team_name: "[PRD]Experience Analytics:[EXA]"
+    team_name: "[PRD] Experience Analytics:[EXA]"
     team_id: 210691
     presenter: "Sebastian Mühr"
     domain: " "
