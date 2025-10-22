@@ -13,7 +13,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 
 from google_slides import GoogleSlidesClient
 from jira_client import JiraClient
-from jellyfish import JellyfishClient
+from csv_client import CSVClient
 from config_loader import load_config, load_teams_config, get_team_config, get_all_teams, validate_team_config, get_team_ids
 from date_utils import get_report_date_range, get_weekly_lookback_range
 from table_utils import prepare_merged_table
@@ -95,14 +95,14 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
         raise
     
 class StatusReportGenerator:
-    """Generates status reports from Jellyfish data"""
+    """Generates status reports from CSV data"""
     
     def __init__(self, config: Dict[str, Any]):
         # Keep the loaded config dict (stop re-reading YAML here)
         self.config = config or {}
 
         # Set up existing clients (keep your wrapper!)
-        self.jellyfish = JellyfishClient(self.config)
+        self.jellyfish = CSVClient(self.config)
         self.jira = JiraClient(self.config)
         self.slides = GoogleSlidesClient(self.config)  # <- keep as the wrapper
 

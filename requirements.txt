@@ -15,6 +15,7 @@ jira==3.10.5
 mangum==0.17.0
 oauthlib==3.3.1
 packaging==25.0
+pandas
 proto-plus==1.26.1
 protobuf==6.32.0
 pyasn1==0.6.1
