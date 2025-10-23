@@ -19,7 +19,7 @@ teams:
     team_id: 5950
     presenter: "Timur Nugmanov"
     domain: "Identity & Access"
-    slide_id: "id.g38df8f47306_0_454"
+    slide_id: "id.slide_20250909_121125"
     image_link: ""
 
   # [PRD] The Bumblebees: [BBEE]
@@ -32,7 +32,7 @@ teams:
     - 210775
     presenter: "Christian Bieneck"
     domain: "App Foundations"
-    slide_id: "id.g38df8f47306_0_438"
+    slide_id: "id.slide_20250909_155018"
     image_link: ""
 
   # Compliant Admin Platform: [CAP]
@@ -42,7 +42,7 @@ teams:
     team_id: 200771
     presenter: "Jonathan Stoye"
     domain: 
-    slide_id: "id.g38df8f47306_0_470"
+    slide_id: "id.g32b5d11736d_5_0"
     image_link: ""
 
   # [PRD] Team Content API: [CAPI]
@@ -52,7 +52,7 @@ teams:
     team_id: 61505
     presenter: "Noel O'Flaherty"
     domain: "CDA/CPA/CMA/GraphQL APIs, Assets"
-    slide_id: "id.g38df8f47306_0_550"
+    slide_id: "id.g2e7564e189d_0_586"
     image_link: ""
 
   # [PRD] Isotopes: [CFISO]
@@ -62,9 +62,17 @@ teams:
     team_id: 57210
     presenter: "Yiotis Kaltsikis"
     domain: "App Foundations"
-    slide_id: "id.g38df8f47306_0_422"
+    slide_id: "id.g369214abfc4_0_10"
     image_link: ""
 
+  # [PRD] Team Clippy: [CLIP]
+  #CLIP:
+    #jira_project_key: "CLIP"
+    #team_name: "[PRD] Team Clippy: [CLIP]"
+    #team_id: 210775
+    #presenter: "Christian Bieneck"
+    #slide_id: "id.g3684ecb6890_0_0"
+    #image_link: ""
 
   # [PRD] Team Content Storage: [CSTORE]
   CSTORE:
@@ -73,7 +81,7 @@ teams:
     team_id: 8032
     presenter: "Meike Pollakowski"
     domain: ""
-    slide_id: "id.g38df8f47306_0_542"
+    slide_id: "g36c8b2d0b60_0_0"
     image_link: ""
 
 
@@ -84,7 +92,7 @@ teams:
     team_id: 205723
     presenter: "Morgan Whitney"
     domain: "Ecosystem"
-    slide_id: "id.g38df8f47306_0_398"
+    slide_id: "id.g36ec2456e65_0_10"
     image_link: ""
 
   # [PRD] Team Tundra (Extensibility)
@@ -94,7 +102,7 @@ teams:
     team_id: 5983
     presenter: "Morgan Whitney"
     domain: "Ecosystem"
-    slide_id: "g38df8f47306_0_406"
+    slide_id: "g21bb3c3ca71_44_0"
     image_link: ""
 
   # [PRD] Fusion: [FUS]
@@ -104,7 +112,7 @@ teams:
     team_id: 191503
     presenter: "Stephen Lloyd"
     domain: ""
-    slide_id: "id.g38df8f47306_0_534"
+    slide_id: "id.g2e7564e189d_0_625"
     image_link: ""
 
   # [PRD] Team Groot: [GROOT]
@@ -114,7 +122,7 @@ teams:
     team_id: 52476
     presenter: "Liam Stokinger"
     domain: "Discoverability & Semantics"
-    slide_id: "id.g38df8f47306_0_494"
+    slide_id: "id.g2e7564e189d_0_599"
     image_link: ""
 
   # [PRD] Team Hejo: [HEJO]
@@ -124,7 +132,7 @@ teams:
     team_id: 5952
     presenter: "Jonathan Duarte"
     domain: "Monetization Infrastructure"
-    slide_id: "id.g38df8f47306_0_486"
+    slide_id: "id.g2ec5d2811d2_6_42"
     image_link: ""
 
   # [PRD] Team Taiga (Marketplace)
@@ -134,7 +142,7 @@ teams:
     team_id: 65807
     presenter: "Michael Kivisto"
     domain: "Ecosystem"
-    slide_id: "g38df8f47306_0_414"
+    slide_id: "g305cc313dc5_2_0"
     image_link: ""
 
   # [PRD] Team Kraken: [KRK]
@@ -144,7 +152,7 @@ teams:
     team_id: 10781
     presenter: "Holger Strom"
     domain: "Content Storage Infra"
-    slide_id: "id.g38df8f47306_0_510"
+    slide_id: "id.g35015920ad0_53_25"
     image_link: ""
 
   # [PRD] Mechagodzilla: [MEC]
@@ -154,7 +162,7 @@ teams:
     team_id: 80893
     presenter: "Michael Pearce"
     domain: "Engineering Productivity"
-    slide_id: "id.g38df8f47306_0_518"
+    slide_id: "id.g2ec5d2811d2_27_13"
     image_link: ""
 
   # [PRD] Team Mogwai: [MOGWAI]
@@ -164,7 +172,7 @@ teams:
     team_id: 11200
     presenter: "Lewis Cowper"
     domain: "Infrastructure (Fleet & Edge ops)"
-    slide_id: "id.g38df8f47306_0_502"
+    slide_id: "id.g35015920ad0_53_39"
     image_link: ""
 
   # [PRD] Team Moi: [MOI]
@@ -174,7 +182,7 @@ teams:
     team_id: 5953
     presenter: "Dan Strydom"
     domain: "Platform Insights"
-    slide_id: "id.g38df8f47306_0_478"
+    slide_id: "id.g2f57620c5c0_13_7"
     image_link: ""
 
   # Picard: [PIC]
@@ -184,7 +192,7 @@ teams:
     team_id: 184597
     presenter: "Christian Bieneck"
     domain: "App Foundations"
-    slide_id: "id.g38df8f47306_0_446"
+    slide_id: "id.g316d527e0e1_0_2"
     image_link: ""
 
   # [PRD] Sparks: [SPA]
@@ -194,7 +202,7 @@ teams:
     team_id: 13877
     presenter: "Chirantan Rajhans"
     domain: "Studio"
-    slide_id: "id.g38df8f47306_0_390"
+    slide_id: "id.g369214abfc4_0_27"
     image_link: ""
 
   # [PRD] Tolkien: [TOL]
@@ -204,7 +212,7 @@ teams:
     team_id: 44743
     presenter: "Rafaela Felix"
     domain: "Authoring & Publishing"
-    slide_id: "g38df8f47306_0_430"
+    slide_id: "g36f16ad6077_0_0"
     image_link: ""
 
   # [PRD] UI Foundation: [UFO]
@@ -214,7 +222,7 @@ teams:
     team_id: 5947
     presenter: "Jonathan Stoye"
     domain: " "
-    slide_id: "id.g38df8f47306_0_462"
+    slide_id: "id.g2d473010025_5_0"
     image_link: ""
 
   # [PRD] Ninetailed: [NT]
@@ -224,17 +232,17 @@ teams:
     team_id: 213625
     presenter: "Sebastian Mühr"
     domain: " "
-    slide_id: "id.g38df8f47306_0_558"
+    slide_id: "id.slide_20250918_160539"
     image_link: ""
 
   # [PRD] Experience Analytics: [EXA]
   EXA:
     jira_project_key: "EXA"
-    team_name: "[PRD] Experience Analytics:[EXA]"
+    team_name: "[PRD]Experience Analytics:[EXA]"
     team_id: 210691
     presenter: "Sebastian Mühr"
     domain: " "
-    slide_id: "id.g38df8f47306_0_566"
+    slide_id: "id.slide_20250918_161548"
     image_link: ""
 
 
@@ -247,20 +255,8 @@ teams:
     - 213101
     presenter: "Stephen Lloyd"
     domain: "Connecting & Restructuring Content"
-    slide_id: "id.g38df8f47306_0_526"
+    slide_id: "id.slide_20250919_115038"
     image_link: ""
-
-## old teams
-#
-  # [PRD] Team Clippy: [CLIP]
-  #CLIP:
-  #  jira_project_key: "CLIP"
-   # team_name: "[PRD] Team Clippy: [CLIP]"
-   # team_id: 210775
-   # presenter: "Christian Bieneck"
-  #  slide_id: "id.g3684ecb6890_0_0"
-   # image_link: ""
-
 
 
 

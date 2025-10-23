@@ -150,11 +150,11 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
     excluded_items = []
     
     for item in items:
-        issue_key = item.get('source_issue_key', 'unknown')
+        issue_key = item.get('key', 'unknown')
         name = item.get('name', '')
-        source_status = item.get('source_issue_status', '')
-        investment_classification = item.get('investment_classification', '')
-        completed_date_str = item.get('completed_date')
+        source_status = item.get('status_name', '')
+        investment_classification = item.get('investment_category', '')
+        completed_date_str = item.get('resolutiondate')
         target_date_str = item.get('target_date')
         date_history = item.get('date_history', [])
         labels = item.get('labels', [])
