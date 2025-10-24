@@ -29,7 +29,7 @@ class CSVClient:
 
     def get_work_items_by_category(
         self,
-        work_category_slug: str,
+        issue_type: str,
         start_date: str,
         end_date: str,
         jira_project_keys: list[str] | None = None,
@@ -47,12 +47,12 @@ class CSVClient:
 
         try:
             # Read CSV file
-            print(f"\n=== Reading CSV for {work_category_slug} ===")
+            print(f"\n=== Reading CSV for {issue_type} ===")
             df = pd.read_csv(self.csv_path)
             
             # Filter by work category if column exists
             if 'issue_type' in df.columns:
-                df = df[df['issue_type'] == work_category_slug]
+                df = df[df['issue_type'] == issue_type]
             
             # Convert jira_project_keys from string to list
             if '_jira_project_keys' in df.columns:
@@ -76,12 +76,12 @@ class CSVClient:
                 if isinstance(item_teams, str):
                     item_teams = [t.strip() for t in item_teams.split(',') if t.strip()]
                 if not item_teams:  # If no teams specified, item belongs to all teams
-                    item['_jira_project_keys'] = team_ids
+                    item['_jira_project_keys'] = jira_project_keys
                     filtered_items.append(item)
                 else:
                     # Check if any of the requestedjira_project_keys match the item's teams
-                    if any(team in item_teams for team in team_ids):
-                        item['_jira_project_keys'] = list(set(item_teams) & set(team_ids))
+                    if any(team in item_teams for team in jira_project_keys):
+                        item['_jira_project_keys'] = list(set(item_teams) & set(jira_project_keys))
                         filtered_items.append(item)
             
             # Filter by dates
