@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-Jellyfish Status Report Generator
-Generates Google Sheets status reports for engineering teams based on Jellyfish data
+Jira Issues Status Report Generator
+Generates Google Sheets status reports for engineering teams based on Jira data
 """
 
 from datetime import datetime, timedelta
@@ -14,7 +14,7 @@ load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '.env'))
 from google_slides import GoogleSlidesClient
 from jira_client import JiraClient
 from csv_client import CSVClient
-from config_loader import load_config, load_teams_config, get_team_config, get_all_teams, validate_team_config, get_team_ids
+from config_loader import load_config, load_teams_config, get_team_config, get_all_teams, validate_team_config, get_project_keys
 from date_utils import get_report_date_range, get_weekly_lookback_range
 from table_utils import prepare_merged_table
 from filter_utils import filter_items, format_excluded_items_for_display
@@ -95,14 +95,14 @@ def duplicate_template_as_last_week_friday(slides_svc, drive_svc, template_id, p
         raise
     
 class StatusReportGenerator:
-    """Generates status reports from CSV data"""
+    """Generates Jira issues status report from CSV data"""
     
     def __init__(self, config: Dict[str, Any]):
         # Keep the loaded config dict (stop re-reading YAML here)
         self.config = config or {}
 
         # Set up existing clients (keep your wrapper!)
-        self.jellyfish = CSVClient(self.config)
+        self.csv = CSVClient(self.config)
         self.jira = JiraClient(self.config)
         self.slides = GoogleSlidesClient(self.config)  # <- keep as the wrapper
 
@@ -176,35 +176,35 @@ class StatusReportGenerator:
             print(f"Skipping team {team_identifier} due to invalid configuration")
             return
         
-        # Update Jellyfish client with team-specific configuration
-        self.jellyfish.team_name = team_config['team_name']
-        team_scope = get_team_ids(team_config)
+        # Update CSV client with team-specific configuration
+        self.csv.team_name = team_config['team_name']
+        team_scope = get_project_keys(team_config) 
 
-        if not team_scope and 'team_id' in team_config:
-            team_scope = [str(team_config['team_id'])]
+        if not team_scope and 'jira_project_key' in team_config:
+            team_scope = [str(team_config['jira_project_key'])]
 
         if not team_scope:
-            print(f"Error: no Jellyfish team IDs configured for {team_identifier}")
+            print(f"Error: no Jira project key configured for {team_identifier}")
             return
         
         start_date, end_date = get_report_date_range()
         print(f"Date range: {start_date.strftime('%Y-%m-%d')} to {end_date.strftime('%Y-%m-%d')}")
-        print(f"Fetching deliverables for team {self.jellyfish.team_name}...")
+        print(f"Fetching deliverables for team {self.csv.team_name}...")
         
-        deliverables = self.jellyfish.get_work_items_by_category(
-            "deliverable-new",
+        deliverables = self.csv.get_work_items_by_category(
+            "deliverable",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d'),
-            team_ids=team_scope
+            jira_project_keys=team_scope
         )
         
-        print(f"Total deliverables received from API: {len(deliverables)}")
+        print(f"Total deliverables received from CSV: {len(deliverables)}")
         
         # Add due date history, labels and maturity level to deliverables
 
         print(f"Adding due date history, labels, and maturity to {len(deliverables)} deliverables...")
         for i, deliverable in enumerate(deliverables, 1):
-            issue_key = deliverable.get('source_issue_key')
+            issue_key = deliverable.get('issue_key')
             if issue_key:
                 print(f"  [{i}/{len(deliverables)}] Fetching due date history, labels, maturity for deliverable {issue_key}...")
                 try:
@@ -213,8 +213,7 @@ class StatusReportGenerator:
                     deliverable['maturity'] = self.jira.get_issue_maturity(issue_key) or "N/A"
 
                     current_due = (
-                        deliverable.get('target_date')
-                        or deliverable.get('due_date')
+                        deliverable.get('due_date')
                         or deliverable.get('current_due_date')
                     )
                     if current_due:
@@ -248,21 +247,21 @@ class StatusReportGenerator:
         filtered_deliverables, excluded_deliverables = filter_items(deliverables, lookback_start, lookback_end)
         print(f"Deliverables after filtering: {len(filtered_deliverables)}")
         
-        print(f"Fetching epics for team {self.jellyfish.team_name}...")
-        epics_response = self.jellyfish.get_work_items_by_category(
-            "epics",
+        print(f"Fetching epics for team {self.csv.team_name}...")
+        epics_response = self.csv.get_work_items_by_category(
+            "epic",
             start_date.strftime('%Y-%m-%d'),
             end_date.strftime('%Y-%m-%d'),
-            team_ids=team_scope
+            jira_project_keys=team_scope
         )
         
-        print(f"Total epics received from API: {len(epics_response)}")
+        print(f"Total epics received from CSV: {len(epics_response)}")
 
         
         # Add due date history, labels and maturity to epics
         print(f"Adding due date history, labels and maturity to {len(epics_response)} epics...")
         for i, epic in enumerate(epics_response, 1):
-            issue_key = epic.get('source_issue_key')
+            issue_key = epic.get('issue_key')
             if issue_key:
                 print(f"  [{i}/{len(epics_response)}] Fetching due date history, labels and maturity for epic {issue_key}...")
                 try:
@@ -351,7 +350,7 @@ class StatusReportGenerator:
         trimmed_name = raw_name.removeprefix("[PRD] ")
         parts = trimmed_name.split(":", 1)
         display_name = parts[0].strip()
-        self.jellyfish.team_name = display_name
+        self.csv.team_name = display_name
 
         # Include the team's EM and domain
         presenter = team_config.get("presenter", "Presenter")
@@ -361,9 +360,9 @@ class StatusReportGenerator:
 
         # Build title: include domain only if non-empty
         if domain:
-            title_text = f"{self.jellyfish.team_name} - {presenter_name} - {domain}"
+            title_text = f"{self.csv.team_name} - {presenter_name} - {domain}"
         else:
-            title_text = f"{self.jellyfish.team_name} - {presenter_name}"
+            title_text = f"{self.csv.team_name} - {presenter_name}"
 
         # Add title to slide
         self.slides.add_title(slide_id, title_text, 50, 20)
@@ -371,15 +370,15 @@ class StatusReportGenerator:
         # Get formatted due dates with history for all items
 
         deliverable_keys = {
-            d.get('source_issue_key')
+            d.get('issue_key')
             for d in (filtered_deliverables or [])
-            if d.get('source_issue_key')
+            if d.get('issue_key')
         }
 
         # Reuse the already-fetched histories so we don't re-call Jira here
         _date_histories = {}
         for _it in (filtered_deliverables or []) + (filtered_epics or []):
-            _k = _it.get('source_issue_key')
+            _k = _it.get('issue_key')
             if _k:
                 _date_histories[_k] = _it.get('date_history') or []
 
@@ -616,12 +615,12 @@ class StatusReportGenerator:
                     print(f"Error: Team '{self.team_selection}' not found in teams configuration")
                     print("Available teams:")
                     all_teams = get_all_teams(self.teams_config)
-                    for team_id, _ in all_teams:
-                        print(f"  - {team_id}")
+                    for jira_project_key, _ in all_teams:
+                        print(f"  - {jira_project_key}")
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(description='Generate Jellyfish status report')
+    parser = argparse.ArgumentParser(description='Generate Jira issues status report')
     parser.add_argument('--config', required=True, help='Path to config file')
     parser.add_argument('--team', help='Team identifier (e.g., BBEE, TOL, CLIP) or "all" for all teams')
     args = parser.parse_args()

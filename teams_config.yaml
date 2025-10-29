@@ -87,7 +87,7 @@ teams:
 
   # [PRD] Team Alpine (Developer Experience)
   DX:
-    jira_project_key: "DX"
+    jira_project_key: DX
     team_name: "[PRD] Team Developer Experience (Alpine)"
     team_id: 205723
     presenter: "Morgan Whitney"

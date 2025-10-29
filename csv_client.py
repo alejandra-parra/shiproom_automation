@@ -1,5 +1,5 @@
 """
-CSV-based client that mimics the Jellyfish API client interface
+CSV-based client with Jira issues 
 """
 
 import os
@@ -35,12 +35,12 @@ class CSVClient:
         jira_project_keys: list[str] | None = None,
     ) -> List[Dict]:
         """
-        Read work items from CSV file for a specific category (e.g., 'deliverable-new' or 'epics')
+        Read work items from CSV file for a specific category (e.g., 'deliverable' or 'epic')
         across one or more jira_project_keys. Falls back to self.jira_project_key if jira_project_keys is None.
         """
-        # Normalize + guard scope (maintaining compatibility with JellyfishClient)
+        # Normalize + guard scope (maintaining compatibility with CSVClient)
         if jira_project_keys is None and self.jira_project_key:
-            jira_project_keys = [str(self.jira_project_keys)]
+            jira_project_keys = [str(self.jira_project_key)]
         jira_project_keys = [str(t).strip() for t in (jira_project_keys or []) if str(t).strip()]
         if not jira_project_keys:
             raise ValueError("get_work_items_by_category: no jira_project_keys provided (and self.jira_project_key not set).")
@@ -55,11 +55,14 @@ class CSVClient:
                 df = df[df['issue_type'] == issue_type]
             
             # Convert jira_project_keys from string to list
-            if '_jira_project_keys' in df.columns:
+            if 'jira_project_keys' in df.columns:
                 df['_jira_project_keys'] = df['jira_project_keys'].fillna('').apply(
                     lambda x: [t.strip() for t in str(x).split(',') if t.strip()]
                 )
-            
+            elif 'jira_project_key' in df.columns:
+                df['_jira_project_keys'] = df['jira_project_key'].fillna('').apply(
+                    lambda x: [t.strip() for t in str(x).split(',') if t.strip()]
+                )
             # Convert labels to list if present
             if 'labels' in df.columns:
                 df['labels'] = df['labels'].fillna('').apply(
@@ -85,20 +88,22 @@ class CSVClient:
                         filtered_items.append(item)
             
             # Filter by dates
-            if start_date and end_date:
-                start = datetime.strptime(start_date, '%Y-%m-%d')
-                end = datetime.strptime(end_date, '%Y-%m-%d')
-                filtered_items = [
-                    item for item in filtered_items 
-                    if start <= datetime.strptime(item.get('created_date', start_date), '%Y-%m-%d') <= end
-                ]
-            
+            #if start_date and end_date:
+            #    start = datetime.strptime(start_date, '%Y-%m-%d')
+            #    end = datetime.strptime(end_date, '%Y-%m-%d')
+            #    filtered_items = [
+            #        item for item in filtered_items 
+            #        if start <= datetime.strptime(item.get('created_date', start_date), '%Y-%m-%d') <= end
+            #    ]
+            print(f"Filtered items after date filter: {len(filtered_items)}")
+            for item in filtered_items:
+                print(item)
             # Deduplicate across teams by issue key (maintaining compatibility with JellyfishClient)
             seen = set()
             unique: List[Dict] = []
             dups = 0
             for it in filtered_items:
-                k = it.get("key")
+                k = it.get("issue_key")
                 if k and k not in seen:
                     seen.add(k)
                     unique.append(it)
@@ -106,7 +111,7 @@ class CSVClient:
                     dups += 1
                     try:
                         for ex in unique:
-                            if ex.get("key") == k:
+                            if ex.get("issue_key") == k:
                                 ex.setdefault("_jira_project_keys", [])
                                 for sid in it.get("_jira_project_keys", []):
                                     if sid not in ex["_jira_project_keys"]:
@@ -114,6 +119,31 @@ class CSVClient:
                                 break
                     except Exception:
                         pass
+
+            # Normalize fields for compatibility with Jellyfish schema
+            for it in unique:
+                # Ensure 'issue_key' exists for downstream code
+                if 'issue_key' not in it:
+                    it['issue_key'] = it.get('issue_id')
+                
+                # convert singular csv column 'jira_project_key' -> _jira_project_keys
+                if '_jira_project_keys' not in it:
+                    raw = it.get('jira_project_keys') or it.get('jira_project_key') or ''
+                    if isinstance(raw, str):
+                        it['_jira_project_keys'] = [t.strip() for t in raw.split(',') if t.strip()]
+                    elif isinstance(raw, list):
+                        it['_jira_project_keys'] = raw
+                    else:
+                        it['_jira_project_keys'] = []
+                
+                # Ensure '_source_team_ids' exists
+                it.setdefault('_source_team_ids', it.get('_jira_project_keys', []))
+
+                # Ensure due_date exists (preserve CSV value); leave empty string if missing
+                it['due_date'] = it.get('due_date', '') 
+
+                # Ensure maturity exists
+                it['maturity'] = it.get('maturity', 'N/A')
 
             print(f"Deduplication: removed {dups} duplicates, kept {len(unique)} unique items")
             return unique

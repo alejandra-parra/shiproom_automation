@@ -16,11 +16,11 @@ def prepare_deliverables_table(
     link_map = {}
 
     for row_idx, item in enumerate(deliverables):
-        issue_key = item.get('source_issue_key', '')
-        issue_url = item.get('source_issue_url', '')
+        issue_key = item.get('issue_key', '')
+        issue_url = item.get('issue_url', '')
 
         due_date_display, formatting_instructions = due_formatter(
-            item.get('target_date', ''),
+            item.get('due_date', ''),
             issue_key
         )
 
@@ -58,10 +58,10 @@ def prepare_epics_table(epics: List[Dict], due_formatter: Callable[[str, str], T
     link_map = {}       # (row, col) -> URL for issue key
     
     for row_idx, item in enumerate(epics):
-        issue_key = item.get('source_issue_key', '')
-        issue_url = item.get('source_issue_url', '')
+        issue_key = item.get('issue_key', '')
+        issue_url = item.get('issue_url', '')
         due_date_display, formatting_instructions = due_formatter(
-            item.get('target_date', ''), 
+            item.get('due_date', ''), 
             issue_key
         )
         
