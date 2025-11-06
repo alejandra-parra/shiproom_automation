@@ -87,7 +87,7 @@ teams:
 
   # [PRD] Team Alpine (Developer Experience)
   DX:
-    jira_project_key: DX
+    jira_project_key: "DX"
     team_name: "[PRD] Team Developer Experience (Alpine)"
     team_id: 205723
     presenter: "Morgan Whitney"
@@ -106,8 +106,8 @@ teams:
     image_link: ""
 
   # [PRD] Fusion: [FUS]
-  FUS:
-    jira_project_key: "FUS"
+  COPS:
+    jira_project_key: "COPS"
     team_name: "[PRD] Content Operations: [FUS]"
     team_id: 191503
     presenter: "Stephen Lloyd"
@@ -238,7 +238,7 @@ teams:
   # [PRD] Experience Analytics: [EXA]
   EXA:
     jira_project_key: "EXA"
-    team_name: "[PRD]Experience Analytics:[EXA]"
+    team_name: "[PRD] Experience Analytics:[EXA]"
     team_id: 210691
     presenter: "Sebastian Mühr"
     domain: " "
