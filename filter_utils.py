@@ -1,7 +1,7 @@
 """
 Filter utility functions for the Jellyfish Status Report Generator.
 This module handles the filtering and status determination of work items.
-Note: The current implementation uses completion date and target date for status determination.
+Note: The current implementation uses completion date and due date for status determination.
 Future versions may use different criteria for status determination.
 """
 
@@ -55,12 +55,12 @@ def format_excluded_items_for_display(excluded_items: List[Dict]) -> str:
         issue_key = item.get('issue_key', 'Unknown')
         name = item.get('name', 'Unknown')
         status = item.get('status', 'Unknown')
-        investment_classification = item.get('investment_classification', 'Unknown')
+        investment_category = item.get('investment_category', 'Unknown')
         exclusion_reason = item.get('exclusion_reason', 'Unknown reason')
         
         # Format: DX-60 - MCP Server POC (Roadmap, Done) : Not in progress or in review (status: Done)
 
-        formatted_line = f"{issue_key} - {name} ({investment_classification}, {status}). Exclusion reason: {exclusion_reason}"
+        formatted_line = f"{issue_key} - {name} ({investment_category}, {status}). Exclusion reason: {exclusion_reason}"
         formatted_lines.append(formatted_line)
     
     return "\n".join(formatted_lines)
@@ -118,7 +118,7 @@ def check_due_date_shift(date_history: List[Dict], lookback_start: datetime) -> 
 
 def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: datetime) -> Tuple[List[Dict], List[Dict]]:
     """
-    Filter and determine status for work items based on completion and target dates.
+    Filter and determine status for work items based on completion and due dates.
     
     Current criteria:
     - Done: Completed in the lookback period
@@ -134,7 +134,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
     - "In Progress" (based on source_issue_status)
     - Completed in the lookback period
     AND
-    - Have "Roadmap" in their investment_classification
+    - Have "Roadmap" in their investment_category
     OR
     - Have shiproom_include label
     
@@ -150,21 +150,21 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
     excluded_items = []
     
     for item in items:
-        issue_key = item.get('source_issue_key', 'unknown')
+        issue_key = item.get('issue_key', 'unknown')
         name = item.get('name', '')
-        source_status = item.get('source_issue_status', '')
-        investment_classification = item.get('investment_classification', '')
-        completed_date_str = item.get('completed_date')
-        target_date_str = item.get('target_date')
+        source_status = item.get('status_name', '')
+        investment_category = item.get('investment_category', '')
+        completed_date_str = item.get('resolutiondate')
+        due_date_str = item.get('due_date')
         date_history = item.get('date_history', [])
         labels = item.get('labels', [])
         
         print(f"\nProcessing item {issue_key}:")
-        print(f"  Target date: {target_date_str}")
+        print(f"  Due date: {due_date_str}")
         print(f"  Completed date: {completed_date_str}")
         print(f"  Date history: {date_history}")
         print(f"  Source status: {source_status}")
-        print(f"  Investment classification: {investment_classification}")
+        print(f"  Investment category: {investment_category}")
         print(f"  Labels: {labels}")
         
         # Check for shiproom labels first
@@ -182,7 +182,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                 'issue_key': issue_key,
                 'name': name,
                 'status': source_status,
-                'investment_classification': investment_classification,
+                'investment_category': investment_category,
                 'exclusion_reason': 'Excluded by shiproom_exclude label'
             })
             continue
@@ -196,15 +196,15 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
             force_include = False
             print(f"  Using normal filtering criteria (no labels or both labels)")
         
-        # Skip items that don't have "Roadmap" in their investment classification
+        # Skip items that don't have "Roadmap" in their investment category
         # (unless they have shiproom_include label)
-        if "Roadmap" not in investment_classification and not force_include:
+        if "Roadmap" not in investment_category and not force_include:
             print(f"  Skipping item (not a roadmap item)")
             excluded_items.append({
                 'issue_key': issue_key,
                 'name': name,
                 'status': source_status,
-                'investment_classification': investment_classification,
+                'investment_category': investment_category,
                 'exclusion_reason': 'Not a roadmap item'
             })
             continue
@@ -237,48 +237,46 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                 'issue_key': issue_key,
                 'name': name,
                 'status': source_status,
-                'investment_classification': investment_classification,
+                'investment_category': investment_category,
                 'exclusion_reason': f'Status: {source_status} (Not in progress nor in review, or done over a week ago)'
             })
             continue
         
-        # Check if overdue (2+ weeks past target date) or had a significant due date shift
+        # Check if overdue (2+ weeks past due date) or had a significant due date shift
         is_overdue = False
+
+        now = datetime.now(tz=lookback_end.tzinfo) if lookback_end and lookback_end.tzinfo else datetime.now()
         
-        # First check target_date_str if available
-        if target_date_str:
+        # First check due_date_str if available
+        if due_date_str:
             try:
-                target_date = datetime.fromisoformat(target_date_str.replace('Z', '+00:00'))
-                print(f"  Target date parsed: {target_date}")
-                print(f"  Lookback end: {lookback_end}")
-                # Check if target date is 2+ weeks in the past
-                two_weeks_ago = lookback_end - timedelta(days=14)
-                if target_date < two_weeks_ago:
+                due_date = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
+                print(f"  Due date parsed: {due_date}")
+                print(f"  Now: {now}")
+                if due_date < now:
                     is_overdue = True
-                    print(f"  Is overdue: True (target date is 2+ weeks in the past)")
+                    print(f"  Is overdue: True (due date is in the past)")
                 else:
-                    print(f"  Is overdue: False (target date is not 2+ weeks in the past)")
+                    print(f"  Is overdue: False (due date is not in the past)")
             except Exception as e:
-                print(f"Error parsing target_date for {issue_key}: {e}")
+                print(f"Error parsing due_date for {issue_key}: {e}")
         
-        # If no target_date_str or not overdue, check the most recent due date from date_history
+        # If no due_date_str or not overdue, check the most recent due date from date_history
         if not is_overdue and date_history:
             try:
                 # Get the most recent due date from date history
                 latest_due_date_str = date_history[-1]['date']
                 latest_due_date = datetime.fromisoformat(latest_due_date_str.replace('Z', '+00:00'))
                 print(f"  Latest due date from history: {latest_due_date}")
-                print(f"  Lookback end: {lookback_end}")
-                # Check if latest due date is 2+ weeks in the past
-                two_weeks_ago = lookback_end - timedelta(days=14)
-                if latest_due_date < two_weeks_ago:
+                print(f"  Now: {now}")
+                if latest_due_date < now:
                     is_overdue = True
-                    print(f"  Is overdue: True (latest due date from history is 2+ weeks in the past)")
+                    print(f"  Is overdue: True (latest due date from history is in the past)")
                 else:
-                    print(f"  Is overdue: False (latest due date from history is not 2+ weeks in the past)")
+                    print(f"  Is overdue: False (latest due date from history is not in the past)")
             except Exception as e:
                 print(f"Error parsing latest due date from history for {issue_key}: {e}")
-        
+
         # If still not overdue, check for any other due date fields that might exist
         if not is_overdue:
             # Check for other potential due date fields in the item
@@ -289,15 +287,13 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
                         due_date_str = str(item[field])
                         due_date = datetime.fromisoformat(due_date_str.replace('Z', '+00:00'))
                         print(f"  Found due date in field '{field}': {due_date}")
-                        print(f"  Lookback end: {lookback_end}")
-                        # Check if due date is 2+ weeks in the past
-                        two_weeks_ago = lookback_end - timedelta(days=14)
-                        if due_date < two_weeks_ago:
+                        print(f"  Now: {now}")
+                        if due_date < now:
                             is_overdue = True
-                            print(f"  Is overdue: True (due date from field '{field}' is 2+ weeks in the past)")
+                            print(f"  Is overdue: True (due date from field '{field}' is in the past)")
                             break
                         else:
-                            print(f"  Is overdue: False (due date from field '{field}' is not 2+ weeks in the past)")
+                            print(f"  Is overdue: False (due date from field '{field}' is not in the past)")
                     except Exception as e:
                         print(f"Error parsing due date from field '{field}' for {issue_key}: {e}")
                         continue

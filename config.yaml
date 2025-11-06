@@ -3,7 +3,9 @@
 
 # Required: Google Slides presentation to update
 google_slides:
-  presentation_id: "1zua6Ks2fAJPtv7utIOffN1WPoStNcrUGDEn2pewKoig"
+  presentation_id: "1OE1sU12CZg1K-Jz2Vr_mIMvqwriTBSXKm6zZqIf3H48"
+
+  #"1zua6Ks2fAJPtv7utIOffN1WPoStNcrUGDEn2pewKoig"
   # slide_id is now configured per team in teams_config.yaml
 
 # Teams Configuration

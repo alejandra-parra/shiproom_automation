@@ -47,27 +47,25 @@ def get_all_teams(teams_config: Dict[str, Any]) -> List[tuple[str, Dict[str, Any
     """Get all teams with their identifiers"""
     teams = teams_config.get('teams', {})
     return [(identifier, team_config) for identifier, team_config in teams.items()]
-def get_team_ids(team_config: Dict[str, Any]) -> list[str]:
+def get_project_keys(team_config: Dict[str, Any]) -> list[str]:
     """
-    Normalize Jellyfish team IDs from config into a non-empty list of strings.
-    This allows to trace back the issues if one team is working on multiple workstreams/projects in Jellyfish.
-    Supports either:
-      - team_ids: [123, 456]
-      - team_id: 123   (legacy)
+    Normalize Jira project keys from config into a non-empty list of strings.
+    This allows to trace back the issues if one team is working on multiple workstreams/projects.
+
     """
-    ids = team_config.get("team_ids")
-    if ids is None:
-        legacy = team_config.get("team_id")
+    jira_keys = team_config.get("jira_project_keys")
+    if jira_keys is None:
+        legacy = team_config.get("jira_project_key")
         if legacy is not None:
-            ids = [legacy]
+            jira_keys = [legacy]
         else:
-            ids = []
+            jira_keys = []
 
     # Normalize to list[str]
-    if isinstance(ids, (str, int)):
-        ids = [ids]
-    ids = [str(x).strip() for x in ids if x is not None and str(x).strip() != ""]
-    return ids
+    if isinstance(jira_keys, (str, int)):
+        jira_keys= [jira_keys]
+    jira_keys = [str(x).strip() for x in jira_keys if x is not None and str(x).strip() != ""]
+    return jira_keys
 
 def validate_team_config(team_config: Dict[str, Any], team_identifier: str) -> bool:
     """
@@ -85,11 +83,11 @@ def validate_team_config(team_config: Dict[str, Any], team_identifier: str) -> b
         return False
 
     # Normalize and check Jellyfish team IDs
-    ids = get_team_ids(team_config)
-    if not ids:
+    jira_keys = get_project_keys(team_config)
+    if not jira_keys:
         print(
-            f"Warning: Team {team_identifier} must define one or more 'team_id' "
-            f"(or legacy 'team_id')"
+            f"Warning: Team {team_identifier} must define one or more 'jira_project_keys' "
+            f"(or legacy 'jira_project_key')"
         )
         return False
 

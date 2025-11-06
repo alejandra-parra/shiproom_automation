@@ -66,13 +66,13 @@ teams:
     image_link: ""
 
   # [PRD] Team Clippy: [CLIP]
-  CLIP:
-    jira_project_key: "CLIP"
-    team_name: "[PRD] Team Clippy: [CLIP]"
-    team_id: 210775
-    presenter: "Christian Bieneck"
-    slide_id: "id.g3684ecb6890_0_0"
-    image_link: ""
+  #CLIP:
+    #jira_project_key: "CLIP"
+    #team_name: "[PRD] Team Clippy: [CLIP]"
+    #team_id: 210775
+    #presenter: "Christian Bieneck"
+    #slide_id: "id.g3684ecb6890_0_0"
+    #image_link: ""
 
   # [PRD] Team Content Storage: [CSTORE]
   CSTORE:
@@ -80,7 +80,7 @@ teams:
     team_name: "[PRD] Team Content Storage: [CSTORE]"
     team_id: 8032
     presenter: "Meike Pollakowski"
-    domain: " Content Strorage, CF Models, Environments"
+    domain: ""
     slide_id: "g36c8b2d0b60_0_0"
     image_link: ""
 
@@ -106,8 +106,8 @@ teams:
     image_link: ""
 
   # [PRD] Fusion: [FUS]
-  FUS:
-    jira_project_key: "FUS"
+  COPS:
+    jira_project_key: "COPS"
     team_name: "[PRD] Content Operations: [FUS]"
     team_id: 191503
     presenter: "Stephen Lloyd"
@@ -151,7 +151,7 @@ teams:
     team_name: "[PRD] Team Kraken: [KRK]"
     team_id: 10781
     presenter: "Holger Strom"
-    domain: "Content Strorage Infra"
+    domain: "Content Storage Infra"
     slide_id: "id.g35015920ad0_53_25"
     image_link: ""
 
@@ -238,7 +238,7 @@ teams:
   # [PRD] Experience Analytics: [EXA]
   EXA:
     jira_project_key: "EXA"
-    team_name: "[PRD]Experience Analytics:[EXA]"
+    team_name: "[PRD] Experience Analytics:[EXA]"
     team_id: 210691
     presenter: "Sebastian Mühr"
     domain: " "
