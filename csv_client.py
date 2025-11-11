@@ -8,7 +8,7 @@ from typing import List, Dict
 from datetime import datetime
 
 class CSVClient:
-    """Client for reading work items from CSV files instead of Jellyfish API"""
+    """Client for reading work items from CSV files """
 
     def __init__(self, config: Dict):
         # Get CSV file path from environment variable
@@ -20,7 +20,7 @@ class CSVClient:
         if not os.path.exists(self.csv_path):
             raise FileNotFoundError(f"CSV file not found at {self.csv_path}")
 
-        # Team info set per team by caller (maintaining compatibility with JellyfishClient)
+        # Team info set per team by caller
         self.jira_project_key = None
         self.team_name = None
 
@@ -38,7 +38,7 @@ class CSVClient:
         Read work items from CSV file for a specific category (e.g., 'deliverable' or 'epic')
         across one or more jira_project_keys. Falls back to self.jira_project_key if jira_project_keys is None.
         """
-        # Normalize + guard scope (maintaining compatibility with CSVClient)
+        # Normalize + guard scope 
         if jira_project_keys is None and self.jira_project_key:
             jira_project_keys = [str(self.jira_project_key)]
         jira_project_keys = [str(t).strip() for t in (jira_project_keys or []) if str(t).strip()]
@@ -98,7 +98,7 @@ class CSVClient:
             print(f"Filtered items after date filter: {len(filtered_items)}")
             for item in filtered_items:
                 print(item)
-            # Deduplicate across teams by issue key (maintaining compatibility with JellyfishClient)
+            # Deduplicate across teams by issue key
             seen = set()
             unique: List[Dict] = []
             dups = 0
@@ -120,7 +120,7 @@ class CSVClient:
                     except Exception:
                         pass
 
-            # Normalize fields for compatibility with Jellyfish schema
+            # Normalize fields 
             for it in unique:
                 # Ensure 'issue_key' exists for downstream code
                 if 'issue_key' not in it:

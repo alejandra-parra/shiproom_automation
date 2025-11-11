@@ -1,5 +1,5 @@
 """
-Status utility functions for the Jellyfish Status Report Generator.
+Status utility functions for the Jira Issues Status Report Generator.
 This module handles status constants, mapping, and color definitions.
 Note: The current implementation uses a simple status system with three states.
 Future versions may expand the status system or modify how statuses are displayed.

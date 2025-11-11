@@ -1,5 +1,5 @@
 """
-Date utility functions for the Jellyfish Status Report Generator.
+Date utility functions for the Jira Issues Status Report Generator
 """
 
 from datetime import datetime, timedelta

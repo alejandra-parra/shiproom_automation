@@ -1,9 +1,25 @@
 # Changelog
 
-All notable changes to the Jellyfish Status Report Generator will be documented in this file.
+All notable changes to the Jira Issues Status Report Generator will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [jira-issues-shiproom v2.0.0] - Released
+### Changed
+- Report name, Jira Issues Status Report Generator
+- Deprecated Jellyfish as data source, we use Jira exclusively via two separate API calls
+- Due date history only includes last change and current date for deliverables and last three changes and current date for epics; past dates are striken on the slide 
+- Overdue logic is immediately overdue when due date is in the past (no automatic grace period)
+
+
+### Added
+- A duplicate of the report prior to update is being produced with every run
+- Team ownership of the deliverables is now determined through a calculation of the team's share of its child epics
+- Maturity field is being extracted from Jira 
+
+### Fixed
+- Fixed duplicate due dates appearing in slides when the change was only a formatting difference
 
 ## [jellyfish-shiproom v1.1.0] - Unreleased
 
