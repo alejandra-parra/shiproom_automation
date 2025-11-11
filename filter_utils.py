@@ -1,5 +1,5 @@
 """
-Filter utility functions for the Jellyfish Status Report Generator.
+Filter utility functions for the Jira Issues Status Report Generator
 This module handles the filtering and status determination of work items.
 Note: The current implementation uses completion date and due date for status determination.
 Future versions may use different criteria for status determination.
@@ -131,7 +131,7 @@ def filter_items(items: List[Dict], lookback_start: datetime, lookback_end: date
     - If both labels exist or neither exists, use normal criteria
     
     Only includes items that are either:
-    - "In Progress" (based on source_issue_status)
+    - "In Progress" (based on Jira status)
     - Completed in the lookback period
     AND
     - Have "Roadmap" in their investment_category

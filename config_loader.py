@@ -1,5 +1,5 @@
 """
-Configuration loader for the Jellyfish Status Report Generator
+Configuration loader for the Jira Issues Status Report Generator
 """
 
 import yaml
@@ -82,7 +82,7 @@ def validate_team_config(team_config: Dict[str, Any], team_identifier: str) -> b
         print(f"Warning: Team {team_identifier} missing required field 'team_name'")
         return False
 
-    # Normalize and check Jellyfish team IDs
+    # Normalize and check Jira project keys
     jira_keys = get_project_keys(team_config)
     if not jira_keys:
         print(

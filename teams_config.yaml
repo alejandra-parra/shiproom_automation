@@ -1,14 +1,14 @@
-# Teams Configuration for Jellyfish Status Report Generator
+# Teams Configuration for Jira Issues Status Report Generator
 # This file contains configuration for all teams that can generate status reports
 # 
 # Required fields:
 # - jira_project_key: The Jira project key (extracted from team name, no brackets)
-# - team_name: Full team name from Jellyfish
-# - team_id: Jellyfish team ID
+# - team_name: Full team name
+# - presenter: Team EM
 #
 # Optional fields:
-# - presenter: Name of the presenter (to be filled manually)
-# - slide_id: Google Slides slide ID (to be filled manually)
+#
+# - slide_id: Google Slides slide ID (to be filled manually after first slide generation for new teams)
 # - image_link: Link to team image file (to be filled manually)
 
 teams:
@@ -258,6 +258,15 @@ teams:
     slide_id: "id.slide_20250919_115038"
     image_link: ""
 
+  # Bridge API: [BAPI]
+  BAPI:
+    jira_project_key: "BAPI"
+    team_name: "Bridge API: [BAPI]"
+    team_ids: 
+    presenter: ""
+    domain: ""
+    slide_id: ""
+    image_link: ""
 
 
 

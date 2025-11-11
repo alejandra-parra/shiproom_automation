@@ -1,5 +1,5 @@
 """
-Table utility functions for the Jellyfish Status Report Generator.
+Table utility functions for the Jira Issues Status Report Generator
 This module handles the preparation and formatting of tables for the status report.
 """
 
