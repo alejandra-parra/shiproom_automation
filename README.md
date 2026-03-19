@@ -1,3 +1,14 @@
+**DEPRECATED - THIS SCRIPT DOES NOT LONGER SUPPORT THE SHIPROOM AUTOMATION** 
+For current version please check out  https://github.com/contentful-labs/shiproom-automation
+
+
+
+
+
+
+
+
+
 # Jellyfish Status Report Generator - Google Slides Edition
 
 This script generates status reports from Jellyfish data and writes them to Google Slides presentations. It creates formatted tables with deliverables and epics, including their status, maturity, and other relevant information.
